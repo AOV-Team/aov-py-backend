@@ -3,11 +3,11 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 
-class TestMeViewSetPOST(TestCase):
+class TestUsersViewSetPOST(TestCase):
     """
     Test /api/me POST (user creation)
     """
-    def test_me_view_set_post_successful(self):
+    def test_users_view_set_post_successful(self):
         """
         Successful /api/me POST
 
@@ -18,7 +18,8 @@ class TestMeViewSetPOST(TestCase):
 
         payload = {
             'email': 'mrtest@mypapaya.io',
-            'password': 'WhoWantsToBeAMillionaire?'
+            'password': 'WhoWantsToBeAMillionaire?',
+            'username': 'aov_hov'
         }
 
         request = client.post('/api/users', data=payload, format='json')
@@ -27,27 +28,28 @@ class TestMeViewSetPOST(TestCase):
         user = account_models.User.objects.get(email='mrtest@mypapaya.io')
         self.assertFalse(user.is_superuser)
 
-    def test_me_view_set_post_already_exists(self):
+    def test_users_view_set_post_already_exists(self):
         """
         /api/me POST (user already exists)
 
         :return: None
         """
         # Create user
-        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass')
+        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
 
         # Attempt to create user via API
         client = APIClient()
 
         payload = {
             'email': 'mrtest@mypapaya.io',
-            'password': 'WhoWantsToBeAMillionaire?'
+            'password': 'WhoWantsToBeAMillionaire?',
+            'username': 'aov_hov'
         }
 
         request = client.post('/api/users', data=payload, format='json')
         self.assertEquals(request.status_code, 409)
 
-    def test_me_view_set_post_bad_request(self):
+    def test_users_view_set_post_bad_request(self):
         """
         /api/me POST (bad request)
 

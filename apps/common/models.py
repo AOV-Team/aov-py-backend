@@ -1,4 +1,17 @@
+from django.db import models
 import time
+
+
+class EditMixin(models.Model):
+    """
+    Abstract class for use in models
+
+    """
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 
 
 def get_uploaded_file_path(instance, filename):

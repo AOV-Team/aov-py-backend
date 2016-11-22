@@ -26,7 +26,7 @@ class TestMailer(TestCase):
 
         :return: None
         """
-        user = account_models.User.objects.create_user(email='test@test.com')
+        user = account_models.User.objects.create_user(email='test@test.com', username='aov_hov')
 
         mailer.send_transactional_email(user, 'welcome')
 
@@ -38,7 +38,7 @@ class TestMailer(TestCase):
         :return: None
         """
         with self.settings(EMAIL_BACKEND=''):
-            user = account_models.User.objects.create_user(email='test@test.com')
+            user = account_models.User.objects.create_user(email='test@test.com', username='aov_hov')
 
             with self.assertRaises(mailer.CommunicationException):
                 mailer.send_transactional_email(user, 'welcome')

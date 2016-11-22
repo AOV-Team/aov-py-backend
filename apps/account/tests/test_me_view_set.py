@@ -15,7 +15,7 @@ class TestMeViewSetGET(TestCase):
         :return:
         """
         # Create data
-        user = account_models.User.objects.create_user(email='test@test.com')
+        user = account_models.User.objects.create_user(email='test@test.com', username='aov_hov')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)

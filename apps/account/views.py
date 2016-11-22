@@ -203,11 +203,12 @@ class UserViewSet(generics.CreateAPIView):
         payload = request.data
         email = payload.get('email')
         password = payload.get('password')
+        username = payload.get('username')
         request = get_default_response('400')
 
-        if email and password:
+        if email and password and username:
             try:
-                user = account_models.User.objects.create_user(email, password)
+                user = account_models.User.objects.create_user(email, password, username)
 
                 if user:
                     request = get_default_response('201')

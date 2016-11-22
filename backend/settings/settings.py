@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'apps.account',
+    'apps.photo',
     'dbmail',
     'guardian',
     'rest_framework',

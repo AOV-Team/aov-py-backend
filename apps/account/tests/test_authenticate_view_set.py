@@ -14,7 +14,7 @@ class TestAuthenticateViewSetDELETE(TestCase):
         :return: None
         """
         # Create a user
-        user = account_models.User.objects.create_user(email='test@test.com')
+        user = account_models.User.objects.create_user(email='test@test.com', username='aov1')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -38,7 +38,7 @@ class TestAuthenticateViewSetDELETE(TestCase):
         :return: None
         """
         # Create a user
-        user = account_models.User.objects.create_user(email='test@test.com')
+        user = account_models.User.objects.create_user(email='test@test.com', username='aov1')
 
         # Get data from endpoint
         client = APIClient()
@@ -58,7 +58,8 @@ class TestAuthViewSetPOST(TestCase):
         :return: None
         """
         # Create user
-        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?')
+        account_models.User.objects\
+            .create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov1')
 
         # Log user in
         client = APIClient()
@@ -80,7 +81,8 @@ class TestAuthViewSetPOST(TestCase):
         :return: None
         """
         # Create user
-        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?')
+        account_models.User.objects\
+            .create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov1')
 
         # Log user in
         client = APIClient()
@@ -100,7 +102,8 @@ class TestAuthViewSetPOST(TestCase):
         :return: None
         """
         # Create user
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?')
+        user = account_models.User.objects\
+            .create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov1')
         user.is_active = False
         user.save()
 
@@ -122,7 +125,8 @@ class TestAuthViewSetPOST(TestCase):
         :return: None
         """
         # Create user
-        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?')
+        account_models.User.objects\
+            .create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov1')
 
         # Log user in
         client = APIClient()
