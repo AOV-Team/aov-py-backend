@@ -7,7 +7,7 @@ class TestUsersViewSetPOST(TestCase):
     """
     Test /api/me POST (user creation)
     """
-    def test_users_view_set_post_successful(self):
+    def test_users_view_set_post_basic_successful(self):
         """
         Successful /api/me POST
 
@@ -23,7 +23,11 @@ class TestUsersViewSetPOST(TestCase):
         }
 
         request = client.post('/api/users', data=payload, format='json')
+        result = request.data['result']
+
         self.assertEquals(request.status_code, 201)
+        self.assertIn('email', result)
+        self.assertIn('username', result)
 
         user = account_models.User.objects.get(email='mrtest@mypapaya.io')
         self.assertFalse(user.is_superuser)
