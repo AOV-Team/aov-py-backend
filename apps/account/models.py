@@ -56,6 +56,9 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     def is_staff(self):
         return self.is_superuser
 
+    def __str__(self):
+        return '{},\t{},\tID{}'.format(self.username, self.email, self.id)
+
 
 class ProfileManager(models.Manager):
     def create_or_update(self, **kwargs):
@@ -83,3 +86,6 @@ class Profile(models.Model):
     gear = models.TextField(blank=True, null=True)
 
     objects = ProfileManager()
+
+    def __str__(self):
+        return '{}:\tID{}'.format(self.user.username, self.id)

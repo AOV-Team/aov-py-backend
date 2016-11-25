@@ -37,6 +37,9 @@ class PhotoClassification(models.Model):
 
     objects = PhotoClassificationManager()
 
+    def __str__(self):
+        return '{}: {},\tID: {}'.format(self.classification_type, self.name, self.id)
+
 
 class PhotoFeedManager(models.Manager):
     def create_or_update(self, **kwargs):
@@ -64,14 +67,29 @@ class PhotoFeed(models.Model):
 
     objects = PhotoFeedManager()
 
+    def __str__(self):
+        return '{},\tID: {}'.format(self.name, self.id)
+
 
 class Photo(models.Model):
     category = models.ManyToManyField(PhotoClassification, related_name='category')
-    photo_feed = models.ManyToManyField(PhotoFeed)
+    photo_feed = models.ManyToManyField(PhotoFeed, blank=True)
     tag = models.ManyToManyField(PhotoClassification, blank=True, related_name='tag')
-    user = models.ForeignKey(account_models.User)
+    user = models.ForeignKey(account_models.User, blank=True, null=True)
     attribution_name = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path)
     location = models.CharField(max_length=255, blank=True, null=True)
     photo_data = models.TextField(blank=True, null=True)
     public = models.BooleanField(default=True)
+
+    def photo_tag(self):
+        """
+        Return HTML img tag with photo path
+
+        :return: String with HTML content
+        """
+        return u'<img src="{}">'.format(self.image)
+
+    def __str__(self):
+        return '{}:\t{},\tID: {}'\
+            .format(self.user.username if self.user else self.attribution_name, self.image, self.id)

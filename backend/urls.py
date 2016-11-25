@@ -14,7 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from apps.account import views as account_views
+from django.conf import settings
 from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework import routers
 
@@ -32,3 +34,7 @@ urlpatterns = [
 
     url(r'^admin/', admin.site.urls),
 ]
+
+# Enable images for runserver
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
