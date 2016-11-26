@@ -55,7 +55,7 @@ class TestUsersPhotosViewSetPOST(TestCase):
 
         :return: None
         """
-        # Create user and data
+        # Create user
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
 
         # Simulate auth

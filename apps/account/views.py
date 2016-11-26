@@ -5,6 +5,7 @@ from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from django.contrib.auth import authenticate
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
@@ -133,6 +134,36 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         updated_user.save()
 
         response.data['result'] = account_serializers.UserSerializer(updated_user).data
+
+        return response
+
+
+class MeProfileViewSet(generics.RetrieveAPIView):
+    """
+    api/me/profile
+    """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = account_models.Profile.objects.all()
+
+    def get(self, request):
+        """
+        GET user profile
+
+        :param request: Request object
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        response = get_default_response('404')
+
+        try:
+            profile = account_models.Profile.objects.get(user=authenticated_user)
+
+            response = get_default_response('200')
+            response.data['result'] = account_serializers.ProfileSerializer(profile).data
+        except ObjectDoesNotExist:
+            response.data['message'] = 'Profile does not exist.'
+            response.data['userMessage'] = 'You do not have a profile.'
 
         return response
 
