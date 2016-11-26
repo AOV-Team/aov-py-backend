@@ -1,4 +1,5 @@
 from apps.account import models as account_models
+from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
 from apps.photo.photo import PhotoFile
 from django.test import TestCase
@@ -33,7 +34,12 @@ class TestUsersPhotosViewSetPOST(TestCase):
         photo2.category = [category]
         photo2.save()
 
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
         client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/users/{}/photos'.format(user.id), format='json')
         result = request.data['results']
@@ -52,7 +58,12 @@ class TestUsersPhotosViewSetPOST(TestCase):
         # Create user and data
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
 
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
         client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/users/{}/photos'.format(user.id), format='json')
         result = request.data['results']

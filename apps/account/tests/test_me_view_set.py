@@ -15,7 +15,7 @@ class TestMeViewSetGET(TestCase):
         :return:
         """
         # Create data
-        user = account_models.User.objects.create_user(email='test@test.com', username='aov_hov')
+        user = account_models.User.objects.create_user(email='test@test.com', social_name='aeon', username='aov_hov')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -28,3 +28,5 @@ class TestMeViewSetGET(TestCase):
         result = request.data['result']
 
         self.assertEquals(result['email'], user.email)
+        self.assertEquals(result['social_name'], user.social_name)
+        self.assertEquals(result['username'], user.username)

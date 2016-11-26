@@ -1,7 +1,9 @@
 from apps.account import models as account_models
-from apps.account import serializers
+from apps.account import serializers as account_serializers
 from apps.account import tasks as account_tasks
 from apps.common.views import get_default_response
+from apps.photo import models as photo_models
+from apps.photo import serializers as photo_serializers
 from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 from rest_framework import generics, permissions
@@ -19,7 +21,7 @@ class AuthenticateViewSet(APIView):
     """
     permission_classes = (permissions.AllowAny,)
     queryset = account_models.User.objects.all()
-    serializer_class = serializers.UserSerializer
+    serializer_class = photo_serializers.PhotoSerializer
 
     def delete(self, request):
         """
@@ -92,7 +94,7 @@ class MeViewSet(generics.RetrieveAPIView):
 
         response = get_default_response('200')
         response.data['userMessage'] = 'Successfully retrieved your user information!'
-        response.data['result'] = serializers.UserSerializer(authenticated_user).data
+        response.data['result'] = account_serializers.UserSerializer(authenticated_user).data
 
         return response
 
@@ -145,7 +147,7 @@ class SocialSignUpViewSet(generics.CreateAPIView):
     """
     permission_classes = (permissions.AllowAny,)
     queryset = account_models.User.objects.all()
-    serializer_class = serializers.UserSerializer
+    serializer_class = account_serializers.UserSerializer
 
     def create(self, request):
         """
@@ -184,6 +186,39 @@ class SocialSignUpViewSet(generics.CreateAPIView):
         return response
 
 
+class UserPhotosViewSet(generics.ListAPIView):
+    """
+    /api/users/{}/photos
+    """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = photo_models.Photo.objects.all()
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def get(self, request, **kwargs):
+        """
+        Get user's photos
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+
+        photos = photo_models.Photo.objects.filter(user=authenticated_user, public=True).order_by('-id')
+        paginated_photos = self.paginate_queryset(photos)
+
+        serialized_items = list()
+
+        for photo in paginated_photos:
+            serialized_items.append(photo_serializers.PhotoSerializer(photo).data)
+
+        response = self.get_paginated_response(serialized_items)
+
+        return response
+
+
+
 class UserViewSet(generics.CreateAPIView):
     """
     /api/user
@@ -191,7 +226,7 @@ class UserViewSet(generics.CreateAPIView):
     """
     permission_classes = (permissions.AllowAny,)
     queryset = account_models.User.objects.all()
-    serializer_class = serializers.UserSerializer
+    serializer_class = account_serializers.UserSerializer
 
     def post(self, request):
         """
@@ -214,7 +249,7 @@ class UserViewSet(generics.CreateAPIView):
                     request = get_default_response('201')
                     request.data['message'] = 'User successfully created'
                     request.data['userMessage'] = 'You have been successfully registered!'
-                    request.data['result'] = serializers.UserSerializer(user).data
+                    request.data['result'] = account_serializers.UserSerializer(user).data
             except IntegrityError:
                 request = get_default_response('409')
                 request.data['message'] = 'User already exists'
