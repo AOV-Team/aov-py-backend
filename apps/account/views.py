@@ -1,7 +1,7 @@
 from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.account import tasks as account_tasks
-from apps.common.views import get_default_response
+from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from django.contrib.auth import authenticate
@@ -74,7 +74,7 @@ class AuthenticateViewSet(APIView):
         return response
 
 
-class MeViewSet(generics.RetrieveAPIView):
+class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
     """
     /api/me
     Endpoint for retrieving user info
@@ -95,6 +95,44 @@ class MeViewSet(generics.RetrieveAPIView):
         response = get_default_response('200')
         response.data['userMessage'] = 'Successfully retrieved your user information!'
         response.data['result'] = account_serializers.UserSerializer(authenticated_user).data
+
+        return response
+
+    def patch(self, request):
+        """
+        Update user
+
+        :param request: Request object
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        payload = request.data
+        response = get_default_response('200')
+
+        # Remove PKs and other fields that cannot be updated via API
+        payload = remove_pks_from_payload('user', payload)
+
+        if 'email' in payload:
+            del payload['email']
+
+        if 'is_active' in payload:
+            del payload['is_active']
+
+        if 'is_superuser' in payload:
+            del payload['is_superuser']
+
+        if 'username' in payload:
+            del payload['username']
+
+        updated_user = account_models.User.objects.get(id=authenticated_user.id)
+
+        # Update user
+        for key in payload:
+            setattr(updated_user, key, payload[key])
+
+        updated_user.save()
+
+        response.data['result'] = account_serializers.UserSerializer(updated_user).data
 
         return response
 

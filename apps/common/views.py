@@ -63,6 +63,28 @@ STATUS_CODES = {
 }
 
 
+def remove_pks_from_payload(model_key, payload):
+    """
+    Remove PK-related keys from API payload
+
+    :param model_key: name of model as expected in payload (e.g. 'user')
+    :param payload: dict to sanitize
+    :return: sanitized payload - dict()
+    """
+    keys = [
+        'id',
+        model_key,
+        '{}_id'.format(model_key),
+        'pk'
+    ]
+
+    for key in keys:
+        if key in payload:
+            del payload[key]
+
+    return payload
+
+
 def get_default_response(status_code):
     """
     Retrieve a default response object that can be modified as needed
