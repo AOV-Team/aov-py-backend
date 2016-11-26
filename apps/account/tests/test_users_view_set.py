@@ -5,15 +5,14 @@ from rest_framework.test import APIClient
 
 class TestUsersViewSetPOST(TestCase):
     """
-    Test /api/me POST (user creation)
+    Test /api/users POST (user creation)
     """
     def test_users_view_set_post_basic_successful(self):
         """
-        Successful /api/me POST
+        Successful /api/users POST
 
         :return: None
         """
-        # Create user
         client = APIClient()
 
         payload = {
@@ -34,7 +33,7 @@ class TestUsersViewSetPOST(TestCase):
 
     def test_users_view_set_post_already_exists(self):
         """
-        /api/me POST (user already exists)
+        /api/users POST (user already exists)
 
         :return: None
         """
@@ -55,7 +54,7 @@ class TestUsersViewSetPOST(TestCase):
 
     def test_users_view_set_post_bad_request(self):
         """
-        /api/me POST (bad request)
+        /api/users POST (bad request)
 
         :return: None
         """
