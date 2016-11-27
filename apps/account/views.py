@@ -186,18 +186,50 @@ class MeProfileViewSet(generics.RetrieveAPIView):
             # Remove PKs that cannot be updated via API
             payload = remove_pks_from_payload('profile', payload)
             payload = remove_pks_from_payload('user', payload)
+            payload['user'] = authenticated_user.id
 
-            # Update profile
-            for key in payload:
-                setattr(profile, key, payload[key])
+            serializer = account_serializers.ProfileSerializer(data=payload, partial=True)
 
-            profile.save()
+            if serializer.is_valid():
+                serializer.update(profile, serializer.validated_data)
 
-            response = get_default_response('200')
-            response.data['result'] = account_serializers.ProfileSerializer(profile).data
+                response = get_default_response('200')
+                response.data['result'] = serializer.data
+            else:
+                response = get_default_response('400')
+                response['message'] = serializer.errors
         except ObjectDoesNotExist:
             response.data['message'] = 'Profile does not exist.'
             response.data['userMessage'] = 'You do not have a profile.'
+
+        return response
+
+    def post(self, request):
+        """
+        CREATE (POST) user profile
+
+        :param request: Request object
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        payload = request.data
+        response = get_default_response('400')
+
+        if 'bio' in payload or 'cover_image' in payload or 'gear' in payload:
+            # Clean up and assign user
+            payload = remove_pks_from_payload('profile', payload)
+            payload = remove_pks_from_payload('user', payload)
+            payload['user'] = authenticated_user.id
+
+            serializer = account_serializers.ProfileSerializer(data=payload)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                response = get_default_response('200')
+                response.data['result'] = serializer.data
+            else:
+                response.data['message'] = serializer.errors
 
         return response
 
