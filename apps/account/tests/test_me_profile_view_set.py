@@ -84,8 +84,8 @@ class TestMeProfileViewSetPATCH(TestCase):
 
         # Test return data
         self.assertEquals(result['bio'], 'Foo')
-        self.assertEquals(result['cover_image'], '')
-        self.assertEquals(result['gear'], '')
+        self.assertEquals(result['cover_image'], None)
+        self.assertEquals(result['gear'], None)
 
         # Check db entry too
         updated_profile = account_models.Profile.objects.get(user=user)

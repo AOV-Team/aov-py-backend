@@ -167,6 +167,40 @@ class MeProfileViewSet(generics.RetrieveAPIView):
 
         return response
 
+    def patch(self, request):
+        """
+        PATCH user profile
+
+        :param request: Request object
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        payload = request.data
+        response = get_default_response('404')
+
+        # Look for profile and update entry if profile exists
+        # ELSE return 404
+        try:
+            profile = account_models.Profile.objects.get(user=authenticated_user)
+
+            # Remove PKs that cannot be updated via API
+            payload = remove_pks_from_payload('profile', payload)
+            payload = remove_pks_from_payload('user', payload)
+
+            # Update profile
+            for key in payload:
+                setattr(profile, key, payload[key])
+
+            profile.save()
+
+            response = get_default_response('200')
+            response.data['result'] = account_serializers.ProfileSerializer(profile).data
+        except ObjectDoesNotExist:
+            response.data['message'] = 'Profile does not exist.'
+            response.data['userMessage'] = 'You do not have a profile.'
+
+        return response
+
 
 class SampleTasksViewSet(APIView):
     """
