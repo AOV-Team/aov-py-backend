@@ -19,18 +19,18 @@ class UserAdmin(BaseUserAdmin):
         ('Permissions', {'fields': ('groups', 'is_active', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ['username', 'email', 'social_name', 'is_active', 'id']
+    list_display = ['username', 'email', 'social_name', 'location', 'age', 'is_active', 'created_at', 'id']
     list_filter = ['is_active', 'is_superuser']
     ordering = ['username']
 
     readonly_fields = ('created_at', 'id', 'last_login')
 
-    search_fields = ['email', 'username', 'first_name', 'last_name']
+    search_fields = ['age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name']
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'bio', 'id']
-    search_fields = ['id', 'user', 'bio']
+    list_display = ['user', 'bio', 'gear', 'id']
+    search_fields = ['id', 'user', 'bio', 'gear']
 
 
 class UserObjectPermissionAdmin(admin.ModelAdmin):

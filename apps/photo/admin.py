@@ -24,7 +24,7 @@ class PhotoAdmin(admin.ModelAdmin):
     filter_horizontal = ('category', 'tag', 'photo_feed')
     form = forms.get_image_preview_form(photo_models.Photo)
 
-    list_display = ['photo_tag', 'user', 'location', 'public', 'id']
+    list_display = ['user', 'location', 'public', 'id']
     ordering = ['id']
     search_fields = ['image', 'id']
 
