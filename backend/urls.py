@@ -34,6 +34,7 @@ urlpatterns = [
 
     # photo
     url(r'api/photo_feeds$', photo_views.PhotoFeedViewSet.as_view()),
+    url(r'api/photo_feeds/(?P<photo_feed_id>[0-9^/]+)/photos$', photo_views.PhotoFeedPhotosViewSet.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
