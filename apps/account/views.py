@@ -138,6 +138,7 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         return response
 
 
+# TODO image compression
 class MeProfileViewSet(generics.RetrieveAPIView):
     """
     api/me/profile

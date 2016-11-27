@@ -30,12 +30,13 @@ urlpatterns = [
     url(r'api/me$', account_views.MeViewSet.as_view()),
     url(r'api/me/profile$', account_views.MeProfileViewSet.as_view()),
     url(r'api/users$', account_views.UserViewSet.as_view()),
-
-    # photo
     url(r'api/users/(?P<user_id>[0-9^/]+)/photos$', account_views.UserPhotosViewSet.as_view()),
 
+    # photo
+    url(r'api/photo_feeds$', photo_views.PhotoFeedViewSet.as_view()),
+
     # sample
-    url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
+    # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
 
     url(r'^admin/', admin.site.urls),
 ]
