@@ -1,0 +1,10 @@
+.img-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.img-wrapper span.feed {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+}

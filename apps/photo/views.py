@@ -1,11 +1,26 @@
 from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
+from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+
+
+@staff_member_required
+def photo_admin(request):
+    context = {
+        'css_file': static('css/photos.css'),
+        'media_url': settings.MEDIA_URL,
+        'photos': photo_models.Photo.objects.all().order_by('-id')
+    }
+
+    return render(request, 'photos.html', context)
 
 
 # TODO image compression
@@ -43,12 +58,12 @@ class PhotoViewSet(generics.ListCreateAPIView):
                     .get(Q(id=classification_id_param) | Q(name__iexact=classification_param))
 
                 return photo_models.Photo.objects\
-                    .filter(Q(category=classification) | Q(tag=classification), **query_params)
+                    .filter(Q(category=classification) | Q(tag=classification), **query_params).order_by('-id')
             except ObjectDoesNotExist:
                 # Empty queryset
                 return photo_models.Photo.objects.none()
         else:
-            return photo_models.Photo.objects.filter(**query_params)
+            return photo_models.Photo.objects.filter(**query_params).order_by('-id')
 
     def post(self, request, *args, **kwargs):
         """

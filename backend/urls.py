@@ -44,7 +44,9 @@ urlpatterns = [
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
 
+    # admin
     url(r'^admin/', admin.site.urls),
+    url(r'^admin/photos$', photo_views.photo_admin)
 ]
 
 # Enable images for runserver
