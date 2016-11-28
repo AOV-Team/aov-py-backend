@@ -354,7 +354,6 @@ class UserPhotosViewSet(generics.ListAPIView):
         return response
 
 
-
 class UserViewSet(generics.CreateAPIView):
     """
     /api/user

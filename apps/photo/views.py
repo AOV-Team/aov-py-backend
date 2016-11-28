@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 
 # TODO image compression
@@ -192,3 +192,57 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
             return photo_models.Photo.objects.filter(photo_feed=photo_feed, public=True)
         except ObjectDoesNotExist:
             raise NotFound
+
+
+class PhotoSingleViewSet(generics.RetrieveDestroyAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = photo_models.Photo.objects.all()
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Delete a photo
+
+        :param request: Request object
+        :param args:
+        :param kwargs:
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        photo_id = kwargs.get('pk')
+
+        try:
+            photo = photo_models.Photo.objects.get(id=photo_id, public=True)
+
+            # Photo must belong to authenticated user
+            if photo.user == authenticated_user:
+                photo.public = False
+                photo.save()
+
+                response = get_default_response('200')
+            else:
+                raise PermissionDenied
+        except ObjectDoesNotExist:
+            raise NotFound
+
+        return response
+
+    def get(self, request, *args, **kwargs):
+        """
+        Get a photo
+
+        :param request: Request object
+        :return: Response object
+        """
+        photo_id = kwargs.get('pk')
+
+        try:
+            photo = photo_models.Photo.objects.get(id=photo_id, public=True)
+
+            response = get_default_response('200')
+            response.data = photo_serializers.PhotoSerializer(photo).data
+        except ObjectDoesNotExist:
+            raise NotFound
+
+        return response
