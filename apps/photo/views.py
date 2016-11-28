@@ -4,12 +4,84 @@ from apps.photo import serializers as photo_serializers
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
+
+
+class PhotoClassificationViewSet(generics.ListCreateAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.PhotoClassificationSerializer
+
+    def get_queryset(self):
+        """
+        Return classifications
+
+        :return: Response object
+        """
+        query_params = {
+            'public': True
+        }
+
+        classification_type = self.request.query_params.get('classification', None)
+
+        # Add classification if provided
+        if classification_type:
+            if classification_type == 'category' or classification_type == 'tag':
+                query_params['classification_type'] = classification_type
+            else:
+                # HTTP 400
+                raise ValidationError('Classification type "{}" not valid'.format(classification_type))
+
+        return photo_models.PhotoClassification.objects.filter(**query_params)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Create new classification
+
+        :param request: Request object
+        :param args:
+        :param kwargs:
+        :return: Response object
+        """
+        payload = request.data
+
+        payload = remove_pks_from_payload('photo_classification', payload)
+
+        # Only tads are allowed
+        if 'classification_type' in payload:
+            if payload['classification_type'] == 'category':
+                raise ValidationError('Cannot create a category')
+        else:
+            payload['classification_type'] = 'tag'
+
+        # If trying to create private entry, deny
+        if 'public' in payload:
+            if not payload['public']:
+                raise ValidationError('Cannot create private classification')
+
+        serializer = photo_serializers.PhotoClassificationSerializer(data=payload)
+
+        if serializer.is_valid():
+            # If classification already exists, update.
+            # Else save new
+            try:
+                classification = photo_models.PhotoClassification.objects.get(name__iexact=payload['name'],
+                                                                              classification_type='tag')
+
+                serializer.update(classification, serializer.validated_data)
+            except ObjectDoesNotExist:
+                serializer.save()
+
+            response = get_default_response('200')
+            response.data = serializer.data
+            return response
+        else:
+            raise ValidationError(serializer.errors)
 
 
 class PhotoFeedViewSet(generics.ListAPIView):
-    permission_classes = (permissions.AllowAny,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = photo_models.PhotoFeed.objects.filter(public=True)
     serializer_class = photo_serializers.PhotoFeedSerializer
 
@@ -19,7 +91,7 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self):
         """
         Return list of photos for requested photo feed
 

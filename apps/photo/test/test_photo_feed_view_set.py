@@ -1,3 +1,5 @@
+from apps.account import models as account_models
+from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
 from django.test import TestCase
 from rest_framework.test import APIClient
@@ -14,11 +16,17 @@ class TestPhotoFeedViewSetGET(TestCase):
         :return: None
         """
         # Create test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
         photo_models.PhotoFeed.objects.create_or_update(name='Landscape')
         photo_models.PhotoFeed.objects.create_or_update(name='Other')
 
-        # Log user in
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
         client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/photo_feeds')
         results = request.data['results']
@@ -32,12 +40,18 @@ class TestPhotoFeedViewSetGET(TestCase):
         :return: None
         """
         # Create test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
         photo_models.PhotoFeed.objects.create_or_update(name='Landscape')
         photo_models.PhotoFeed.objects.create_or_update(name='Other')
         photo_models.PhotoFeed.objects.create_or_update(name='Misc', public=False)
 
-        # Log user in
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
         client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/photo_feeds')
         results = request.data['results']
