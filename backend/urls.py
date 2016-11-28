@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'api/users/(?P<user_id>[0-9^/]+)/photos$', account_views.UserPhotosViewSet.as_view()),
 
     # photo
+    url(r'api/photos$', photo_views.PhotoViewSet.as_view()),
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
     url(r'api/photo_classifications/(?P<photo_classification_id>[0-9^/]+)/photos$',
         photo_views.PhotoClassificationPhotosViewSet.as_view()),

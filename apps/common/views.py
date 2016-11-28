@@ -4,14 +4,8 @@ from rest_framework.response import Response
 import copy
 
 RESPONSES = {
-    '200': {
-        'message': 'Success',
-        'userMessage': 'The action was successfully completed.'
-    },
-    '201': {
-        'message': 'Resource successfully created.',
-        'userMessage': 'Your data has been saved.'
-    },
+    '200': {},
+    '201': {},
     '400': {
         'message': 'One or more required fields are missing.',
         'userMessage': 'We were unable to process your request due to an error. Please check all fields and try again.',

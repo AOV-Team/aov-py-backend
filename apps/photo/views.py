@@ -8,6 +8,46 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import NotFound, ValidationError
 
 
+# TODO image compression
+class PhotoViewSet(generics.ListCreateAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def get_queryset(self):
+        """
+        Return images
+
+        :return: Queryset
+        """
+        return photo_models.Photo.objects.filter(public=True)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Save photo
+
+        :param request: Request object
+        :param args:
+        :param kwargs:
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        payload = request.data
+        payload['user'] = authenticated_user.id
+
+        serializer = photo_serializers.PhotoSerializer(data=payload)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            response = get_default_response('200')
+            response.data = serializer.data
+        else:
+            raise ValidationError(serializer.errors)
+
+        return response
+
+
 class PhotoClassificationViewSet(generics.ListCreateAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
@@ -17,7 +57,7 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
         """
         Return classifications
 
-        :return: Response object
+        :return: Queryset
         """
         query_params = {
             'public': True
@@ -45,7 +85,6 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
         :return: Response object
         """
         payload = request.data
-
         payload = remove_pks_from_payload('photo_classification', payload)
 
         # Only tads are allowed
