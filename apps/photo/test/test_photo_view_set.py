@@ -68,6 +68,168 @@ class TestPhotoViewSetGET(TestCase):
 
         self.assertEquals(len(results), 1)
 
+    def test_photo_view_set_get_classification(self):
+        """
+        Test that we get photos filtered by category
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
+                                                                             classification_type='category')
+
+        photo1 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo1.save()
+        photo1.category = [category]
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/photos?classification=night')
+        results = request.data['results']
+
+        self.assertEquals(len(results), 1)
+
+    def test_photo_view_set_get_classification_does_not_exist(self):
+        """
+        Test that we get empty result set if classification does not exist
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
+                                                                             classification_type='category')
+
+        photo1 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo1.save()
+        photo1.category = [category]
+        photo1.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/photos?classification=other')
+        results = request.data['results']
+
+        self.assertEquals(len(results), 0)
+
+    def test_photo_view_set_get_classification_id(self):
+        """
+        Test that we get photos filtered by category (using ID)
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
+                                                                             classification_type='category')
+
+        photo1 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo1.save()
+        photo1.category = [category]
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/photos?classification={}'.format(category.id))
+        results = request.data['results']
+
+        self.assertEquals(len(results), 1)
+
+    def test_photo_view_set_get_filtered(self):
+        """
+        Test that we get photos filtered by category and location
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
+                                                                             classification_type='category')
+
+        photo1 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                   location='Boise', user=user)
+        photo1.save()
+        photo1.category = [category]
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
+                   location='Boise', user=user)
+        photo2.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        # Case insensitive
+        request = client.get('/api/photos?classification=night&location=boise')
+        results = request.data['results']
+
+        self.assertEquals(len(results), 1)
+
+    def test_photo_view_set_get_location(self):
+        """
+        Test that we get photos filtered by location
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        photo1 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                   location='boise', user=user)
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        # Case insensitive
+        request = client.get('/api/photos?location=Boise')
+        results = request.data['results']
+
+        self.assertEquals(len(results), 1)
+
 
 class TestPhotoViewSetPOST(TestCase):
     """

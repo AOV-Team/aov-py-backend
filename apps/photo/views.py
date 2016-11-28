@@ -20,7 +20,35 @@ class PhotoViewSet(generics.ListCreateAPIView):
 
         :return: Queryset
         """
-        return photo_models.Photo.objects.filter(public=True)
+        classification_param = self.request.query_params.get('classification')
+        location = self.request.query_params.get('location')
+        query_params = {
+            'public': True
+        }
+
+        if location:
+            query_params['location__iexact'] = location
+
+        if classification_param:
+            try:
+                # If we get classification id, use it
+                # Otherwise set to 0 (will not match anything)
+                try:
+                    classification_id_param = int(classification_param)
+                except ValueError:
+                    classification_id_param = 0
+
+                # Match either by ID or name
+                classification = photo_models.PhotoClassification.objects\
+                    .get(Q(id=classification_id_param) | Q(name__iexact=classification_param))
+
+                return photo_models.Photo.objects\
+                    .filter(Q(category=classification) | Q(tag=classification), **query_params)
+            except ObjectDoesNotExist:
+                # Empty queryset
+                return photo_models.Photo.objects.none()
+        else:
+            return photo_models.Photo.objects.filter(**query_params)
 
     def post(self, request, *args, **kwargs):
         """
