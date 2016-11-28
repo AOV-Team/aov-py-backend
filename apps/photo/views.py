@@ -2,6 +2,7 @@ from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import NotFound, ValidationError
@@ -79,6 +80,26 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
             raise ValidationError(serializer.errors)
 
 
+class PhotoClassificationPhotosViewSet(generics.ListAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def get_queryset(self):
+        """
+        Return photos for a classification
+
+        :return: Queryset
+        """
+        try:
+            photo_classification_id = self.kwargs.get('photo_classification_id')
+            classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
+
+            return photo_models.Photo.objects.filter(Q(category=classification) | Q(tag=classification), public=True)
+        except ObjectDoesNotExist:
+            raise NotFound
+
+
 class PhotoFeedViewSet(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
@@ -95,7 +116,7 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
         """
         Return list of photos for requested photo feed
 
-        :return: Response object
+        :return: Queryset
         """
         try:
             photo_feed_id = self.kwargs['photo_feed_id']
