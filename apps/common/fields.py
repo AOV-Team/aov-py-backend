@@ -12,37 +12,23 @@ class PhotoPreviewField(Field):
     required = False
     show_hidden_initial = False
     validators = []
+    widget = widgets.ImagePreviewWidget
 
-    def __init__(self, **kwargs):
-        print('kwargs', kwargs)
-        # kwargs['media_path'] = 'images/1480095395_LcRH5o.jpg'
-        widget = widgets.ImagePreviewWidget(attrs=kwargs)
+    def __init__(self, widget=None, **kwargs):
+        widget = widget or self.widget
 
-        # extra_attrs = self.widget_attrs(widget)
-        #
-        # if extra_attrs:
-        #     widget.attrs.update(extra_attrs)
+        if isinstance(widget, type):
+            widget = widget()
+
+        extra_attrs = self.widget_attrs(widget, {'media_path': kwargs.get('media_path')})
+
+        if extra_attrs:
+            widget.attrs.update(extra_attrs)
 
         self.widget = widget
 
-        # widget = self.widget
-        #
-        # media_path = 'images/1480095395_LcRH5o.jpg'
-        #
-        # if isinstance(widget, type):
-        #     widget = widget(attrs={'media_path': media_path})
-        #
-        # widget.media_path = media_path
-        #
-        # # # widget.media_path = media_path
-        # # print('mppp', media_path)
-        # # # media_path = 'images/1480095395_LcRH5o.jpg'
-        # # # print('m000', media_path)
-        # # widget = widgets.ImagePreviewWidget(attrs={'media_path': mm})
-        #
-        # extra_attrs = self.widget_attrs(widget)
-        #
-        # if extra_attrs:
-        #     widget.attrs.update(extra_attrs)
-        #
-        # self.widget = widget
+    def widget_attrs(self, widget, default=None):
+        if default:
+            return default
+        else:
+            return {'media_path': ''}

@@ -16,13 +16,13 @@ class PhotoFeedAdmin(admin.ModelAdmin):
 
 class PhotoAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('Image', {'fields': ('image_preview', 'image', 'user', 'location', 'public')}),
+        ('Image', {'fields': ('image', 'user', 'location', 'public')}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
         ('Misc', {'fields': ('attribution_name', 'photo_data')}),
     )
 
     filter_horizontal = ('category', 'tag', 'photo_feed')
-    form = forms.get_image_preview_form(photo_models.Photo)
+    # form = forms.get_image_preview_form(photo_models.Photo)
 
     list_display = ['user', 'location', 'public', 'id']
     ordering = ['-id']

@@ -12,9 +12,7 @@ def get_image_preview_form(dynamic_model, image_attribute_name='image'):
 
             # If there's an instance, get image media path
             if instance and instance.pk:
-                print('data', str(getattr(instance, image_attribute_name)))
                 self.image_preview = fields.PhotoPreviewField(media_path=str(getattr(instance, image_attribute_name)))
-                # self.image_preview = fields.PhotoPreviewField(media_path='booo')
 
         class Meta:
             fields = '__all__'
