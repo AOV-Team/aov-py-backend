@@ -13,31 +13,29 @@
 
 <script>
 $( document ).ready(function() {
-    $.get('/api/photos/2', function(data) {
-        console.log(data);
-    });
-
     // Update photo feed for a photo
     $('input[type="checkbox"]').click(function() {
         var photoId = $(this).parent().attr('id').replace('photo-feeds-', ''),
-            photo_feeds = [],
+            photoFeeds = [],
             csrfToken = $(this).parent().find('input[type="hidden"]').attr('value');
 
         $(this).parent().children('input[checked]').each(function(index) {
-            photo_feeds.push($(this).attr('class').replace('feed-', ''));
+            photoFeeds.push($(this).attr('class').replace('feed-', ''));
         });
 
-        console.log(csrfToken);
         // Append feed just checked
-        photo_feeds.push($(this).attr('class').replace('feed-', ''));
+        photoFeeds.push($(this).attr('class').replace('feed-', ''));
+        console.log(photoFeeds);
 
         $.ajax({
             url: '/api/photos/' + photoId,
             method: 'patch',
             headers: { 'X-CSRFToken': csrfToken },
             data: {
-                photo_feed: photo_feeds
-            }
+                photo_feed: photoFeeds
+            },
+            dataType: 'json',
+            traditional: true
         });
     });
 });
@@ -71,19 +69,6 @@ $( document ).ready(function() {
             {% endfor %}
             {% csrf_token %}
         </div>
-        <!--<div class="feeds-wrapper">-->
-            <!--{% for feed in photo_feeds %}-->
-            <!--{% if feed.public %}-->
-            <!--{% if feed.name in photo.photo_feed.all %}-->
-            <!--<label>{{ feed.name }}</label>-->
-            <!--<input type="checkbox" value="{{ feed.id }}" checked>-->
-            <!--{% else %}-->
-            <!--<label>{{ feed.name }}</label>-->
-            <!--<input type="checkbox" value="{{ feed.id }}">-->
-            <!--{% endif %}-->
-            <!--{% endif %}-->
-            <!--{% endfor %}-->
-        <!--</div>-->
     </div>
     {% endfor %}
 </div>
