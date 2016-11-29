@@ -1,0 +1,90 @@
+[
+  {
+  "fields": {
+    "name": "Aerial",
+    "classification_type": "category"
+  },
+  "pk": 1,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Animal",
+    "classification_type": "category"
+  },
+  "pk": 2,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Black & White",
+    "classification_type": "category"
+  },
+  "pk": 3,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Drone",
+    "classification_type": "category"
+  },
+  "pk": 4,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "iPhone",
+    "classification_type": "category"
+  },
+  "pk": 5,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Landscape",
+    "classification_type": "category"
+  },
+  "pk": 6,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Nightscape",
+    "classification_type": "category"
+  },
+  "pk": 7,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Other",
+    "classification_type": "category"
+  },
+  "pk": 8,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Portrait",
+    "classification_type": "category"
+  },
+  "pk": 9,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Transportation",
+    "classification_type": "category"
+  },
+  "pk": 10,
+  "model": "photo.photoclassification"
+  },
+  {
+  "fields": {
+    "name": "Urban",
+    "classification_type": "category"
+  },
+  "pk": 11,
+  "model": "photo.photoclassification"
+  }
+]

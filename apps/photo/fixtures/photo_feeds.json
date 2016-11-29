@@ -1,0 +1,9 @@
+[
+  {
+  "fields": {
+    "name": "AOV Feed"
+  },
+  "pk": 1,
+  "model": "photo.photofeed"
+  }
+]
