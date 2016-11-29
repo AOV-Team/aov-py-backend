@@ -1,6 +1,8 @@
 from apps.account import models as account_models
 from apps.common import models as common_models
+from django.conf import settings
 from django.db import models
+from django.utils.safestring import mark_safe
 
 
 class PhotoClassificationManager(models.Manager):
@@ -88,7 +90,7 @@ class Photo(models.Model):
 
         :return: String with HTML content
         """
-        return u'<img src="{}">'.format(self.image)
+        return mark_safe(u'<img style="width: 100px;" src="{}{}">'.format(settings.MEDIA_URL, self.image))
 
     def __str__(self):
         return '{}:\t{},\tID: {}'\
