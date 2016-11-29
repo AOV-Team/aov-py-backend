@@ -3,21 +3,38 @@ from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import generics, permissions
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 
 @staff_member_required
 def photo_admin(request):
+    """
+    View for /admin/photos
+
+    :param request: Request object
+    :return: render()
+    """
+    photos = photo_models.Photo.objects.all().order_by('-id')
+
+    # Add list of names of feeds that image is in
+    # Makes it easier to work with in the HTML template
+    for photo in photos:
+        if not getattr(photo, 'photo_feed_names', None):
+            photo.photo_feed_names = list()
+
+        for feed in photo.photo_feed.all():
+            if feed.public:
+                photo.photo_feed_names.append(feed.name)
+
     context = {
-        'css_file': static('css/photos.css'),
         'media_url': settings.MEDIA_URL,
-        'photos': photo_models.Photo.objects.all().order_by('-id')
+        'photo_feeds': photo_models.PhotoFeed.objects.filter(public=True),
+        'photos': photos
     }
 
     return render(request, 'photos.html', context)
@@ -183,7 +200,7 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
 
 
 class PhotoFeedViewSet(generics.ListAPIView):
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     queryset = photo_models.PhotoFeed.objects.filter(public=True)
     serializer_class = photo_serializers.PhotoFeedSerializer
@@ -209,8 +226,8 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
             raise NotFound
 
 
-class PhotoSingleViewSet(generics.RetrieveDestroyAPIView):
-    authentication_classes = (TokenAuthentication,)
+class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     queryset = photo_models.Photo.objects.all()
     serializer_class = photo_serializers.PhotoSerializer
@@ -261,3 +278,36 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView):
             raise NotFound
 
         return response
+
+    def patch(self, request, *args, **kwargs):
+        """
+
+        :param request:
+        :return:
+        """
+        # Needs to be superuser
+        if request.user.is_superuser:
+            photo_id = kwargs.get('pk')
+            payload = request.data
+            payload = remove_pks_from_payload('photo', payload)
+
+            # Cannot change image
+            if 'image' in payload:
+                del payload['image']
+
+            try:
+                photo = photo_models.Photo.objects.get(id=photo_id)
+                serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
+
+                if serializer.is_valid():
+                    serializer.save()
+
+                    response = get_default_response('200')
+                    response.data = serializer.data
+                    return response
+                else:
+                    raise ValidationError(serializer.errors)
+            except ObjectDoesNotExist:
+                raise NotFound
+        else:
+            raise PermissionDenied

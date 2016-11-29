@@ -26,7 +26,7 @@ class TestMeProfileViewSetGET(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/me/profile')
-        result = request.data['result']
+        result = request.data
 
         self.assertIn('bio', result)
         self.assertIn('cover_image', result)
@@ -80,7 +80,7 @@ class TestMeProfileViewSetPATCH(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.patch('/api/me/profile', data=payload, format='json')
-        result = request.data['result']
+        result = request.data
 
         # Test return data
         self.assertEquals(result['bio'], 'Foo')
@@ -168,7 +168,7 @@ class TestMeProfileViewSetPATCH(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.patch('/api/me/profile', data=payload, format='json')
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(result['bio'], 'Foo')
 
@@ -208,7 +208,7 @@ class TestMeProfileViewSetPOST(TestCase):
 
             request = client.post('/api/me/profile', data=payload, format='multipart')
 
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(result['user'], user.id)
         self.assertEquals(result['bio'], 'This is cool!')
@@ -248,7 +248,7 @@ class TestMeProfileViewSetPOST(TestCase):
 
             request = client.post('/api/me/profile', data=payload, format='multipart')
 
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(result['bio'], 'This is cool!')
         self.assertIsNotNone(result['cover_image'])
@@ -309,7 +309,7 @@ class TestMeProfileViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.post('/api/me/profile', data=payload, format='json')
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(result['bio'], 'This is cool!')
         self.assertEquals(result['gear'], '["Nikon", "50mm Lens"]')

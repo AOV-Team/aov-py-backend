@@ -22,7 +22,7 @@ class TestUsersViewSetPOST(TestCase):
         }
 
         request = client.post('/api/users', data=payload, format='json')
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(request.status_code, 201)
         self.assertIn('email', result)

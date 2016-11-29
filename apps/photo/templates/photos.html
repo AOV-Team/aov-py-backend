@@ -2,17 +2,44 @@
 {% block title %}Photos{% endblock %}
 
 {% block extrahead %}
+{% load static %}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="{{ css_file }}">
+<link rel="stylesheet" href="{% static "css/photos.css" %}">
 <script
-  src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
-  integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
   crossorigin="anonymous"></script>
 
 <script>
 $( document ).ready(function() {
-    console.log( "ready!" );
+    $.get('/api/photos/2', function(data) {
+        console.log(data);
+    });
+
+    // Update photo feed for a photo
+    $('input[type="checkbox"]').click(function() {
+        var photoId = $(this).parent().attr('id').replace('photo-feeds-', ''),
+            photo_feeds = [],
+            csrfToken = $(this).parent().find('input[type="hidden"]').attr('value');
+
+        $(this).parent().children('input[checked]').each(function(index) {
+            photo_feeds.push($(this).attr('class').replace('feed-', ''));
+        });
+
+        console.log(csrfToken);
+        // Append feed just checked
+        photo_feeds.push($(this).attr('class').replace('feed-', ''));
+
+        $.ajax({
+            url: '/api/photos/' + photoId,
+            method: 'patch',
+            headers: { 'X-CSRFToken': csrfToken },
+            data: {
+                photo_feed: photo_feeds
+            }
+        });
+    });
 });
 </script>
 {% endblock %}
@@ -32,6 +59,31 @@ $( document ).ready(function() {
                 Feed
             </span>
         </div>
+        <div id="photo-feeds-{{ photo.id }}" class="feeds-wrapper">
+            {% for feed in photo_feeds %}
+            {% if feed.name in photo.photo_feed_names %}
+            <label>{{ feed.name }}</label>
+            <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked>
+            {% else %}
+            <label>{{ feed.name }}</label>
+            <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}">
+            {% endif %}
+            {% endfor %}
+            {% csrf_token %}
+        </div>
+        <!--<div class="feeds-wrapper">-->
+            <!--{% for feed in photo_feeds %}-->
+            <!--{% if feed.public %}-->
+            <!--{% if feed.name in photo.photo_feed.all %}-->
+            <!--<label>{{ feed.name }}</label>-->
+            <!--<input type="checkbox" value="{{ feed.id }}" checked>-->
+            <!--{% else %}-->
+            <!--<label>{{ feed.name }}</label>-->
+            <!--<input type="checkbox" value="{{ feed.id }}">-->
+            <!--{% endif %}-->
+            <!--{% endif %}-->
+            <!--{% endfor %}-->
+        <!--</div>-->
     </div>
     {% endfor %}
 </div>

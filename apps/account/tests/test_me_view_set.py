@@ -25,7 +25,7 @@ class TestMeViewSetGET(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/me')
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(result['email'], user.email)
         self.assertEquals(result['social_name'], user.social_name)
@@ -58,7 +58,7 @@ class TestMeViewSetPATCH(TestCase):
         }
 
         request = client.patch('/api/me', data=payload, format='json')
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(result['age'], 22)
 
@@ -90,7 +90,7 @@ class TestMeViewSetPATCH(TestCase):
         }
 
         request = client.patch('/api/me', data=payload, format='json')
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(result['age'], 22)
 
@@ -123,7 +123,7 @@ class TestMeViewSetPATCH(TestCase):
         }
 
         request = client.patch('/api/me', data=payload, format='json')
-        result = request.data['result']
+        result = request.data
 
         self.assertEquals(result['age'], 22)
         self.assertEquals(result['is_superuser'], False)

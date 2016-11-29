@@ -94,8 +94,7 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         authenticated_user = TokenAuthentication().authenticate(request)[0]
 
         response = get_default_response('200')
-        response.data['userMessage'] = 'Successfully retrieved your user information!'
-        response.data['result'] = account_serializers.UserSerializer(authenticated_user).data
+        response.data = account_serializers.UserSerializer(authenticated_user).data
 
         return response
 
@@ -133,7 +132,7 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
 
         updated_user.save()
 
-        response.data['result'] = account_serializers.UserSerializer(updated_user).data
+        response.data = account_serializers.UserSerializer(updated_user).data
 
         return response
 
@@ -161,7 +160,7 @@ class MeProfileViewSet(generics.RetrieveAPIView):
             profile = account_models.Profile.objects.get(user=authenticated_user)
 
             response = get_default_response('200')
-            response.data['result'] = account_serializers.ProfileSerializer(profile).data
+            response.data = account_serializers.ProfileSerializer(profile).data
         except ObjectDoesNotExist:
             response.data['message'] = 'Profile does not exist.'
             response.data['userMessage'] = 'You do not have a profile.'
@@ -195,7 +194,7 @@ class MeProfileViewSet(generics.RetrieveAPIView):
                 serializer.update(profile, serializer.validated_data)
 
                 response = get_default_response('200')
-                response.data['result'] = serializer.data
+                response.data = serializer.data
             else:
                 response = get_default_response('400')
                 response['message'] = serializer.errors
@@ -228,7 +227,7 @@ class MeProfileViewSet(generics.RetrieveAPIView):
                 serializer.save()
 
                 response = get_default_response('200')
-                response.data['result'] = serializer.data
+                response.data = serializer.data
             else:
                 response.data['message'] = serializer.errors
 
@@ -382,9 +381,7 @@ class UserViewSet(generics.CreateAPIView):
 
                 if user:
                     request = get_default_response('201')
-                    request.data['message'] = 'User successfully created'
-                    request.data['userMessage'] = 'You have been successfully registered!'
-                    request.data['result'] = account_serializers.UserSerializer(user).data
+                    request.data = account_serializers.UserSerializer(user).data
             except IntegrityError:
                 request = get_default_response('409')
                 request.data['message'] = 'User already exists'
