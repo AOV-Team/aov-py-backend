@@ -4,7 +4,7 @@
 {% block extrahead %}
 {% load static %}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="{% static "css/photos.css" %}">
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -39,7 +39,6 @@ $( document ).ready(function() {
             photoFeeds.push(thisCheckboxFeedId);
         }
 
-        console.log(photoFeeds);
         data = {
             photo_feed: photoFeeds
         }
@@ -56,35 +55,68 @@ $( document ).ready(function() {
             traditional: true
         });
     });
+
+    // Modal toggle (show)
+    $('.modal-toggle').click(function(e) {
+        e.preventDefault();
+        var parent = $(this).parent();
+
+        parent.siblings('.overlay').show();
+        parent.siblings('.feeds-modal').show();
+    });
+
+    // Modal toggle (hide)
+    $('.fa-window-close').click(function(e) {
+        e.preventDefault();
+
+        var parent = $(this).parent();
+        parent.hide();
+        parent.siblings('.overlay').hide();
+    });
+
+    // Modal toggle (overlay) (hide)
+    $('.overlay').click(function() {
+        $(this).hide();
+        $(this).siblings('.feeds-modal').hide();
+    });
 });
 </script>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    {% for photo in photos %}
-    <div class="col-xs-3">
-        <small>
-            <strong>Username:</strong> {{ photo.user.username }}<br>
-            <strong>Social name:</strong> {{ photo.user.social_name }}<br>
-            <strong>Location:</strong> {{ photo.location }}<br>
-        </small>
-        <div class="img-wrapper">
-            <img class="img-responsive" src="{{ media_url }}{{ photo.image }}">
+<div class="container">
+    <div class="row photo-mgmt">
+        {% for photo in photos %}
+        <div class="col-xs-3">
+            <div class="img-wrapper">
+                <a class="modal-toggle"
+                   title="@{{ photo.user.username }} / IG: {{ photo.user.social_name }} | {{ photo.location }}">
+                    <img src="{{ media_url }}{{ photo.image }}">
+                </a>
+            </div>
+            <div class="overlay"></div>
+            <div id="photo-feeds-{{ photo.id }}" class="feeds-modal">
+                <span class="fa fa-window-close"></span>
+                <strong>Feeds</strong><br>
+                {% for feed in photo_feeds %}
+                {% if feed.name in photo.photo_feed_names %}
+                <label>{{ feed.name }}</label>
+                <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked><br>
+                {% else %}
+                <label>{{ feed.name }}</label>
+                <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}"><br>
+                {% endif %}
+                {% endfor %}
+                {% csrf_token %}
+                <img src="{{ media_url }}{{ photo.image }}">
+                <small>
+                <strong>Username:</strong> {{ photo.user.username }}<br>
+                <strong>Social name:</strong> {{ photo.user.social_name }}<br>
+                <strong>Location:</strong> {{ photo.location }}<br>
+            </small>
+            </div>
         </div>
-        <div id="photo-feeds-{{ photo.id }}" class="feeds-wrapper">
-            {% for feed in photo_feeds %}
-            {% if feed.name in photo.photo_feed_names %}
-            <label>{{ feed.name }}</label>
-            <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked>
-            {% else %}
-            <label>{{ feed.name }}</label>
-            <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}">
-            {% endif %}
-            {% endfor %}
-            {% csrf_token %}
-        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 {% endblock %}

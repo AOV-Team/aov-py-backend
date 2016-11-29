@@ -19,7 +19,7 @@ def photo_admin(request):
     :param request: Request object
     :return: render()
     """
-    photos = photo_models.Photo.objects.all().order_by('-id')
+    photos = photo_models.Photo.objects.filter(public=True).order_by('-id')
 
     # Add list of names of feeds that image is in
     # Makes it easier to work with in the HTML template
