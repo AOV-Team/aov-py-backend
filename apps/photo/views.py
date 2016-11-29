@@ -1,4 +1,4 @@
-from apps.common.views import get_default_response, remove_pks_from_payload
+from apps.common.views import get_default_response, handle_jquery_empty_array, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from django.conf import settings
@@ -290,6 +290,7 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
             photo_id = kwargs.get('pk')
             payload = request.data
             payload = remove_pks_from_payload('photo', payload)
+            payload = handle_jquery_empty_array('photo_feed', payload)
 
             # Cannot change image
             if 'image' in payload:

@@ -4,7 +4,7 @@
 {% block extrahead %}
 {% load static %}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">-->
 <link rel="stylesheet" href="{% static "css/photos.css" %}">
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -17,23 +17,41 @@ $( document ).ready(function() {
     $('input[type="checkbox"]').click(function() {
         var photoId = $(this).parent().attr('id').replace('photo-feeds-', ''),
             photoFeeds = [],
-            csrfToken = $(this).parent().find('input[type="hidden"]').attr('value');
+            csrfToken = $(this).parent().find('input[type="hidden"]').attr('value'),
+            thisCheckboxFeedId = $(this).attr('class').replace('feed-', ''),
+            thisCheckboxChecked = $(this).attr('checked');
 
+        // Append all feeds that were already checked
         $(this).parent().children('input[checked]').each(function(index) {
-            photoFeeds.push($(this).attr('class').replace('feed-', ''));
+            var id = $(this).attr('class').replace('feed-', '')
+
+            // Append feeds already checked
+            // Otherwise uncheck
+            if (id !== thisCheckboxFeedId)
+                photoFeeds.push(id);
+            else
+                $(this).removeAttr('checked');
         });
 
-        // Append feed just checked
-        photoFeeds.push($(this).attr('class').replace('feed-', ''));
+        // Append feed just checked if unchecked
+        if (thisCheckboxChecked == undefined) {
+            $(this).attr('checked', true);
+            photoFeeds.push(thisCheckboxFeedId);
+        }
+
         console.log(photoFeeds);
+        data = {
+            photo_feed: photoFeeds
+        }
+
+        if(photoFeeds.length == 0)
+            data.photo_feed = null;
 
         $.ajax({
             url: '/api/photos/' + photoId,
             method: 'patch',
             headers: { 'X-CSRFToken': csrfToken },
-            data: {
-                photo_feed: photoFeeds
-            },
+            data: data,
             dataType: 'json',
             traditional: true
         });
@@ -53,9 +71,6 @@ $( document ).ready(function() {
         </small>
         <div class="img-wrapper">
             <img class="img-responsive" src="{{ media_url }}{{ photo.image }}">
-            <span class="feed fa fa-arrow-right">
-                Feed
-            </span>
         </div>
         <div id="photo-feeds-{{ photo.id }}" class="feeds-wrapper">
             {% for feed in photo_feeds %}

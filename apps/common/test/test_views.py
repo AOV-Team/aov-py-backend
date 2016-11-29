@@ -2,6 +2,53 @@ from apps.common import views
 from django.test import TestCase
 
 
+class TestHandleJqueryEmptyArray(TestCase):
+    """
+    Test jQuery empty array fix
+    """
+    def test_handle_jquery_empty_array_successful(self):
+        """
+        Test that fix is applied
+
+        :return: None
+        """
+        payload = {
+            'photo_feed': ['']
+        }
+
+        fixed_payload = views.handle_jquery_empty_array('photo_feed', payload)
+
+        self.assertEquals(fixed_payload['photo_feed'], [])
+
+    def test_handle_jquery_empty_array_key_does_not_exist(self):
+        """
+        Test that fix is not applied if payload key does not exist
+
+        :return: None
+        """
+        payload = {
+            'photo_feed': [1, 2]
+        }
+
+        fixed_payload = views.handle_jquery_empty_array('category', payload)
+
+        self.assertEquals(fixed_payload['photo_feed'], [1, 2])
+
+    def test_handle_jquery_empty_array_not_empty(self):
+        """
+        Test that fix is not applied if array has data
+
+        :return: None
+        """
+        payload = {
+            'photo_feed': [1, 2]
+        }
+
+        fixed_payload = views.handle_jquery_empty_array('photo_feed', payload)
+
+        self.assertEquals(fixed_payload['photo_feed'], [1, 2])
+
+
 class TestRemovePksFromPayload(TestCase):
     def test_remove_pks_from_payload_successful(self):
         """

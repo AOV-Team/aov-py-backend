@@ -57,6 +57,26 @@ STATUS_CODES = {
 }
 
 
+def handle_jquery_empty_array(key, payload):
+    """
+    jQuery/JS does not send empty arrays.
+    Workaround is to send array with empty string - ['']
+    This removes the workaround and creates an empty list
+
+    :param key: dict key to fix
+    :param payload: data dict
+    :return: fixed dict
+    """
+    new_payload = dict(payload)
+
+    if key in new_payload:
+        # Only apply fix to empty array
+        if len(new_payload[key]) == 1 and new_payload[key][0] == '' or len(new_payload[key]) == 0:
+            new_payload[key] = list()
+
+    return new_payload
+
+
 def remove_pks_from_payload(model_key, payload):
     """
     Remove PK-related keys from API payload

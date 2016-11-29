@@ -25,7 +25,7 @@ class PhotoAdmin(admin.ModelAdmin):
     form = forms.get_image_preview_form(photo_models.Photo)
 
     list_display = ['user', 'location', 'public', 'id']
-    ordering = ['id']
+    ordering = ['-id']
     search_fields = ['image', 'id']
 
 
