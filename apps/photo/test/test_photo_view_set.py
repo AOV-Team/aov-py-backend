@@ -271,6 +271,42 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(len(photos), 1)
 
+    def test_photo_view_set_post_processed_successful(self):
+        """
+        Test that we can save a photo
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects \
+            .create_or_update(name='Cityscape', classification_type='category')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open('apps/common/test/data/photos/photo1-min.jpg', 'rb') as image:
+            payload = {
+                'category': category.id,
+                'image': image
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(result['user'], user.id)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
+
     def test_photo_view_set_post_bad_request_fields_missing(self):
         """
         Test that we get 400 if required fields are missing

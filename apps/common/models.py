@@ -1,5 +1,5 @@
 from django.db import models
-import time
+import datetime
 
 
 class EditMixin(models.Model):
@@ -22,7 +22,13 @@ def get_uploaded_file_path(instance, filename):
     :param filename: name of file
     :return: path to file
     """
-    # Seconds since epoch
-    current_time = str(round(time.time(), 0)).split('.')[0]
+    # If image has user, use username.{extension}
+    # Else use name of file
+    filename = '{}.{}'.format(instance.user.username, filename.split('.')[1]) if instance.user else filename
 
-    return 'images/{}_{}'.format(current_time, filename)
+    # Date stamp
+    # 2016-11-30_13:59:57
+    current_time = str(str(datetime.datetime.now()).split('.')[0]).split('.')[0].replace(' ', '_')
+
+    # 2016-11-30_13:59:57_{filename|username}.{ext}
+    return '{}_{}'.format(current_time, filename.replace(' ', '_'))
