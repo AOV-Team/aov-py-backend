@@ -45,7 +45,6 @@ coverage.xml
 *.pot
 
 # Django/Project stuff:
-celery.py
 *.log
 *.pdf
 *.csv
