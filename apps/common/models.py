@@ -14,17 +14,22 @@ class EditMixin(models.Model):
         abstract = True
 
 
-def get_uploaded_file_path(instance, filename):
+def get_uploaded_file_path(instance, filename, compressed=False):
     """
     Function that determines file path for specified file
 
     :param instance: instance of db object for which file is being saved
     :param filename: name of file
+    :param compressed: whether to mark file as compressed
     :return: path to file
     """
     # If image has user, use username.{extension}
     # Else use name of file
-    filename = '{}.{}'.format(instance.user.username, filename.split('.')[1]) if instance.user else filename
+    # If compressed: username_min.{extension}
+    filename = '{}.{}'\
+        .format(instance.user.username if not compressed else '{}_min'.format(instance.user.username),
+                filename.split('.')[1]) if instance.user else filename if not compressed else '{}_min.{}'\
+        .format(filename.split('.')[0], filename.split('.')[1])
 
     # Date stamp
     # 2016-11-30_13:59:57
