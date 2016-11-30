@@ -9,13 +9,13 @@ class TestPhotoClassificationManager(TestCase):
 
         :return: None
         """
-        photo_models.PhotoClassification.objects.create_or_update(name='Landscape')
+        photo_models.PhotoClassification.objects.create_or_update(name='Rural')
 
         query = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(query), 1)
-        self.assertEquals(query[0].name, 'Landscape')
-        self.assertEquals(query[0].classification_type, 'tag')  # default is tag
+        self.assertEquals(len(query), 12)
+        self.assertEquals(query[11].name, 'Rural')
+        self.assertEquals(query[11].classification_type, 'tag')  # default is tag
 
     def test_create_photo_classifications_successful(self):
         """
@@ -23,12 +23,12 @@ class TestPhotoClassificationManager(TestCase):
 
         :return: None
         """
-        photo_models.PhotoClassification.objects.create_or_update(name='Landscape')
+        photo_models.PhotoClassification.objects.create_or_update(name='Rural')
         photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
 
         query = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(query), 2)
+        self.assertEquals(len(query), 13)
 
     def test_create_photo_classifications_update_case(self):
         """
@@ -36,19 +36,19 @@ class TestPhotoClassificationManager(TestCase):
 
         :return: None
         """
-        photo_models.PhotoClassification.objects.create_or_update(name='Landscape')
+        photo_models.PhotoClassification.objects.create_or_update(name='Rural')
 
         query = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(query), 1)
+        self.assertEquals(len(query), 12)
 
         # This must update existing entry
-        photo_models.PhotoClassification.objects.create_or_update(name='landscape')
+        photo_models.PhotoClassification.objects.create_or_update(name='rural')
 
         query2 = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(query2), 1)
-        self.assertEquals(query2[0].name, 'landscape')
+        self.assertEquals(len(query2), 12)
+        self.assertEquals(query2[11].name, 'rural')
 
     def test_create_photo_classifications_update_case_different_classifications(self):
         """
@@ -56,15 +56,15 @@ class TestPhotoClassificationManager(TestCase):
 
         :return: None
         """
-        photo_models.PhotoClassification.objects.create_or_update(name='Landscape', classification_type='category')
+        photo_models.PhotoClassification.objects.create_or_update(name='Rural', classification_type='category')
 
         query = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(query), 1)
+        self.assertEquals(len(query), 12)
 
         # This must not update existing entry
-        photo_models.PhotoClassification.objects.create_or_update(name='landscape')
+        photo_models.PhotoClassification.objects.create_or_update(name='rural')
 
         query2 = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(query2), 2)
+        self.assertEquals(len(query2), 13)

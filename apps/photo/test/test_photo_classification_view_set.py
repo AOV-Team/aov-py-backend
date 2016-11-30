@@ -20,7 +20,7 @@ class TestPhotoClassificationViewSetGET(TestCase):
 
         photo_models.PhotoClassification.objects.create_or_update(name='City')
         photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
-        photo_models.PhotoClassification.objects.create_or_update(name='Urban', classification_type='category')
+        photo_models.PhotoClassification.objects.create_or_update(name='Rural', classification_type='category')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -32,7 +32,8 @@ class TestPhotoClassificationViewSetGET(TestCase):
         request = client.get('/api/photo_classifications')
         results = request.data['results']
 
-        self.assertEquals(len(results), 3)
+        # 11 classifications are created by fixture
+        self.assertEquals(len(results), 14)
         self.assertEquals(results[2]['classification_type'], 'category')
 
     def test_photo_classification_view_set_get_filtered_successful(self):
@@ -95,7 +96,7 @@ class TestPhotoClassificationViewSetGET(TestCase):
 
         photo_models.PhotoClassification.objects.create_or_update(name='City', public=False)
         photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
-        photo_models.PhotoClassification.objects.create_or_update(name='Urban', classification_type='category')
+        photo_models.PhotoClassification.objects.create_or_update(name='Rural', classification_type='category')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -107,7 +108,7 @@ class TestPhotoClassificationViewSetGET(TestCase):
         request = client.get('/api/photo_classifications')
         results = request.data['results']
 
-        self.assertEquals(len(results), 2)
+        self.assertEquals(len(results), 13)
 
 
 class TestPhotoClassificationViewSetPOST(TestCase):
@@ -143,7 +144,8 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         # Query for entry as well
         classifications = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(classifications), 1)
+        # 11 classifications are loaded by fixture
+        self.assertEquals(len(classifications), 12)
 
     def test_photo_classification_view_set_post_category_not_allowed(self):
         """
@@ -174,7 +176,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         # Query for entry as well
         classifications = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(classifications), 0)
+        self.assertEquals(len(classifications), 11)
 
     def test_photo_classification_view_set_post_category_update_not_allowed(self):
         """
@@ -206,7 +208,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         # Query for entry as well
         classifications = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(classifications), 1)
+        self.assertEquals(len(classifications), 12)
 
     def test_photo_classification_view_set_post_tag_category_exists(self):
         """
@@ -240,7 +242,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         # Query for entry as well
         classifications = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(classifications), 2)
+        self.assertEquals(len(classifications), 13)
 
     def test_photo_classification_view_set_post_not_public(self):
         """
@@ -271,7 +273,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         # Query for entry as well
         classifications = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(classifications), 0)
+        self.assertEquals(len(classifications), 11)
 
     def test_photo_classification_view_set_post_update(self):
         """
@@ -304,5 +306,5 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         # Query for entry as well
         classifications = photo_models.PhotoClassification.objects.all()
 
-        self.assertEquals(len(classifications), 1)
-        self.assertEquals(classifications[0].name, 'Night')
+        self.assertEquals(len(classifications), 12)
+        self.assertEquals(classifications[11].name, 'Night')

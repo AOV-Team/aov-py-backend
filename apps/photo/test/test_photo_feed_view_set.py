@@ -31,7 +31,8 @@ class TestPhotoFeedViewSetGET(TestCase):
         request = client.get('/api/photo_feeds')
         results = request.data['results']
 
-        self.assertEquals(len(results), 2)
+        # 1 feed is preloaded by fixture
+        self.assertEquals(len(results), 3)
 
     def test_photo_feed_view_set_get_public_only(self):
         """
@@ -56,4 +57,4 @@ class TestPhotoFeedViewSetGET(TestCase):
         request = client.get('/api/photo_feeds')
         results = request.data['results']
 
-        self.assertEquals(len(results), 2)
+        self.assertEquals(len(results), 3)
