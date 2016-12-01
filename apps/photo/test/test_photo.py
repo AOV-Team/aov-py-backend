@@ -1,16 +1,34 @@
-from apps.photo.photo import PhotoFile
-from django.test import TestCase
+from apps.photo.photo import Photo
+from django.conf import settings
+from django.test import override_settings, TestCase
+from os.path import getsize
 
 
-class TestPhotoFile(TestCase):
-    def test_photo_file_read_successful(self):
+class TestPhoto(TestCase):
+    def test_photo_read_successful(self):
         """
         Test that we can open an image file
 
         :return: None
         """
-        photo = PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb'))
+        photo = Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb'))
 
         self.assertIsNotNone(photo.name)
         self.assertEquals(photo.width, 750)
         self.assertEquals(photo.height, 749)
+
+    @override_settings(IMAGES_USE_REMOTE_STORAGE=False)
+    def test_photo_save_compressed_local(self):
+        """
+        Test that we can save compressed images in media
+
+        :return: None
+        """
+        file = 'apps/common/test/data/photos/photo1-min.jpg'
+        saved = settings.MEDIA_ROOT + '/img.jpg'
+
+        photo = Photo(open(file, 'rb'))
+        photo.resize(max_width=2000)
+        photo.save(saved, quality=80)
+
+        self.assertLess(getsize(file), getsize(saved))

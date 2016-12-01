@@ -1,7 +1,7 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
-from apps.photo.photo import PhotoFile
+from apps.photo.photo import Photo
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -20,7 +20,7 @@ class TestPhotoSingleViewSetDELETE(TestCase):
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
         photo = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
 
         # Simulate auth
@@ -49,7 +49,7 @@ class TestPhotoSingleViewSetDELETE(TestCase):
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
         photo = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
 
         access_user = account_models.User.objects.create_user(email='mr@mypapaya.io', password='Who?', username='aov2')
@@ -85,7 +85,7 @@ class TestPhotoSingleViewSetGET(TestCase):
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
         photo = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
 
         # Simulate auth
@@ -110,7 +110,7 @@ class TestPhotoSingleViewSetGET(TestCase):
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
         photo = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), public=False, user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), public=False, user=user)
         photo.save()
 
         # Simulate auth
@@ -163,7 +163,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         feed = photo_models.PhotoFeed.objects.create_or_update(name='Night')
 
         photo = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
         photo.category = [category]
         photo.save()
@@ -204,7 +204,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         feed = photo_models.PhotoFeed.objects.create_or_update(name='Night')
 
         photo = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
         photo.category = [category]
         photo.photo_feed = [feed]
@@ -246,7 +246,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         feed = photo_models.PhotoFeed.objects.create_or_update(name='Night')
 
         photo = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
         photo.category = [category]
         photo.save()

@@ -21,23 +21,7 @@ class TestGetUploadedFilePath(TestCase):
 
         image_path = common_models.get_uploaded_file_path(photo, 'photo.jpg')
 
-        if not re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}:[0-9]{2}:[0-9]{2}_aov1\.jpg',
-                        image_path):
-            self.fail()
-
-    def test_get_uploaded_file_path_compressed(self):
-        """
-        Test that file naming is correct for compressed file
-
-        :return: None
-        """
-        # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        photo = photo_models.Photo(user=user)
-
-        image_path = common_models.get_uploaded_file_path(photo, 'photo.jpg', compressed=True)
-
-        if not re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}:[0-9]{2}:[0-9]{2}_aov1_min\.jpg',
+        if not re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{6}_aov1\.jpg',
                         image_path):
             self.fail()
 
@@ -52,21 +36,6 @@ class TestGetUploadedFilePath(TestCase):
 
         image_path = common_models.get_uploaded_file_path(photo, 'photo.jpg')
 
-        if not re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}:[0-9]{2}:[0-9]{2}_photo\.jpg$',
-                        image_path):
-            self.fail()
-
-    def test_get_uploaded_file_path_no_user_compressed(self):
-        """
-        Test that file naming is correct even if no user + compressed
-
-        :return: None
-        """
-        # Test data
-        photo = photo_models.Photo()
-
-        image_path = common_models.get_uploaded_file_path(photo, 'photo.jpg', compressed=True)
-
-        if not re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}:[0-9]{2}:[0-9]{2}_photo_min\.jpg$',
+        if not re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{6}_photo\.jpg$',
                         image_path):
             self.fail()

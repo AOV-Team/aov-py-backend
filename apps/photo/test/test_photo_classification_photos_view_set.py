@@ -1,7 +1,7 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
-from apps.photo.photo import PhotoFile
+from apps.photo.photo import Photo
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -23,13 +23,13 @@ class TestPhotoClassificationPhotosViewSetGET(TestCase):
             .create_or_update(name='night', classification_type='category')
 
         photo1 = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
         photo1.category = [classification]
         photo1.save()
 
         photo2 = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
         photo2.category = [classification]
         photo2.save()
@@ -62,13 +62,13 @@ class TestPhotoClassificationPhotosViewSetGET(TestCase):
             .create_or_update(name='night', classification_type='category')
 
         photo1 = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), public=False, user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), public=False, user=user)
         photo1.save()
         photo1.category = [classification]
         photo1.save()
 
         photo2 = photo_models \
-            .Photo(image=PhotoFile(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
         photo2.category = [classification]
         photo2.save()

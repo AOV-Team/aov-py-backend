@@ -14,26 +14,44 @@ class EditMixin(models.Model):
         abstract = True
 
 
-def get_uploaded_file_path(instance, filename, compressed=False):
+def build_file_name(date_stamp, filename):
+    """
+    Builds name of image file
+    e.g. 2016-11-30_135957_{filename[.ext]}
+
+    :param date_stamp: date/date time stamp to prepend to image name
+    :param filename: name of image
+    :return: String with formatted file name
+    """
+    return '{}_{}'.format(date_stamp, filename.replace(' ', '_'))
+
+
+def get_date_stamp_str():
+    """
+    Date stamp
+    e.g. 2016-11-30_135957
+
+    :return: Date stamp str
+    """
+    return str(str(datetime.datetime.now()).split('.')[0]).replace(':', '').replace(' ', '_')
+
+
+def get_uploaded_file_path(instance, filename):
     """
     Function that determines file path for specified file
 
     :param instance: instance of db object for which file is being saved
     :param filename: name of file
-    :param compressed: whether to mark file as compressed
     :return: path to file
     """
     # If image has user, use username.{extension}
     # Else use name of file
-    # If compressed: username_min.{extension}
     filename = '{}.{}'\
-        .format(instance.user.username if not compressed else '{}_min'.format(instance.user.username),
-                filename.split('.')[1]) if instance.user else filename if not compressed else '{}_min.{}'\
-        .format(filename.split('.')[0], filename.split('.')[1])
+        .format(instance.user.username, filename.split('.')[-1]) if instance.user else filename
 
     # Date stamp
-    # 2016-11-30_13:59:57
-    current_time = str(str(datetime.datetime.now()).split('.')[0]).split('.')[0].replace(' ', '_')
+    current_time = get_date_stamp_str()
 
-    # 2016-11-30_13:59:57_{filename|username}.{ext}
-    return '{}_{}'.format(current_time, filename.replace(' ', '_'))
+    # 2016-11-30_135957_{filename|username}.{ext}
+    return build_file_name(current_time, filename)
+

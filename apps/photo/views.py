@@ -1,6 +1,7 @@
 from apps.common.views import get_default_response, handle_jquery_empty_array, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
+from apps.photo.photo import Photo
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -40,7 +41,6 @@ def photo_admin(request):
     return render(request, 'photos.html', context)
 
 
-# TODO image compression
 class PhotoViewSet(generics.ListCreateAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
@@ -94,6 +94,8 @@ class PhotoViewSet(generics.ListCreateAPIView):
         authenticated_user = TokenAuthentication().authenticate(request)[0]
         payload = request.data
         payload['user'] = authenticated_user.id
+
+        # Image compression
 
         serializer = photo_serializers.PhotoSerializer(data=payload)
 

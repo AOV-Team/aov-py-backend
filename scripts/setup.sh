@@ -6,7 +6,7 @@ if [ "$1" == "dev" ]; then
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gdb',
+        'NAME': 'aov',
         'USER': 'djangodev',
         'PASSWORD': 'golden',
         'HOST': '127.0.0.1',
@@ -26,6 +26,8 @@ EMAIL['EMAIL_HOST_PASSWORD'] = ''
 EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
+
+IMAGES_USE_REMOTE_STORAGE = False
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 EOF
@@ -55,6 +57,8 @@ EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
 
+IMAGES_USE_REMOTE_STORAGE = True
+
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 EOF
 elif [ "$1" == "production" ]; then
@@ -82,6 +86,8 @@ EMAIL['EMAIL_HOST_PASSWORD'] = ''
 EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
+
+IMAGES_USE_REMOTE_STORAGE = True
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 EOF
