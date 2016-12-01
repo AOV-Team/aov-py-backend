@@ -1,4 +1,5 @@
 from django.core.files.images import ImageFile
+from io import BytesIO
 from PIL import Image
 
 
@@ -13,6 +14,21 @@ class Photo(ImageFile):
         super(Photo, self).__init__(file_object)
         self.obj = file_object
         self.img = Image.open(file_object)
+
+    def compress(self, quality=80, max_width=2000):
+        """
+        Resize and save image to memory.
+        Shortcut for resize() and save() except that it returns image as in-memory bytes
+
+        :param quality: image quality
+        :param max_width: max image width
+        :return: BytesIO
+        """
+        self.resize(max_width=max_width)
+
+        mem_img = BytesIO()
+        self.img.save(mem_img, format='JPEG', quality=quality)
+        return mem_img
 
     def resize(self, max_width=2000):
         """

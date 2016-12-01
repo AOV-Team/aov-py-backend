@@ -1,6 +1,7 @@
 from apps.photo.photo import Photo
 from django.conf import settings
 from django.test import override_settings, TestCase
+from io import BytesIO
 from os.path import getsize
 
 
@@ -16,6 +17,19 @@ class TestPhoto(TestCase):
         self.assertIsNotNone(photo.name)
         self.assertEquals(photo.width, 750)
         self.assertEquals(photo.height, 749)
+
+    def test_photo_compress(self):
+        """
+        Test that we can get compressed image in in-memory bytes
+
+        :return: None
+        """
+        file = 'apps/common/test/data/photos/photo1-min.jpg'
+
+        photo = Photo(open(file, 'rb'))
+        image = photo.compress()
+
+        self.assertIsInstance(image, BytesIO)
 
     @override_settings(IMAGES_USE_REMOTE_STORAGE=False)
     def test_photo_save_compressed_local(self):
