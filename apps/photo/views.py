@@ -1,3 +1,4 @@
+from apps.common import models as commmon_models
 from apps.common.views import get_default_response, handle_jquery_empty_array, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
@@ -98,8 +99,11 @@ class PhotoViewSet(generics.ListCreateAPIView):
         # Image compression
         # Save original first
         if 'image' in payload:
-            # TODO save original first
+            # Save original photo to media
             photo = Photo(payload['image'])
+            photo.save('{}/{}_{}'.format(settings.MEDIA_ROOT, commmon_models.get_date_stamp_str(), photo.name))
+
+            # Process image to save
             payload['image'] = photo.compress()
 
         serializer = photo_serializers.PhotoSerializer(data=payload)
@@ -154,7 +158,7 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
         payload = request.data
         payload = remove_pks_from_payload('photo_classification', payload)
 
-        # Only tads are allowed
+        # Only tags are allowed
         if 'classification_type' in payload:
             if payload['classification_type'] == 'category':
                 raise ValidationError('Cannot create a category')

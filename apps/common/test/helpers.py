@@ -1,4 +1,23 @@
 from rest_framework.authtoken.models import Token
+import fnmatch
+import os
+
+
+def find_file_by_pattern(path, pattern):
+    """
+    Find files in specified path that match given pattern
+
+    :param path: directory to search
+    :param pattern: UNIX glob-style pattern
+    :return: list of matched files or None
+    """
+    matched_files = list()
+
+    for file in os.listdir(path):
+        if fnmatch.fnmatch(file, pattern):
+            matched_files.append(file)
+
+    return matched_files if len(matched_files) > 0 else None
 
 
 def get_token_for_user(user):

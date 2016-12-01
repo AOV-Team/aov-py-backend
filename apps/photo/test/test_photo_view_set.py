@@ -1,4 +1,5 @@
 from apps.account import models as account_models
+from apps.common.models import get_date_stamp_str
 from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
@@ -6,6 +7,8 @@ from django.conf import settings
 from django.test import override_settings, TestCase
 from os.path import getsize
 from rest_framework.test import APIClient
+import re
+import time
 
 
 class TestPhotoViewSetGET(TestCase):
@@ -246,7 +249,7 @@ class TestPhotoViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        original_image = 'apps/common/test/data/photos/photo1-min.jpg'
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
 
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
         category = photo_models.PhotoClassification.objects\
@@ -259,16 +262,15 @@ class TestPhotoViewSetPOST(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        with open(original_image, 'rb') as image:
+        with open(image, 'rb') as i:
             payload = {
                 'category': category.id,
-                'image': image
+                'image': i
             }
 
             request = client.post('/api/photos', data=payload, format='multipart')
 
         result = request.data
-        print(result)
 
         self.assertEquals(result['category'][0], category.id)
         self.assertEquals(result['user'], user.id)
@@ -278,11 +280,21 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(len(photos), 1)
 
-        # Test that original image is saved
-        print(photos[0].image)
+        # Test that original uploaded image is saved (before resized and compressed)
+        matched_images = test_helpers.find_file_by_pattern(settings.MEDIA_ROOT, '*_md-portrait.jpg')
+        original_image = matched_images[0] if matched_images is not None else matched_images
+
+        if original_image is not None:
+            if not re.match('^' + get_date_stamp_str().split('_')[0] + '_[0-9]{6}_md-portrait\.jpg$', original_image):
+                self.fail('Original image not matched!')
+        else:
+            self.fail('Original image not found!')
+
+        # Sleep so other image-related unit tests don't get jacked up
+        time.sleep(1)
 
         # Test that compression worked
-        self.assertGreater(getsize(original_image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
+        self.assertGreater(getsize(image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
 
     def test_photo_view_set_post_bad_request_fields_missing(self):
         """
