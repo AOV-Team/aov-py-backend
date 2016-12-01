@@ -96,6 +96,11 @@ class PhotoViewSet(generics.ListCreateAPIView):
         payload['user'] = authenticated_user.id
 
         # Image compression
+        # Save original first
+        if 'image' in payload:
+            # TODO save original first
+            photo = Photo(payload['image'])
+            payload['image'] = photo.compress()
 
         serializer = photo_serializers.PhotoSerializer(data=payload)
 

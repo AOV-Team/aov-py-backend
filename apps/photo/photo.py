@@ -1,9 +1,22 @@
+from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from io import BytesIO
-from PIL import Image
+from PIL import Image as PillowImage
 
 
 class Photo(ImageFile):
+    """
+    Class to manipulate image data
+
+    References
+    https://docs.djangoproject.com/en/1.10/_modules/django/core/files/uploadedfile/#InMemoryUploadedFile
+    http://stackoverflow.com/questions/36417049/how-to-convert-an-inmemoryuploadedfile-in-django-to-a-fomat-for-flickr-api
+    http://stackoverflow.com/questions/24373341/django-image-resizing-and-convert-before-upload
+    http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
+    http://stackoverflow.com/questions/3723220/how-do-you-convert-a-pil-image-to-a-django-file
+
+    """
     def __init__(self, file_object):
         """
         Constructor
@@ -13,7 +26,7 @@ class Photo(ImageFile):
         """
         super(Photo, self).__init__(file_object)
         self.obj = file_object
-        self.img = Image.open(file_object)
+        self.pillow_image = PillowImage.open(file_object)
 
     def compress(self, quality=80, max_width=2000):
         """
@@ -27,8 +40,10 @@ class Photo(ImageFile):
         self.resize(max_width=max_width)
 
         mem_img = BytesIO()
-        self.img.save(mem_img, format='JPEG', quality=quality)
-        return mem_img
+        self.pillow_image.save(fp=mem_img, format='JPEG', quality=quality)
+        content = ContentFile(mem_img.getvalue())
+
+        return InMemoryUploadedFile(content, None, self.name, 'image/jpeg', content.tell, None)
 
     def resize(self, max_width=2000):
         """
@@ -38,12 +53,12 @@ class Photo(ImageFile):
         :return: Resized or original image (PIL Image object)
         """
         # Resize if larger than max
-        if self.img.size[0] > max_width:
-            img_ratio = self.img.size[0] / float(self.img.size[1])
+        if self.pillow_image.size[0] > max_width:
+            img_ratio = self.pillow_image.size[0] / float(self.pillow_image.size[1])
             new_height = int(max_width / img_ratio)
-            self.img = self.img.resize((max_width, new_height), Image.ANTIALIAS)
+            self.pillow_image = self.pillow_image.resize((max_width, new_height), PillowImage.ANTIALIAS)
 
-        return self.img
+        return self.pillow_image
 
     def save(self, filename, quality=100):
         """
@@ -53,4 +68,4 @@ class Photo(ImageFile):
         :param quality: image quality
         :return: None
         """
-        self.img.save(filename, format='JPEG', quality=quality)
+        self.pillow_image.save(filename, format='JPEG', quality=quality)

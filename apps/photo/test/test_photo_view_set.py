@@ -2,7 +2,9 @@ from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
+from django.conf import settings
 from django.test import override_settings, TestCase
+from os.path import getsize
 from rest_framework.test import APIClient
 
 
@@ -235,7 +237,7 @@ class TestPhotoViewSetPOST(TestCase):
     """
     Test POST api/photos
     """
-    @override_settings(IMAGES_USE_REMOTE_STORAGE=False)
+    @override_settings(IMAGES_USE_REMOTE_STORAGE=True)
     def test_photo_view_set_post_successful(self):
         """
         Test that we can save a photo.
@@ -244,6 +246,8 @@ class TestPhotoViewSetPOST(TestCase):
         :return: None
         """
         # Test data
+        original_image = 'apps/common/test/data/photos/photo1-min.jpg'
+
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
         category = photo_models.PhotoClassification.objects\
             .create_or_update(name='Landscape', classification_type='category')
@@ -255,7 +259,7 @@ class TestPhotoViewSetPOST(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        with open('apps/common/test/data/photos/photo1-min.jpg', 'rb') as image:
+        with open(original_image, 'rb') as image:
             payload = {
                 'category': category.id,
                 'image': image
@@ -264,6 +268,7 @@ class TestPhotoViewSetPOST(TestCase):
             request = client.post('/api/photos', data=payload, format='multipart')
 
         result = request.data
+        print(result)
 
         self.assertEquals(result['category'][0], category.id)
         self.assertEquals(result['user'], user.id)
@@ -272,6 +277,12 @@ class TestPhotoViewSetPOST(TestCase):
         photos = photo_models.Photo.objects.all()
 
         self.assertEquals(len(photos), 1)
+
+        # Test that original image is saved
+        print(photos[0].image)
+
+        # Test that compression worked
+        self.assertGreater(getsize(original_image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
 
     def test_photo_view_set_post_bad_request_fields_missing(self):
         """

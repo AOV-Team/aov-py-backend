@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.account',
     'apps.photo',
+    'apps.utils',
     'dbmail',
     'guardian',
     'rest_framework',
