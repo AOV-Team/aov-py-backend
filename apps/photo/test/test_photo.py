@@ -1,7 +1,7 @@
 from apps.photo.photo import Photo
 from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.test import override_settings, TestCase
-from io import BytesIO
 from os.path import getsize
 
 
@@ -29,7 +29,7 @@ class TestPhoto(TestCase):
         photo = Photo(open(file, 'rb'))
         image = photo.compress()
 
-        self.assertIsInstance(image, BytesIO)
+        self.assertIsInstance(image, InMemoryUploadedFile)
 
     @override_settings(IMAGES_USE_REMOTE_STORAGE=False)
     def test_photo_save_compressed_local(self):
