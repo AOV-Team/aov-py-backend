@@ -240,7 +240,7 @@ class TestPhotoViewSetPOST(TestCase):
     """
     Test POST api/photos
     """
-    @override_settings(IMAGES_USE_REMOTE_STORAGE=True)
+    @override_settings(IMAGES_USE_REMOTE_STORAGE=False)
     def test_photo_view_set_post_successful(self):
         """
         Test that we can save a photo.

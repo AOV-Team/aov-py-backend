@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-from backend.settings.project_config import DATABASES, DEBUG, EMAIL, SOCIAL_AUTH_FACEBOOK_SECRET
+from backend.settings.project_config import DATABASES, DEBUG, EMAIL, SOCIAL_AUTH_FACEBOOK_SECRET, STORAGE
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -191,11 +191,13 @@ STATICFILES_DIRS = (
 
 # Image Storage
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-AWS_ACCESS_KEY_ID = 'AKIAIIFCTY3MW6SGSFEQ'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'aovdev1'
-AWS_S3_FILE_OVERWRITE = False
+if STORAGE['REMOTE_IMAGE_STORAGE']:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+
+    AWS_ACCESS_KEY_ID = STORAGE['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = STORAGE['AWS_SECRET_ACCESS_KEY']
+    AWS_STORAGE_BUCKET_NAME = STORAGE['AWS_STORAGE_BUCKET_NAME']
+    AWS_S3_FILE_OVERWRITE = False
 
 # Misc
 
