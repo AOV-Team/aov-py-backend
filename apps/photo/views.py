@@ -1,4 +1,4 @@
-from apps.common import models as commmon_models
+from apps.common import models as common_models
 from apps.common.views import get_default_response, handle_jquery_empty_array, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
@@ -101,7 +101,9 @@ class PhotoViewSet(generics.ListCreateAPIView):
         if 'image' in payload:
             # Save original photo to media
             photo = Photo(payload['image'])
-            photo.save('{}/{}_{}'.format(settings.MEDIA_ROOT, commmon_models.get_date_stamp_str(), photo.name))
+            photo.save('{}/u{}_{}_{}'
+                       .format(settings.MEDIA_ROOT, authenticated_user.id, common_models.get_date_stamp_str(),
+                               photo.name))
 
             # Process image to save
             payload['image'] = photo.compress()

@@ -46,8 +46,8 @@ def get_uploaded_file_path(instance, filename):
     """
     # If image has user, use username.{extension}
     # Else use name of file
-    filename = '{}.{}'\
-        .format(instance.user.username, filename.split('.')[-1]) if instance.user else filename
+    filename = 'u{}.{}'\
+        .format(instance.user.id, filename.split('.')[-1]) if instance.user else filename
 
     # Date stamp
     current_time = get_date_stamp_str()

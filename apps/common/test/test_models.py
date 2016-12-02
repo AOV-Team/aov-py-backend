@@ -21,8 +21,7 @@ class TestGetUploadedFilePath(TestCase):
 
         image_path = common_models.get_uploaded_file_path(photo, 'photo.jpg')
 
-        if not re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{6}_aov1\.jpg',
-                        image_path):
+        if not re.match('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{6}_u' + str(user.id) + '\.jpg', image_path):
             self.fail()
 
     def test_get_uploaded_file_path_no_user(self):

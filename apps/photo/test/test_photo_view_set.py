@@ -285,7 +285,8 @@ class TestPhotoViewSetPOST(TestCase):
         original_image = matched_images[0] if matched_images is not None else matched_images
 
         if original_image is not None:
-            if not re.match('^' + get_date_stamp_str().split('_')[0] + '_[0-9]{6}_md-portrait\.jpg$', original_image):
+            if not re.match('^u{}_'.format(user.id) + get_date_stamp_str().split('_')[0] + '_[0-9]{6}_md-portrait\.jpg$',
+                            original_image):
                 self.fail('Original image not matched!')
         else:
             self.fail('Original image not found!')
