@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    'storages',
     'apps.account',
     'apps.photo',
     'apps.utils',
@@ -187,6 +188,14 @@ STATIC_ROOT = '/var/media/backend/static'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+# Image Storage
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+AWS_ACCESS_KEY_ID = 'AKIAIIFCTY3MW6SGSFEQ'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'aovdev1'
+AWS_S3_FILE_OVERWRITE = False
 
 # Misc
 
