@@ -1,4 +1,5 @@
 from apps.account import models
+from apps.photo import models as photo_models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from guardian import models as guardian
@@ -19,13 +20,28 @@ class UserAdmin(BaseUserAdmin):
         ('Permissions', {'fields': ('groups', 'is_active', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ['username', 'email', 'social_name', 'location', 'age', 'is_active', 'created_at', 'id']
+    list_display = ['username', 'email', 'social_name', 'location', 'age', 'created_at', 'photo_count',
+                    'id']
     list_filter = ['is_active', 'is_superuser']
     ordering = ['username']
 
     readonly_fields = ('created_at', 'id', 'last_login')
 
     search_fields = ['age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name']
+
+    def photo_count(self, obj):
+        """
+        Show number of photos that user has uploaded
+
+        :param obj: instance of User
+        :return: String w/ photo count
+        """
+        user_photos = photo_models.Photo.objects.filter(user=obj)
+
+        return u'{}'.format(len(user_photos))
+
+    photo_count.allow_tags = True
+    photo_count.short_description = 'Photos'
 
 
 class ProfileAdmin(admin.ModelAdmin):
