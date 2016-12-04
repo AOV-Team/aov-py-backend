@@ -1,7 +1,7 @@
 amqp==2.1.1
 Babel==2.3.4
 billiard==3.5.0.2
-boto==2.43.0
+boto3==1.4.2
 botocore==1.4.81
 celery==4.0.0
 defusedxml==0.4.1
