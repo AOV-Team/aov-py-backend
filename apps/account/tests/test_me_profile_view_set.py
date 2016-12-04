@@ -120,8 +120,7 @@ class TestMeProfileViewSetPATCH(TestCase):
 
         result = request.data
 
-        if 'cover_image' not in result:
-            self.fail('Cover image not in result!')
+        self.assertIn('cover_image', result)
 
         # Check db entry too
         updated_profile = account_models.Profile.objects.get(user=user)

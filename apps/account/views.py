@@ -400,22 +400,51 @@ class UserViewSet(generics.CreateAPIView):
         :return: Response object
         """
         payload = request.data
-        email = payload.get('email')
-        password = payload.get('password')
-        username = payload.get('username')
-        request = get_default_response('400')
+        response = get_default_response('400')
 
-        if email and password and username:
+        if 'avatar' in payload:
+            # Save original photo to media
             try:
-                user = account_models.User.objects.create_user(email, password, username)
+                photo = Photo(payload['avatar'])
+                photo.save('AVATAR_NEW_USER_{}_{}'.format(common_models.get_date_stamp_str(), photo.name))
 
-                if user:
-                    request = get_default_response('201')
-                    request.data = account_serializers.UserSerializer(user).data
-            except IntegrityError:
-                request = get_default_response('409')
-                request.data['message'] = 'User already exists'
-                request.data['userMessage'] = 'A user with the same email already exists. If you forgot your ' \
-                                              'password, you can reset it using the Reset form.'
+                # Process image to save
+                payload['avatar'] = photo.compress()
+            except TypeError:
+                raise ValidationError('Avatar image is not of type image')
 
-        return request
+        serializer = account_serializers.UserSerializer(data=payload)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            response = get_default_response('201')
+            response.data = serializer.data
+        else:
+            response = get_default_response('409')
+            response.data['message'] = list()
+            response.data['userMessage'] = list()
+
+            # Does email already exist?
+            if 'email' in serializer.errors:
+                if 'user with this email already exists.' in serializer.errors['email']:
+                    response.data['message'].append('Email already exists')
+                    response.data['userMessage'].append('A user with the same email already exists. '
+                                                        'Did you forget your login?')
+                else:
+                    raise ValidationError(serializer.errors)
+
+            # Does username already exist?
+            if 'username' in serializer.errors:
+                if 'user with this username already exists.' in serializer.errors['username']:
+                    response.data['message'].append('Username already exists')
+                    response.data['userMessage'].append('A user with the same username already exists. '
+                                                        'Please choose a different username.')
+                else:
+                    raise ValidationError(serializer.errors)
+
+            # For all other errors
+            if 'email' not in serializer.errors and 'username' not in serializer.errors:
+                raise ValidationError(serializer.errors)
+
+        return response
