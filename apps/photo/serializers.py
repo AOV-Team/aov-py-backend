@@ -28,5 +28,5 @@ class PhotoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Photo
-        fields = ('id', 'category', 'tag', 'user', 'attribution_name', 'dimensions', 'image', 'location', 'photo_data',
-                  'public', 'photo_feed')
+        fields = ('id', 'category', 'tag', 'user', 'attribution_name', 'dimensions', 'image', 'location',
+                  'original_image_url', 'photo_data', 'public', 'photo_feed')

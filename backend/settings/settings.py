@@ -201,8 +201,11 @@ if REMOTE_IMAGE_STORAGE:
     AWS_S3_REGION_NAME = 'us-west-2'
 
     MEDIA_URL = 'http://{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
+    ORIGINAL_MEDIA_URL = 'http://{}.s3.amazonaws.com/'.format(STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+    ORIGINAL_MEDIA_URL = MEDIA_URL
 
 # Misc
 

@@ -274,6 +274,7 @@ class TestPhotoViewSetPOST(TestCase):
         result = request.data
 
         self.assertEquals(result['category'][0], category.id)
+        self.assertIn('original_image_url', result)
         self.assertEquals(result['user'], user.id)
 
         # Query for entry
@@ -329,6 +330,7 @@ class TestPhotoViewSetPOST(TestCase):
         result = request.data
 
         self.assertEquals(result['category'][0], category.id)
+        self.assertIn('original_image_url', result)
         self.assertEquals(result['user'], user.id)
 
         # Query for entry

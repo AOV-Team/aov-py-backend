@@ -114,9 +114,12 @@ class PhotoViewSet(generics.ListCreateAPIView):
             # Save original photo to media
             try:
                 photo = Photo(payload['image'])
-                photo.save('u{}_{}_{}'
-                           .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
-                           custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET'])
+                remote_key = photo.save('u{}_{}_{}'
+                                        .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
+                                        custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
+
+                # Original image url
+                payload['original_image_url'] = '{}{}'.format(settings.ORIGINAL_MEDIA_URL, remote_key)
 
                 # Process image to save
                 payload['image'] = photo.compress()

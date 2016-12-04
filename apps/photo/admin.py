@@ -17,7 +17,7 @@ class PhotoFeedAdmin(admin.ModelAdmin):
 
 class PhotoAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('Image', {'fields': ('image', 'user', 'location', 'public')}),
+        ('Image', {'fields': ('image', 'original_image_url', 'user', 'location', 'public',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
         ('Misc', {'fields': ('attribution_name', 'photo_data')}),
     )
@@ -27,6 +27,7 @@ class PhotoAdmin(admin.ModelAdmin):
 
     list_display = ['photo_tag', 'user_info', 'location', 'public', 'id']
     ordering = ['-id']
+    readonly_fields = ('original_image_url',)
     search_fields = ['image', 'id']
 
     def user_info(self, obj):

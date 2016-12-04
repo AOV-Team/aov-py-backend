@@ -198,7 +198,7 @@ class MeProfileViewSet(generics.RetrieveAPIView):
                     photo = Photo(payload['cover_image'])
                     photo.save('COVER_u{}_{}_{}'
                                .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
-                               custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET'])
+                               custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
 
                     # Process image to save
                     payload['cover_image'] = photo.compress()
@@ -246,7 +246,7 @@ class MeProfileViewSet(generics.RetrieveAPIView):
                     photo = Photo(payload['cover_image'])
                     photo.save('COVER_u{}_{}_{}'
                                .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
-                               custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET'])
+                               custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
 
                     # Process image to save
                     payload['cover_image'] = photo.compress()
@@ -409,7 +409,7 @@ class UserViewSet(generics.CreateAPIView):
             try:
                 photo = Photo(payload['avatar'])
                 photo.save('AVATAR_NEW_USER_{}_{}'.format(common_models.get_date_stamp_str(), photo.name),
-                           custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET'])
+                           custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
 
                 # Process image to save
                 payload['avatar'] = photo.compress()

@@ -115,6 +115,9 @@ $( document ).ready(function() {
                     <strong>Location:</strong> {{ photo.location }}<br>
                 </small>
                 <a target="_blank" href="{{ media_url }}{{ photo.image }}">Download <span class="fa fa-external-link"></span></a>
+                {% if photo.original_image_url %}
+                <br><a target="_blank" href="{{ photo.original_image_url }}">Download Original <span class="fa fa-external-link"></span></a>
+                {% endif %}
             </div>
         </div>
         {% endfor %}

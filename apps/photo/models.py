@@ -81,6 +81,7 @@ class Photo(models.Model):
     attribution_name = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path)
     location = models.CharField(max_length=255, blank=True, null=True)
+    original_image_url = models.URLField(blank=True, null=True)
     photo_data = models.TextField(blank=True, null=True)
     public = models.BooleanField(default=True)
 
