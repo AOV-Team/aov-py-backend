@@ -240,7 +240,7 @@ class TestPhotoViewSetPOST(TestCase):
     """
     Test POST api/photos
     """
-    @override_settings(IMAGES_USE_REMOTE_STORAGE=False,
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
                        DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_view_set_post_successful(self):
         """
@@ -297,6 +297,44 @@ class TestPhotoViewSetPOST(TestCase):
 
         # Test that compression worked
         self.assertGreater(getsize(image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
+
+    def test_photo_view_set_post_remote_successful(self):
+        """
+        Test that we can save a photo. Must save remotely.
+
+        :return: None
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
+
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects \
+            .create_or_update(name='Landscape', classification_type='category')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'image': i
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(result['user'], user.id)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
 
     def test_photo_view_set_post_bad_request_fields_missing(self):
         """

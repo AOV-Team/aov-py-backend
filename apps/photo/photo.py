@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -62,10 +63,11 @@ class Photo(ImageFile):
 
     def save(self, filename, quality=100):
         """
-        Save an image.
+        Save an image. Saves locally to media or remotely
 
         :param filename: name to give to image file
         :param quality: image quality
         :return: None
         """
+        # if settings.STORAGE
         self.pillow_image.save(filename, format='JPEG', quality=quality)
