@@ -2,8 +2,8 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage as storage
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
+from io import BufferedReader, BytesIO
 from PIL import Image as PillowImage
 
 
@@ -26,9 +26,14 @@ class Photo(ImageFile):
         :param file_object: object created using Python's open()
         :return: None
         """
-        super(Photo, self).__init__(file_object)
-        self.obj = file_object
-        self.pillow_image = PillowImage.open(file_object)
+        if isinstance(file_object, BufferedReader) \
+                or isinstance(file_object, InMemoryUploadedFile) \
+                or isinstance(file_object, TemporaryUploadedFile):
+            super(Photo, self).__init__(file_object)
+            self.obj = file_object
+            self.pillow_image = PillowImage.open(file_object)
+        else:
+            raise TypeError('File object not instance of BufferedReader, InMemoryUploadedFile or TemporaryUploadedFile')
 
     def compress(self, quality=80, max_width=2000):
         """

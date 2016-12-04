@@ -1,15 +1,18 @@
 from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.account import tasks as account_tasks
+from apps.common import models as common_models
 from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
+from apps.photo.photo import Photo
 from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from social.apps.django_app.utils import load_strategy
 from social.apps.django_app.utils import load_backend
@@ -137,7 +140,6 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         return response
 
 
-# TODO image compression
 class MeProfileViewSet(generics.RetrieveAPIView):
     """
     api/me/profile
@@ -188,6 +190,20 @@ class MeProfileViewSet(generics.RetrieveAPIView):
             payload = remove_pks_from_payload('user', payload)
             payload['user'] = authenticated_user.id
 
+            # Image compression
+            # Save original first
+            if 'cover_image' in payload:
+                # Save original photo to media
+                try:
+                    photo = Photo(payload['cover_image'])
+                    photo.save('u{}_{}_{}'
+                               .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
+
+                    # Process image to save
+                    payload['cover_image'] = photo.compress()
+                except TypeError:
+                    raise ValidationError('Cover image is not of type image')
+
             serializer = account_serializers.ProfileSerializer(data=payload, partial=True)
 
             if serializer.is_valid():
@@ -220,6 +236,20 @@ class MeProfileViewSet(generics.RetrieveAPIView):
             payload = remove_pks_from_payload('profile', payload)
             payload = remove_pks_from_payload('user', payload)
             payload['user'] = authenticated_user.id
+
+            # Image compression
+            # Save original first
+            if 'cover_image' in payload:
+                # Save original photo to media
+                try:
+                    photo = Photo(payload['cover_image'])
+                    photo.save('u{}_{}_{}'
+                               .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
+
+                    # Process image to save
+                    payload['cover_image'] = photo.compress()
+                except TypeError:
+                    raise ValidationError('Cover image is not of type image')
 
             serializer = account_serializers.ProfileSerializer(data=payload)
 

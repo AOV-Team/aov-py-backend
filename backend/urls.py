@@ -46,7 +46,7 @@ urlpatterns = [
 
     # admin
     url(r'^admin/', admin.site.urls),
-    url(r'^admin/photos$', photo_views.photo_admin)
+    url(r'^admin/photos/$', photo_views.photo_admin)
 ]
 
 # Enable images for runserver

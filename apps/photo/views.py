@@ -100,12 +100,15 @@ class PhotoViewSet(generics.ListCreateAPIView):
         # Save original first
         if 'image' in payload:
             # Save original photo to media
-            photo = Photo(payload['image'])
-            photo.save('u{}_{}_{}'
-                       .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
+            try:
+                photo = Photo(payload['image'])
+                photo.save('u{}_{}_{}'
+                           .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
 
-            # Process image to save
-            payload['image'] = photo.compress()
+                # Process image to save
+                payload['image'] = photo.compress()
+            except TypeError:
+                raise ValidationError('Image is not of type image')
 
         serializer = photo_serializers.PhotoSerializer(data=payload)
 

@@ -18,6 +18,15 @@ class TestPhoto(TestCase):
         self.assertEquals(photo.width, 750)
         self.assertEquals(photo.height, 749)
 
+    def test_photo_bad_type(self):
+        """
+        Test that we get TypeError if we don't supply a file
+
+        :return: None
+        """
+        with self.assertRaises(TypeError):
+            Photo('foo')
+
     def test_photo_compress(self):
         """
         Test that we can get compressed image in in-memory bytes
@@ -31,7 +40,8 @@ class TestPhoto(TestCase):
 
         self.assertIsInstance(image, InMemoryUploadedFile)
 
-    @override_settings(IMAGES_USE_REMOTE_STORAGE=False)
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_save_compressed_local(self):
         """
         Test that we can save compressed images in media
@@ -39,10 +49,10 @@ class TestPhoto(TestCase):
         :return: None
         """
         file = 'apps/common/test/data/photos/photo1-min.jpg'
-        saved = settings.MEDIA_ROOT + '/img.jpg'
+        saved = 'img.jpg'
 
         photo = Photo(open(file, 'rb'))
         photo.resize(max_width=2000)
         photo.save(saved, quality=80)
 
-        self.assertLess(getsize(file), getsize(saved))
+        self.assertLess(getsize(file), getsize('{}/{}'.format(settings.MEDIA_ROOT, saved)))
