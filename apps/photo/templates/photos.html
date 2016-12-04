@@ -99,24 +99,41 @@ $( document ).ready(function() {
                 <span class="fa fa-window-close"></span>
                 <strong>Feeds</strong><br>
                 {% for feed in photo_feeds %}
+                <label>{{ feed.name }}</label>
                 {% if feed.name in photo.photo_feed_names %}
-                <label>{{ feed.name }}</label>
-                <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked><br>
+                <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked>
                 {% else %}
-                <label>{{ feed.name }}</label>
-                <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}"><br>
+                <input class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}">
                 {% endif %}
                 {% endfor %}
                 {% csrf_token %}
                 <img src="{{ media_url }}{{ photo.image }}">
                 <small>
-                <strong>Username:</strong> {{ photo.user.username }}<br>
-                <strong>Social name:</strong> {{ photo.user.social_name }}<br>
-                <strong>Location:</strong> {{ photo.location }}<br>
-            </small>
+                    <strong>Email:</strong> {{ photo.user.email }}<br>
+                    <strong>Username:</strong> {{ photo.user.username }}<br>
+                    <strong>Social name:</strong> {{ photo.user.social_name }}<br>
+                    <strong>Location:</strong> {{ photo.location }}<br>
+                </small>
+                <a target="_blank" href="{{ media_url }}{{ photo.image }}">Download <span class="fa fa-external-link"></span></a>
             </div>
         </div>
         {% endfor %}
+    </div>
+    <!-- pagination -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if photos.has_previous %}
+                <a href="?page={{ photos.previous_page_number }}"><span class="fa fa-arrow-circle-left"></span></a>
+            {% endif %}
+
+            <span class="current">
+                Page <strong>{{ photos.number }}</strong> of {{ photos.paginator.num_pages }}
+            </span>
+
+            {% if photos.has_next %}
+                <a href="?page={{ photos.next_page_number }}"><span class="fa fa-arrow-circle-right"></span></a>
+            {% endif %}
+        </span>
     </div>
 </div>
 {% endblock %}

@@ -6,6 +6,7 @@ from apps.photo.photo import Photo
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import generics, permissions
@@ -16,12 +17,23 @@ from rest_framework.exceptions import NotFound, PermissionDenied, ValidationErro
 @staff_member_required
 def photo_admin(request):
     """
-    View for /admin/photos
+    View for /admin/photos/
 
     :param request: Request object
     :return: render()
     """
     photos = photo_models.Photo.objects.filter(public=True).order_by('-id')
+    paginator = Paginator(photos, 20)
+    page = request.GET.get('page')
+
+    try:
+        photos = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        photos = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        photos = paginator.page(paginator.num_pages)
 
     # Add list of names of feeds that image is in
     # Makes it easier to work with in the HTML template
