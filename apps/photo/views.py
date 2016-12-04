@@ -101,9 +101,8 @@ class PhotoViewSet(generics.ListCreateAPIView):
         if 'image' in payload:
             # Save original photo to media
             photo = Photo(payload['image'])
-            photo.save('{}/u{}_{}_{}'
-                       .format(settings.MEDIA_ROOT, authenticated_user.id, common_models.get_date_stamp_str(),
-                               photo.name))
+            photo.save('u{}_{}_{}'
+                       .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
 
             # Process image to save
             payload['image'] = photo.compress()

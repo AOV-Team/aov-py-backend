@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
+from django.core.files.storage import default_storage as storage
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from io import BytesIO
 from PIL import Image as PillowImage
@@ -69,5 +70,10 @@ class Photo(ImageFile):
         :param quality: image quality
         :return: None
         """
-        # if settings.STORAGE
-        self.pillow_image.save(filename, format='JPEG', quality=quality)
+        if settings.REMOTE_IMAGE_STORAGE:
+            mem_img = BytesIO()
+            self.pillow_image.save(fp=mem_img, format='JPEG', quality=quality)
+            content = ContentFile(mem_img.getvalue())
+            storage.save(filename, content)
+        else:
+            self.pillow_image.save('{}/{}'.format(settings.MEDIA_ROOT, filename), format='JPEG', quality=quality)
