@@ -15,7 +15,18 @@ class PhotoFeedSerializer(serializers.ModelSerializer):
 
 
 class PhotoSerializer(serializers.ModelSerializer):
+    dimensions = serializers.SerializerMethodField()
+
+    def get_dimensions(self, obj):
+        """
+        Get image dimensions
+
+        :param obj: Photo object
+        :return: dict containing image dimensions
+        """
+        return {'width': obj.image.width, 'height': obj.image.height}
+
     class Meta:
         model = models.Photo
-        fields = ('id', 'category', 'tag', 'user', 'attribution_name', 'image', 'location', 'photo_data', 'public',
-                  'photo_feed')
+        fields = ('id', 'category', 'tag', 'user', 'attribution_name', 'dimensions', 'image', 'location', 'photo_data',
+                  'public', 'photo_feed')

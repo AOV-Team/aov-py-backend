@@ -96,9 +96,11 @@ class TestPhotoSingleViewSetGET(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/photos/{}'.format(photo.id))
-        results = request.data
+        result = request.data
 
-        self.assertEquals(results['user'], user.id)
+        self.assertIn('dimensions', result)
+        self.assertIn('image', result)
+        self.assertEquals(result['user'], user.id)
 
     def test_photo_single_view_set_get_deleted(self):
         """
