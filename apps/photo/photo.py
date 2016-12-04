@@ -1,10 +1,11 @@
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
-from django.core.files.storage import default_storage as storage
+# from django.core.files.storage import default_storage as storage
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from io import BufferedReader, BytesIO
 from PIL import Image as PillowImage
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class Photo(ImageFile):
@@ -67,11 +68,13 @@ class Photo(ImageFile):
 
         return self.pillow_image
 
-    def save(self, filename, quality=100):
+    def save(self, filename, custom_bucket=False, quality=100):
         """
         Save an image. Saves locally to media or remotely
 
         :param filename: name to give to image file
+        :param custom_bucket: If using remote storage, storage will use this bucket instead of the one set in
+        settings.py
         :param quality: image quality
         :return: None
         """
@@ -79,6 +82,15 @@ class Photo(ImageFile):
             mem_img = BytesIO()
             self.pillow_image.save(fp=mem_img, format='JPEG', quality=quality)
             content = ContentFile(mem_img.getvalue())
-            storage.save(filename, content)
+
+            if custom_bucket:
+                storage = S3Boto3Storage(bucket=custom_bucket)
+            else:
+                storage = S3Boto3Storage()
+
+            return storage.save(filename, content)
         else:
-            self.pillow_image.save('{}/{}'.format(settings.MEDIA_ROOT, filename), format='JPEG', quality=quality)
+            full_filename = '{}/{}'.format(settings.MEDIA_ROOT, filename)
+            self.pillow_image.save(full_filename, format='JPEG', quality=quality)
+
+            return full_filename

@@ -6,9 +6,9 @@ from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.utils import IntegrityError
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -197,7 +197,8 @@ class MeProfileViewSet(generics.RetrieveAPIView):
                 try:
                     photo = Photo(payload['cover_image'])
                     photo.save('COVER_u{}_{}_{}'
-                               .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
+                               .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
+                               custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET'])
 
                     # Process image to save
                     payload['cover_image'] = photo.compress()
@@ -244,7 +245,8 @@ class MeProfileViewSet(generics.RetrieveAPIView):
                 try:
                     photo = Photo(payload['cover_image'])
                     photo.save('COVER_u{}_{}_{}'
-                               .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
+                               .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
+                               custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET'])
 
                     # Process image to save
                     payload['cover_image'] = photo.compress()
@@ -406,7 +408,8 @@ class UserViewSet(generics.CreateAPIView):
             # Save original photo to media
             try:
                 photo = Photo(payload['avatar'])
-                photo.save('AVATAR_NEW_USER_{}_{}'.format(common_models.get_date_stamp_str(), photo.name))
+                photo.save('AVATAR_NEW_USER_{}_{}'.format(common_models.get_date_stamp_str(), photo.name),
+                           custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET'])
 
                 # Process image to save
                 payload['avatar'] = photo.compress()

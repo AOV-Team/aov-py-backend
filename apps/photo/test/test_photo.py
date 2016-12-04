@@ -56,3 +56,16 @@ class TestPhoto(TestCase):
         photo.save(saved, quality=80)
 
         self.assertLess(getsize(file), getsize('{}/{}'.format(settings.MEDIA_ROOT, saved)))
+
+    def test_photo_save_remote_custom_bucket(self):
+        """
+        Test that we can save to custom remote bucket
+
+        :return: None
+        """
+        file = 'apps/common/test/data/photos/cover.jpg'
+
+        photo = Photo(open(file, 'rb'))
+        saved = photo.save('custom_bucket.jpg', custom_bucket='aovdev1', quality=80)
+
+        self.assertIsNotNone(saved)

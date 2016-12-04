@@ -103,7 +103,8 @@ class PhotoViewSet(generics.ListCreateAPIView):
             try:
                 photo = Photo(payload['image'])
                 photo.save('u{}_{}_{}'
-                           .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
+                           .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
+                           custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET'])
 
                 # Process image to save
                 payload['image'] = photo.compress()
