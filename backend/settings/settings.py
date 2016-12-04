@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-from backend.settings.project_config import DATABASES, DEBUG, EMAIL, SOCIAL_AUTH_FACEBOOK_SECRET
+from backend.settings.project_config import DATABASES, DEBUG, EMAIL, SOCIAL_AUTH_FACEBOOK_SECRET, STORAGE
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    'storages',
     'apps.account',
     'apps.photo',
     'apps.utils',
@@ -187,6 +188,17 @@ STATIC_ROOT = '/var/media/backend/static'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+# Image Storage
+
+if STORAGE['REMOTE_IMAGE_STORAGE']:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    AWS_ACCESS_KEY_ID = STORAGE['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = STORAGE['AWS_SECRET_ACCESS_KEY']
+    AWS_STORAGE_BUCKET_NAME = STORAGE['AWS_STORAGE_BUCKET_NAME']
+
+    MEDIA_URL = 'http://{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
 
 # Misc
 

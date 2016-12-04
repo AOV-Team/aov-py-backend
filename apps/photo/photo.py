@@ -4,6 +4,9 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from io import BytesIO
 from PIL import Image as PillowImage
 
+# TODO S3 upload handler
+# http://stackoverflow.com/questions/39626044/how-to-avoid-having-idle-connection-timeout-while-uploading-large-file
+
 
 class Photo(ImageFile):
     """

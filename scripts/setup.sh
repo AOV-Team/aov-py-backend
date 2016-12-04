@@ -27,9 +27,15 @@ EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
 
-IMAGES_USE_REMOTE_STORAGE = False
-
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
+
+STORAGE = dict()
+
+STORAGE['AWS_ACCESS_KEY_ID'] = ''
+STORAGE['AWS_SECRET_ACCESS_KEY'] = ''
+STORAGE['AWS_STORAGE_BUCKET_NAME'] = 'aovdev'
+STORAGE['IMAGES_ORIGINAL_BUCKET'] = 'aovdev-original'
+STORAGE['REMOTE_IMAGE_STORAGE'] = True
 EOF
 elif [ "$1" == "staging" ]; then
     cat > backend/settings/project_config.py <<'EOF'
@@ -57,9 +63,15 @@ EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
 
-IMAGES_USE_REMOTE_STORAGE = True
-
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
+
+STORAGE = dict()
+
+STORAGE['AWS_ACCESS_KEY_ID'] = ''
+STORAGE['AWS_SECRET_ACCESS_KEY'] = ''
+STORAGE['AWS_STORAGE_BUCKET_NAME'] = 'aovstaging'
+STORAGE['IMAGES_ORIGINAL_BUCKET'] = 'aovstaging-original'
+STORAGE['REMOTE_IMAGE_STORAGE'] = True
 EOF
 elif [ "$1" == "production" ]; then
     cat > backend/settings/project_config.py <<'EOF'
@@ -87,9 +99,15 @@ EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
 
-IMAGES_USE_REMOTE_STORAGE = True
-
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
+
+STORAGE = dict()
+
+STORAGE['AWS_ACCESS_KEY_ID'] = ''
+STORAGE['AWS_SECRET_ACCESS_KEY'] = ''
+STORAGE['AWS_STORAGE_BUCKET_NAME'] = 'aovprod'
+STORAGE['IMAGES_ORIGINAL_BUCKET'] = 'aovprod-original'
+STORAGE['REMOTE_IMAGE_STORAGE'] = True
 EOF
 else
     echo "No environment specified [dev|staging|production]"
