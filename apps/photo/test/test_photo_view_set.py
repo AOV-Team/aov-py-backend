@@ -240,7 +240,8 @@ class TestPhotoViewSetPOST(TestCase):
     """
     Test POST api/photos
     """
-    @override_settings(IMAGES_USE_REMOTE_STORAGE=False)
+    @override_settings(IMAGES_USE_REMOTE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_view_set_post_successful(self):
         """
         Test that we can save a photo.

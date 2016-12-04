@@ -199,6 +199,8 @@ if STORAGE['REMOTE_IMAGE_STORAGE']:
     AWS_STORAGE_BUCKET_NAME = STORAGE['AWS_STORAGE_BUCKET_NAME']
 
     MEDIA_URL = 'http://{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Misc
 
