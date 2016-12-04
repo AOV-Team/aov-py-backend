@@ -196,7 +196,7 @@ class MeProfileViewSet(generics.RetrieveAPIView):
                 # Save original photo to media
                 try:
                     photo = Photo(payload['cover_image'])
-                    photo.save('u{}_{}_{}'
+                    photo.save('COVER_u{}_{}_{}'
                                .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
 
                     # Process image to save
@@ -243,7 +243,7 @@ class MeProfileViewSet(generics.RetrieveAPIView):
                 # Save original photo to media
                 try:
                     photo = Photo(payload['cover_image'])
-                    photo.save('u{}_{}_{}'
+                    photo.save('COVER_u{}_{}_{}'
                                .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name))
 
                     # Process image to save

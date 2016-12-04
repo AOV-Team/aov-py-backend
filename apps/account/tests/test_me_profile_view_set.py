@@ -73,13 +73,16 @@ class TestMeProfileViewSetPATCH(TestCase):
         # Get data from endpoint
         client = APIClient()
 
-        payload = {
-            'bio': 'Foo'
-        }
+        with open('apps/common/test/data/photos/cover.jpg', 'rb') as image:
+            payload = {
+                'bio': 'Foo',
+                'cover_image': image,
+            }
 
-        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+            client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        request = client.patch('/api/me/profile', data=payload, format='json')
+            request = client.patch('/api/me/profile', data=payload, format='multipart')
+
         result = request.data
 
         # Test return data
@@ -89,6 +92,41 @@ class TestMeProfileViewSetPATCH(TestCase):
         updated_profile = account_models.Profile.objects.get(user=user)
 
         self.assertEquals(updated_profile.bio, 'Foo')
+
+    def test_me_profile_view_set_patch_image(self):
+        """
+        Test that we can update user image
+
+        :return: None
+        """
+        # Create test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+
+        with open('apps/common/test/data/photos/cover.jpg', 'rb') as image:
+            payload = {
+                'cover_image': image,
+            }
+
+            client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+            request = client.patch('/api/me/profile', data=payload, format='multipart')
+
+        result = request.data
+
+        if 'cover_image' not in result:
+            self.fail('Cover image not in result!')
+
+        # Check db entry too
+        updated_profile = account_models.Profile.objects.get(user=user)
+
+        self.assertIsNotNone(updated_profile.cover_image)
 
     def test_me_profile_view_set_patch_bad_request(self):
         """
