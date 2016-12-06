@@ -141,6 +141,14 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         return response
 
 
+class MeGearViewSet(generics.ListCreateAPIView):
+    """
+    api/me/gear
+
+    """
+    pass
+
+
 class MeProfileViewSet(generics.RetrieveAPIView):
     """
     api/me/profile
@@ -180,6 +188,10 @@ class MeProfileViewSet(generics.RetrieveAPIView):
         authenticated_user = TokenAuthentication().authenticate(request)[0]
         payload = request.data
         response = get_default_response('404')
+
+        # Gear not allowed
+        if 'gear' in payload:
+            raise ValidationError('Gear not editable. Use /api/me/gear')
 
         # Look for profile and update entry if profile exists
         # ELSE return 404
@@ -233,7 +245,11 @@ class MeProfileViewSet(generics.RetrieveAPIView):
         payload = request.data
         response = get_default_response('400')
 
-        if 'bio' in payload or 'cover_image' in payload or 'gear' in payload:
+        # Gear not allowed
+        if 'gear' in payload:
+            raise ValidationError('Gear not editable. Use /api/me/gear')
+
+        if 'bio' in payload or 'cover_image' in payload:
             # Clean up and assign user
             payload = remove_pks_from_payload('profile', payload)
             payload = remove_pks_from_payload('user', payload)

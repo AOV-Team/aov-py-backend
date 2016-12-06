@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'api/auth$', account_views.AuthenticateViewSet.as_view()),
     url(r'api/auth/social$', account_views.SocialSignUpViewSet.as_view()),
     url(r'api/me$', account_views.MeViewSet.as_view()),
+    url(r'api/me/gear', account_views.MeGearViewSet.as_view()),
     url(r'api/me/profile$', account_views.MeProfileViewSet.as_view()),
     url(r'api/users$', account_views.UserViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/photos$', account_views.UserPhotosViewSet.as_view()),

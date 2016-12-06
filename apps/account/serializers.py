@@ -12,5 +12,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
+        """
+        Gear is handled separately
+        """
         model = models.Profile
-        fields = ('user', 'bio', 'cover_image', 'gear')
+        fields = ('user', 'bio', 'cover_image')

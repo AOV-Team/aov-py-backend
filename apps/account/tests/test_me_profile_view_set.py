@@ -30,7 +30,7 @@ class TestMeProfileViewSetGET(TestCase):
 
         self.assertIn('bio', result)
         self.assertIn('cover_image', result)
-        self.assertIn('gear', result)
+        self.assertNotIn('gear', result)
 
     def test_me_profile_view_set_get_does_not_exist(self):
         """
@@ -153,6 +153,34 @@ class TestMeProfileViewSetPATCH(TestCase):
 
         self.assertEquals(request.status_code, 400)
 
+    def test_me_profile_view_set_patch_gear(self):
+        """
+        Test that we get HTTP 400 if attempting to edit gear using this endpoint
+
+        :return: None
+        """
+        # Create test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'bio': 'Foo',
+            'gear': {
+                'name': 'Nifty Fifty'
+            }
+        }
+
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.patch('/api/me/profile', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 400)
+
     def test_me_profile_view_set_patch_not_found(self):
         """
         Test that we get 404 if profile does not exist
@@ -237,8 +265,7 @@ class TestMeProfileViewSetPOST(TestCase):
         with open('apps/common/test/data/photos/photo1-min.jpg', 'rb') as image:
             payload = {
                 'bio': 'This is cool!',
-                'cover_image': image,
-                'gear': '["Nikon", "50mm Lens"]'
+                'cover_image': image
             }
 
             client.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -250,7 +277,6 @@ class TestMeProfileViewSetPOST(TestCase):
         self.assertEquals(result['user'], user.id)
         self.assertEquals(result['bio'], 'This is cool!')
         self.assertIsNotNone(result['cover_image'])
-        self.assertEquals(result['gear'], '["Nikon", "50mm Lens"]')
 
         # Query for entry
         profile = account_models.Profile.objects.filter(user=user)
@@ -277,8 +303,7 @@ class TestMeProfileViewSetPOST(TestCase):
             payload = {
                 'about': 'Awesome',
                 'bio': 'This is cool!',
-                'cover_image': image,
-                'gear': '["Nikon", "50mm Lens"]'
+                'cover_image': image
             }
 
             client.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -289,7 +314,6 @@ class TestMeProfileViewSetPOST(TestCase):
 
         self.assertEquals(result['bio'], 'This is cool!')
         self.assertIsNotNone(result['cover_image'])
-        self.assertEquals(result['gear'], '["Nikon", "50mm Lens"]')
 
         # Query for entry
         profile = account_models.Profile.objects.filter(user=user)
@@ -322,9 +346,9 @@ class TestMeProfileViewSetPOST(TestCase):
 
         self.assertEquals(request.status_code, 400)
 
-    def test_me_profile_view_set_post_no_image(self):
+    def test_me_profile_view_set_post_gear_not_allowed(self):
         """
-        Test that we save without an image
+        Test that we get HTTP 400 if user submits gear (need to use /api/me/gear/)
 
         :return: None
         """
@@ -346,10 +370,35 @@ class TestMeProfileViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.post('/api/me/profile', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 400)
+
+    def test_me_profile_view_set_post_no_image(self):
+        """
+        Test that we save without an image
+
+        :return: None
+        """
+        # Create test user
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass',
+                                                       username='aov_hov')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'bio': 'This is cool!'
+        }
+
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.post('/api/me/profile', data=payload, format='json')
         result = request.data
 
         self.assertEquals(result['bio'], 'This is cool!')
-        self.assertEquals(result['gear'], '["Nikon", "50mm Lens"]')
 
         # Query for entry
         profile = account_models.Profile.objects.filter(user=user)
