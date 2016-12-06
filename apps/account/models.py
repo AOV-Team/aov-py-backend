@@ -2,6 +2,7 @@ from apps.common import models as common_models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.utils import timezone
+import json
 
 
 class UserCustomManager(BaseUserManager):
@@ -58,6 +59,54 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
 
     def __str__(self):
         return '{},\t{},\tID{}'.format(self.username, self.email, self.id)
+
+
+class Gear:
+    """
+    Class for managing a profile's gear
+    """
+    def __init__(self, profile, gear=None):
+        """
+        Format for gear
+        [
+            {
+                name: ''
+                link: ''
+            }
+        ]
+
+        :param profile: instance of Profile
+        :param gear: list of dictionaries containing gear info
+        """
+        self.gear = gear
+        self.profile = profile
+
+    @property
+    def all(self):
+        """
+        Retrieve all gear
+
+        :return: list
+        """
+        if not self.profile.gear:
+            return list()
+        else:
+            return json.loads(self.profile.gear)
+
+    def save(self):
+        """
+        Saves gear to profile instance
+
+        :return: Profile instance
+        """
+        if self.gear:
+            self.profile.gear = json.dumps(self.gear)
+            self.profile.save()
+        else:
+            self.profile.gear = json.dumps(list())
+            self.profile.save()
+
+        return self.profile
 
 
 class ProfileManager(models.Manager):

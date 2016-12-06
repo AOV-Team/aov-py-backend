@@ -141,12 +141,35 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         return response
 
 
-class MeGearViewSet(generics.ListCreateAPIView):
+class MeGearViewSet(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView):
     """
     api/me/gear
-
     """
-    pass
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = account_models.Profile.objects.all()
+
+    def get(self, request, **kwargs):
+        """
+        Get user's gear
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        response = get_default_response('200')
+
+        try:
+            profile = account_models.Profile.objects.get(user=authenticated_user)
+            gear = account_models.Gear(profile)
+
+            response.data = gear.all
+        except ObjectDoesNotExist:
+            # If user does not have a profile, return empty list
+            response.data = list()
+
+        return response
 
 
 class MeProfileViewSet(generics.RetrieveAPIView):
