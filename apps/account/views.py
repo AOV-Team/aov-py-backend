@@ -8,6 +8,7 @@ from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
@@ -388,7 +389,9 @@ class UserPhotosViewSet(generics.ListAPIView):
 class UserViewSet(generics.CreateAPIView):
     """
     /api/user
+
     Endpoint class for User model
+    http://stackoverflow.com/questions/27468552/changing-serializer-fields-on-the-fly/#answer-27471503
     """
     permission_classes = (permissions.AllowAny,)
     queryset = account_models.User.objects.all()
@@ -419,7 +422,10 @@ class UserViewSet(generics.CreateAPIView):
         serializer = account_serializers.UserSerializer(data=payload)
 
         if serializer.is_valid():
-            serializer.save()
+            if 'password' in payload:
+                serializer.save(password=make_password(payload['password']))
+            else:
+                raise ValidationError('Password is required')
 
             response = get_default_response('201')
             response.data = serializer.data

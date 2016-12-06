@@ -9,14 +9,15 @@ class TestUsersViewSetPOST(TestCase):
     """
     def test_users_view_set_post_basic_successful(self):
         """
-        Successful /api/users POST
+        Successful /api/users POST.
+        Log user in to make sure password is correctly set
 
         :return: None
         """
         client = APIClient()
 
         payload = {
-            'email': 'mrtest@mypapaya.io',
+            'email': 'mr@mypapaya.io',
             'password': 'WhoWantsToBeAMillionaire?',
             'username': 'aov_hov'
         }
@@ -28,8 +29,17 @@ class TestUsersViewSetPOST(TestCase):
         self.assertIn('email', result)
         self.assertIn('username', result)
 
-        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
+        user = account_models.User.objects.get(email='mr@mypapaya.io')
         self.assertFalse(user.is_superuser)
+
+        # Attempt to log user in
+        login_request = client.post('/api/auth',
+                                    data={'email': 'mr@mypapaya.io', 'password': 'WhoWantsToBeAMillionaire?'},
+                                    format='json')
+        login_result = login_request.data
+
+        self.assertIn('token', login_result)
+
 
     def test_users_view_set_post_cannot_set_superuser(self):
         """
