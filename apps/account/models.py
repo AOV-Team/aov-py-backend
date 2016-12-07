@@ -113,9 +113,9 @@ class Gear:
                 # Find matches of new data in old
                 matches = list()
 
-                for l in old_data:
-                    if l['make'] == i['make'] and l['model'] == i['model']:
-                        matches.append(l)
+                for d in old_data:
+                    if d['make'] == i['make'] and d['model'] == i['model']:
+                        matches.append(d)
 
                 # Make sure that link is the same of at least one of the links of the existing items
                 link_matches = 0
@@ -139,12 +139,20 @@ class Gear:
         if self.gear:
             # Cannot have more than 8 items
             if len(self.gear) > 8:
-                raise OverLimitException
+                raise OverLimitException('User cannot have more than 8 gear items')
 
-            # Make and model are mandatory
+            # Perform checks on data
             for i in self.gear:
+                # Make and model are mandatory
                 if 'make' not in i or 'model' not in i:
                     raise ValueError('Make and model required')
+
+                # Only make, model, and link are allowed
+                for key in i.keys():
+                    if key == 'make' or key == 'model' or key == 'link':
+                        pass
+                    else:
+                        raise ValueError('Invalid key {} found'.format(key))
 
             self.profile.gear = json.dumps(self.gear)
             self.profile.save()

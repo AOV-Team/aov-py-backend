@@ -20,11 +20,13 @@ class TestMeGearViewSetDELETE(TestCase):
 
         gear = account_models.Gear(profile, [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             },
             {
-                'name': 'Tripod',
+                'make': 'Manfrotto',
+                'model': 'Tripod',
                 'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
             }
         ])
@@ -44,7 +46,7 @@ class TestMeGearViewSetDELETE(TestCase):
         # Check profile entry
         updated_profile = account_models.Profile.objects.get(user=user)
 
-        self.assertEquals(updated_profile.gear, None)
+        self.assertEquals(updated_profile.gear, '[]')
 
     def test_me_gear_view_set_delete_no_profile(self):
         """
@@ -83,11 +85,13 @@ class TestMeGearViewSetGET(TestCase):
 
         gear = account_models.Gear(profile, [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             },
             {
-                'name': 'Tripod',
+                'make': 'Manfrotto',
+                'model': 'Tripod',
                 'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
             }
         ])
@@ -104,7 +108,8 @@ class TestMeGearViewSetGET(TestCase):
         results = request.data
 
         self.assertEquals(len(results), 2)
-        self.assertEquals(results[0]['name'], 'Canon T3i')
+        self.assertEquals(results[0]['make'], 'Canon')
+        self.assertEquals(results[0]['model'], 'T3i')
 
     def test_me_gear_view_set_get_empty(self):
         """
@@ -168,7 +173,8 @@ class TestMeGearViewSetPATCH(TestCase):
 
         gear = account_models.Gear(profile, [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             }
         ])
@@ -183,11 +189,13 @@ class TestMeGearViewSetPATCH(TestCase):
 
         payload = [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             },
             {
-                'name': 'Tripod'
+                'make': 'Manfrotto',
+                'model': 'Tripod',
             }
         ]
 
@@ -196,9 +204,10 @@ class TestMeGearViewSetPATCH(TestCase):
 
         self.assertEquals(len(results), 2)
         self.assertIn('link', results[0])
-        self.assertEquals(results[1]['name'], 'Tripod')
+        self.assertEquals(results[1]['make'], 'Manfrotto')
+        self.assertEquals(results[1]['model'], 'Tripod')
 
-    def test_me_gear_view_set_patch_bad_request(self):
+    def test_me_gear_view_set_patch_bad_request_missing_model(self):
         """
         Test that we get a 400 if we pass bad data
 
@@ -210,7 +219,8 @@ class TestMeGearViewSetPATCH(TestCase):
 
         gear = account_models.Gear(profile, [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             }
         ])
@@ -225,11 +235,12 @@ class TestMeGearViewSetPATCH(TestCase):
 
         payload = [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             },
             {
-                'model': 'Tripod'
+                'make': 'Manfrotto',
             }
         ]
 
@@ -241,7 +252,56 @@ class TestMeGearViewSetPATCH(TestCase):
         updated_gear = account_models.Gear(account_models.Profile.objects.get(user=user)).all
 
         self.assertEquals(len(updated_gear), 1)
-        self.assertEquals(updated_gear[0]['name'], 'Canon T3i')
+        self.assertEquals(updated_gear[0]['make'], 'Canon')
+        self.assertEquals(updated_gear[0]['model'], 'T3i')
+
+    def test_me_gear_view_set_patch_bad_request_bad_key(self):
+        """
+        Test that we get a 400 if we pass bad data (bad key)
+
+        :return:
+        """
+        # Create test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        profile = account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
+
+        gear = account_models.Gear(profile, [
+            {
+                'make': 'Canon',
+                'model': 'T3i',
+                'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
+            }
+        ])
+        gear.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = [
+            {
+                'make': 'Canon',
+                'model': 'T3i',
+                'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
+            },
+            {
+                'name': 'Manfrotto',
+            }
+        ]
+
+        request = client.patch('/api/me/gear', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 400)
+
+        # Check profile entry
+        updated_gear = account_models.Gear(account_models.Profile.objects.get(user=user)).all
+
+        self.assertEquals(len(updated_gear), 1)
+        self.assertEquals(updated_gear[0]['make'], 'Canon')
+        self.assertEquals(updated_gear[0]['model'], 'T3i')
 
     def test_me_gear_view_set_patch_empty(self):
         """
@@ -262,22 +322,27 @@ class TestMeGearViewSetPATCH(TestCase):
 
         payload = [
             {
-                'name': 'Canon T3i'
+                'make': 'Canon',
+                'model': 'T3i',
             },
             {
-                'name': 'Nifty Fifty'
+                'make': 'Canon',
+                'model': 'EF 50mm'
             }
         ]
 
         request = client.patch('/api/me/gear', data=payload, format='json')
+
         self.assertEquals(request.status_code, 200)
 
         # Check profile entry
         updated_gear = account_models.Gear(account_models.Profile.objects.get(user=user)).all
 
         self.assertEquals(len(updated_gear), 2)
-        self.assertEquals(updated_gear[0]['name'], 'Canon T3i')
-        self.assertEquals(updated_gear[0]['name'], 'Nifty Fifty')
+        self.assertEquals(updated_gear[0]['make'], 'Canon')
+        self.assertEquals(updated_gear[0]['model'], 'T3i')
+        self.assertEquals(updated_gear[1]['make'], 'Canon')
+        self.assertEquals(updated_gear[1]['model'], 'EF 50mm')
 
     def test_me_gear_view_set_patch_link_new(self):
         """
@@ -293,11 +358,13 @@ class TestMeGearViewSetPATCH(TestCase):
 
         gear = account_models.Gear(profile, [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             },
             {
-                'name': 'Tripod'
+                'make': 'Manfrotto',
+                'model': 'Tripod',
             }
         ])
         gear.save()
@@ -311,11 +378,13 @@ class TestMeGearViewSetPATCH(TestCase):
 
         payload = [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             },
             {
-                'name': 'Tripod',
+                'make': 'Manfrotto',
+                'model': 'Tripod',
                 'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
             }
         ]
@@ -343,11 +412,13 @@ class TestMeGearViewSetPATCH(TestCase):
 
         gear = account_models.Gear(profile, [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             },
             {
-                'name': 'Tripod',
+                'make': 'Manfrotto',
+                'model': 'Tripod',
                 'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
             }
         ])
@@ -362,11 +433,13 @@ class TestMeGearViewSetPATCH(TestCase):
 
         payload = [
             {
-                'name': 'Canon T3i',
+                'make': 'Canon',
+                'model': 'T3i',
                 'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
             },
             {
-                'name': 'Tripod',
+                'make': 'Manfrotto',
+                'model': 'Tripod',
                 'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
             }
         ]
@@ -401,7 +474,8 @@ class TestMeGearViewSetPATCH(TestCase):
 
         payload = [
             {
-                'name': 'Canon T3i'
+                'make': 'Canon',
+                'model': 'T3i',
             }
         ]
 
@@ -421,7 +495,8 @@ class TestMeGearViewSetPATCH(TestCase):
 
         gear = account_models.Gear(profile, [
             {
-                'name': 'Canon T3i'
+                'make': 'Canon',
+                'model': 'T3i',
             }
         ])
         gear.save()
@@ -435,31 +510,40 @@ class TestMeGearViewSetPATCH(TestCase):
 
         payload = [
             {
-                'name': 'Canon T3i'
+                'make': 'Canon',
+                'model': 'T3i',
             },
             {
-                'name': 'Tripod'
+                'make': 'Manfrotto',
+                'model': 'Tripod',
             },
             {
-                'name': 'Nifty Fifty'
+                'make': 'Canon',
+                'model': 'EF 50mm'
             },
             {
-                'name': 'Camera Bag'
+                'make': 'Canon',
+                'model': 'Camera Bag'
             },
             {
-                'name': 'Polarizing Filter'
+                'make': 'Tamron',
+                'model': 'Polarizing Filter'
             },
             {
-                'name': 'Mic'
+                'make': 'Generic',
+                'model': 'Mic'
             },
             {
-                'name': 'Battery Pack'
+                'make': 'Canon',
+                'model': 'Battery Pack'
             },
             {
-                'name': 'Bulb'
+                'make': 'Canon',
+                'model': 'Bulb'
             },
             {
-                'name': 'Charger'
+                'make': 'Canon',
+                'model': 'Charger'
             }
         ]
 
@@ -471,61 +555,43 @@ class TestMeGearViewSetPATCH(TestCase):
         updated_gear = account_models.Gear(account_models.Profile.objects.get(user=user)).all
 
         self.assertEquals(len(updated_gear), 1)
-        self.assertEquals(updated_gear[0]['name'], 'Canon T3i')
+        self.assertEquals(updated_gear[0]['make'], 'Canon')
+        self.assertEquals(updated_gear[0]['model'], 'T3i')
 
     def test_me_gear_view_set_patch_set_empty_data(self):
         """
+        Test that we can set empty data
 
-
-        :return:
+        :return: None
         """
+        # Create test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        profile = account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
 
+        gear = account_models.Gear(profile, [
+            {
+                'make': 'Canon',
+                'model': 'T3i',
+            }
+        ])
+        gear.save()
 
-# class TestMeGearViewSetPOST(TestCase):
-#     """
-#     Test POST /api/me/gear
-#     """
-#     def test_me_gear_view_set_post_successful(self):
-#         """
-#         Test that we can add user's gear
-#
-#         :return: None
-#         """
-#         # Create test data
-#         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
-#         profile = account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
-#
-#     def test_me_gear_view_set_post_empty_data(self):
-#         """
-#
-#
-#         :return:
-#         """
-#
-#     def test_me_gear_view_set_post_bad_request(self):
-#         """
-#
-#
-#         :return:
-#         """
-#
-#     def test_me_gear_view_set_post_link(self):
-#         """
-#
-#
-#         :return:
-#         """
-#
-#     def test_me_gear_view_set_post_no_profile(self):
-#         """
-#
-#
-#         :return:
-#         """
-#
-#     def test_me_gear_view_set_post_over_limit(self):
-#         """
-#
-#
-#         :return:
-#         """
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = []
+
+        request = client.patch('/api/me/gear', data=payload, format='json')
+        result = request.data
+
+        self.assertEquals(request.status_code, 200)
+        self.assertEquals(result, list())
+
+        # Check profile entry
+        updated_gear = account_models.Gear(account_models.Profile.objects.get(user=user)).all
+
+        self.assertEquals(len(updated_gear), 0)

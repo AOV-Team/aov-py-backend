@@ -252,6 +252,36 @@ class TestGear(TestCase):
         self.assertEquals(items[0]['make'], 'Canon')
         self.assertEquals(items[0]['model'], 'T3i')
 
+    def test_gear_save_bad_key(self):
+        """
+        Test that we cannot save data if there's an invalid key.
+        Only make/model/link allowed
+
+        :return: None
+        """
+        user = User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        profile = Profile.objects.create_or_update(user=user, bio='I am a tester.')
+
+        gear = Gear(profile, [
+            {
+                'make': 'Canon',
+                'model': 'T3i',
+                'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
+            },
+            {
+                'make': 'Manfrotto',
+                'model': 'Tripod',
+                'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
+            },
+            {
+                'name': 'Canon',
+                'link': 'https://www.amazon.com/Canon-50mm-1-8-Camera-Lens/dp/B00007E7JU'
+            }
+        ])
+
+        with self.assertRaises(ValueError):
+            gear.save()
+
     def test_gear_save_no_make(self):
         """
         Test that we cannot save gear without make

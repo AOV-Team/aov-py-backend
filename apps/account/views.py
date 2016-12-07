@@ -2,6 +2,7 @@ from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.account import tasks as account_tasks
 from apps.common import models as common_models
+from apps.common.exceptions import ForbiddenValue, OverLimitException
 from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
@@ -141,13 +142,32 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         return response
 
 
-class MeGearViewSet(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIView):
+class MeGearViewSet(APIView):
     """
     api/me/gear
     """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     queryset = account_models.Profile.objects.all()
+
+    def delete(self, request):
+        """
+        Remove all gear
+
+        :param request: Request object
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        response = get_default_response('200')
+
+        try:
+            profile = account_models.Profile.objects.get(user=authenticated_user)
+            gear = account_models.Gear(profile)
+            gear.save()
+        except ObjectDoesNotExist:
+            pass
+
+        return response
 
     def get(self, request, **kwargs):
         """
@@ -168,6 +188,41 @@ class MeGearViewSet(generics.CreateAPIView, generics.RetrieveUpdateDestroyAPIVie
         except ObjectDoesNotExist:
             # If user does not have a profile, return empty list
             response.data = list()
+
+        return response
+
+    def patch(self, request):
+        """
+        Update gear
+
+        :param request: Request object
+        :return: Response object
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        payload = request.data
+        response = get_default_response('400')
+
+        try:
+            profile = account_models.Profile.objects.get(user=authenticated_user)
+            gear = account_models.Gear(profile, payload)
+
+            if gear.links_valid(payload):
+                gear.save()
+            else:
+                raise ForbiddenValue('Links cannot be updated using this endpoint')
+
+            response = get_default_response('200')
+            response.data = gear.all
+        except ForbiddenValue as e:
+            response = get_default_response('403')
+            response.data['message'] = str(e)
+        except ObjectDoesNotExist:
+            response = get_default_response('403')
+            response.data['message'] = 'Profile does not exist. Create a profile for the user to update gear.'
+        except OverLimitException as e:
+            response.data['message'] = str(e)
+        except ValueError as e:
+            response.data['message'] = str(e)
 
         return response
 
