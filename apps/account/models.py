@@ -106,7 +106,7 @@ class Gear:
 
         for i in new_data:
             if 'make' not in i or 'model' not in i:
-                raise ValueError('Make and model required')
+                raise KeyError('Make and model required')
 
             # If there's a link in the new data, check it
             if 'link' in i:
@@ -145,7 +145,7 @@ class Gear:
             for i in self.gear:
                 # Make and model are mandatory
                 if 'make' not in i or 'model' not in i:
-                    raise ValueError('Make and model required')
+                    raise KeyError('Make and model required')
 
                 # Only make, model, and link are allowed
                 for key in i.keys():

@@ -1,5 +1,6 @@
 from apps.account.models import Gear, Profile, User
 from django.test import TestCase
+from json.decoder import JSONDecodeError
 
 
 class TestGear(TestCase):
@@ -51,6 +52,21 @@ class TestGear(TestCase):
 
         self.assertIsInstance(items, list)
         self.assertEquals(len(items), 0)
+
+    def test_gear_all_invalid_json(self):
+        """
+        Test that if json cannot be parsed, we get an error
+
+        :return: None
+        """
+        user = User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        profile = Profile.objects.create_or_update(user=user, bio='I am a tester.',
+                                                   gear='[{"make": "Canon", "model": "EF 50mm"},{]')
+
+        gear = Gear(profile)
+
+        with self.assertRaises(JSONDecodeError):
+            gear.all
 
     def test_gear_links_valid(self):
         """
@@ -215,7 +231,7 @@ class TestGear(TestCase):
             }
         ]
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             gear.links_valid(payload)
 
     def test_gear_save_successful(self):
@@ -274,7 +290,9 @@ class TestGear(TestCase):
                 'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
             },
             {
-                'name': 'Canon',
+                'make': 'Canon',
+                'model': 'EF 50mm',
+                'name': 'Nifty Fifty',
                 'link': 'https://www.amazon.com/Canon-50mm-1-8-Camera-Lens/dp/B00007E7JU'
             }
         ])
@@ -291,7 +309,7 @@ class TestGear(TestCase):
         user = User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
         profile = Profile.objects.create_or_update(user=user, bio='I am a tester.')
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             gear = Gear(profile, [
                 {
                     'model': 'T3i'
@@ -313,7 +331,7 @@ class TestGear(TestCase):
         user = User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
         profile = Profile.objects.create_or_update(user=user, bio='I am a tester.')
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             gear = Gear(profile, [
                 {
                     'make': 'Canon'

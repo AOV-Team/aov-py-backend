@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
+from json.decoder import JSONDecodeError
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -185,6 +186,9 @@ class MeGearViewSet(APIView):
             gear = account_models.Gear(profile)
 
             response.data = gear.all
+        except JSONDecodeError:
+            response = get_default_response('500')
+            response.data['message'] = 'Unable to parse gear data.'
         except ObjectDoesNotExist:
             # If user does not have a profile, return empty list
             response.data = list()
@@ -215,6 +219,8 @@ class MeGearViewSet(APIView):
             response.data = gear.all
         except ForbiddenValue as e:
             response = get_default_response('403')
+            response.data['message'] = str(e)
+        except KeyError as e:
             response.data['message'] = str(e)
         except ObjectDoesNotExist:
             response = get_default_response('403')

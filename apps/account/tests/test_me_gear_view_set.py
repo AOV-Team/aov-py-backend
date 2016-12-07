@@ -111,6 +111,29 @@ class TestMeGearViewSetGET(TestCase):
         self.assertEquals(results[0]['make'], 'Canon')
         self.assertEquals(results[0]['model'], 'T3i')
 
+    def test_me_gear_view_set_get_bad_json(self):
+        """
+        Test that we get HTTP 500 if gear json is invalid
+
+        :return: None
+        """
+        # Create test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.',
+                                                        gear='[{"make": "Canon", "model": "EF 50mm"},{]')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/me/gear')
+
+        self.assertEquals(request.status_code, 500)
+        self.assertEquals(request.data.message, 'Unable to parse gear data.')
+
     def test_me_gear_view_set_get_empty(self):
         """
         Test that we get empty list if no gear
