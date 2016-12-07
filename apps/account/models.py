@@ -1,4 +1,5 @@
 from apps.common import models as common_models
+from apps.common.exceptions import OverLimitException
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.utils import timezone
@@ -93,6 +94,42 @@ class Gear:
         else:
             return json.loads(self.profile.gear)
 
+    def links_valid(self, new_data):
+        """
+        Check that links match existing links and that no new links have been added.
+        Used by PATCH endpoint to ensure that links cannot be created via API
+
+        :param new_data: The data to be saved that needs to be checked
+        :return: boolean
+        """
+        old_data = self.all
+
+        for i in new_data:
+            if 'make' not in i or 'model' not in i:
+                raise ValueError('Make and model required')
+
+            # If there's a link in the new data, check it
+            if 'link' in i:
+                # Find matches of new data in old
+                matches = list()
+
+                for l in old_data:
+                    if l['make'] == i['make'] and l['model'] == i['model']:
+                        matches.append(l)
+
+                # Make sure that link is the same of at least one of the links of the existing items
+                link_matches = 0
+
+                for m in matches:
+                    if 'link' in m:
+                        if m['link'] == i['link']:
+                            link_matches += 1
+
+                if link_matches == 0:
+                    return False
+
+        return True
+
     def save(self):
         """
         Saves gear to profile instance
@@ -100,6 +137,15 @@ class Gear:
         :return: Profile instance
         """
         if self.gear:
+            # Cannot have more than 8 items
+            if len(self.gear) > 8:
+                raise OverLimitException
+
+            # Make and model are mandatory
+            for i in self.gear:
+                if 'make' not in i or 'model' not in i:
+                    raise ValueError('Make and model required')
+
             self.profile.gear = json.dumps(self.gear)
             self.profile.save()
         else:
