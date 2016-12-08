@@ -1,5 +1,5 @@
-# Django Starter Project
-Use this project to jump-start your Django projects
+# AOV Backend
+AOV's Django backend.
 
 ## Getting Started
 1. Clone repo
@@ -11,3 +11,6 @@ Use this project to jump-start your Django projects
 7. Run `./scripts/install_redis.sh`
 8. Run `./scripts/start.sh`
 9. Run `./manage.py runserver` in another terminal
+
+## Commands
+To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
