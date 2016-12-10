@@ -15,7 +15,7 @@ class UserBehavior(TaskSet):
 
     @task(1)
     def profile(self):
-        self.client.get('/api/me', headers={'authorization': 'Token 354a012de983b8079fdba3abd1278853cfc958ff'})
+        self.client.get('/api/me', headers={'authorization': 'Token c43319463700091924abe6cebb563d8b45daa2e1'})
 
 
 class WebsiteUser(HttpLocust):
