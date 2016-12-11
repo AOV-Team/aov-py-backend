@@ -28,6 +28,7 @@ EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
 
+# Simpler hasher for DEV/TESTING only
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
@@ -41,6 +42,10 @@ STORAGE['AWS_SECRET_ACCESS_KEY'] = ''
 STORAGE['AWS_STORAGE_BUCKET_NAME'] = 'aovdev'
 STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'] = 'aovdev-original'
 STORAGE['REMOTE_IMAGE_STORAGE'] = True
+
+TEMPLATE_OPTIONS = dict()
+
+TEMPLATE_OPTIONS['LOADERS'] = None
 EOF
 elif [ "$1" == "staging" ]; then
     cat > backend/settings/project_config.py <<'EOF'
@@ -80,6 +85,15 @@ STORAGE['AWS_SECRET_ACCESS_KEY'] = os.environ['AWS_SECRET_ACCESS_KEY']
 STORAGE['AWS_STORAGE_BUCKET_NAME'] = 'aovstaging'
 STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'] = 'aovstaging-original'
 STORAGE['REMOTE_IMAGE_STORAGE'] = True
+
+TEMPLATE_OPTIONS = dict()
+
+TEMPLATE_OPTIONS['LOADERS'] = [
+    ('django.template.loaders.cached.Loader', [
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    ]),
+]
 EOF
 elif [ "$1" == "production" ]; then
     cat > backend/settings/project_config.py <<'EOF'
@@ -119,6 +133,15 @@ STORAGE['AWS_SECRET_ACCESS_KEY'] = os.environ['AWS_SECRET_ACCESS_KEY']
 STORAGE['AWS_STORAGE_BUCKET_NAME'] = 'aovprod'
 STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'] = 'aovprod-original'
 STORAGE['REMOTE_IMAGE_STORAGE'] = True
+
+TEMPLATE_OPTIONS = dict()
+
+TEMPLATE_OPTIONS['LOADERS'] = [
+    ('django.template.loaders.cached.Loader', [
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    ]),
+]
 EOF
 else
     echo "No environment specified [dev|staging|production]"
