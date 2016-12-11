@@ -19,11 +19,27 @@ class NewUser(TaskSet):
         if self.token:
             self.create_profile()
 
-    @task(1)
+    @task(50)
     def get_photos(self):
         if self.token:
-            response = self.client.get('/api/photos', headers={'authorization': 'Token {}'.format(self.token)})
-            # print(response.status_code, response.content)
+            page = random.randrange(1, 4)
+
+            self.client.get('/api/photos?page={}'.format(page),
+                            headers={'authorization': 'Token {}'.format(self.token)})
+
+    @task(10)
+    def get_profile(self):
+        if self.token:
+            self.client.get('/api/me/profile', headers={'authorization': 'Token {}'.format(self.token)})
+
+    @task(1)
+    def upload_photo(self):
+        if self.token:
+            with open('apps/common/test/data/photos/1mb.jpg', 'rb') as image:
+                self.client.post('/api/photos', data={
+                    'category': 8,
+                    'public': True,
+                }, files={'image': image}, headers={'authorization': 'Token {}'.format(self.token)})
 
     def register(self):
         identifier = random.randrange(1000000)
@@ -49,10 +65,9 @@ class NewUser(TaskSet):
 
     def create_profile(self):
         with open('apps/common/test/data/photos/cover.jpg', 'rb') as image:
-            self.client.post('/api/me/profile', {
+            self.client.post('/api/me/profile', data={
                 'bio': 'My email is {}'.format(self.email),
-                'cover': image
-            }, {'authorization': 'Token {}'.format(self.token)})
+            }, files={'cover_image': image}, headers={'authorization': 'Token {}'.format(self.token)})
 
 
 class WebsiteUser(HttpLocust):
