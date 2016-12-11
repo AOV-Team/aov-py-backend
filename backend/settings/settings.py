@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-from backend.settings.project_config import DATABASES, DEBUG, EMAIL, SOCIAL_AUTH_FACEBOOK_SECRET, STORAGE
+from backend.settings.project_config import *
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -192,6 +192,7 @@ STATICFILES_DIRS = (
 )
 
 # Image Storage
+
 REMOTE_IMAGE_STORAGE = STORAGE['REMOTE_IMAGE_STORAGE']
 
 if REMOTE_IMAGE_STORAGE:

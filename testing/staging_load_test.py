@@ -1,24 +1,62 @@
 from locust import HttpLocust, TaskSet, task
+import json
+import random
 
 
-class UserBehavior(TaskSet):
+class NewUser(TaskSet):
+    email = None
+    token = None
+
     def on_start(self):
-        """ on_start is called when a Locust start before any task is scheduled """
+        """
+        When task set starts, register new user
+
+        :return: None
+        """
+        self.register()
         self.login()
 
-    def login(self):
-        self.client.post("/api/auth", {'email': 'travis@artofvisuals.com', 'password': 'crush2017!'})
-
-    # @task(2)
-    # def index(self):
-    #     self.client.get("/")
+        if self.token:
+            self.create_profile()
 
     @task(1)
-    def profile(self):
-        self.client.get('/api/me', headers={'authorization': 'Token c43319463700091924abe6cebb563d8b45daa2e1'})
+    def get_photos(self):
+        if self.token:
+            response = self.client.get('/api/photos', headers={'authorization': 'Token {}'.format(self.token)})
+            # print(response.status_code, response.content)
+
+    def register(self):
+        identifier = random.randrange(1000000)
+        self.email = 'test-{}@artofvisuals.com'.format(identifier)
+
+        self.client.post('/api/users', {
+            'email': self.email,
+            'is_active': True,
+            'password': 'pass',
+            'social_name': '@test-{}'.format(identifier),
+            'username': '@test-{}'.format(identifier)
+        })
+
+    def login(self):
+        response = self.client.post('/api/auth', {
+            'email': self.email,
+            'password': 'pass',
+        })
+
+        if response.status_code == 201:
+            content = json.loads(response.content.decode('utf-8'))
+            self.token = content['token']
+
+    def create_profile(self):
+        with open('apps/common/test/data/photos/cover.jpg', 'rb') as image:
+            self.client.post('/api/me/profile', {
+                'bio': 'My email is {}'.format(self.email),
+                'cover': image
+            }, {'authorization': 'Token {}'.format(self.token)})
 
 
 class WebsiteUser(HttpLocust):
-    task_set = UserBehavior
-    min_wait = 5000
-    max_wait = 9000
+    host = 'https://staging.artofvisuals.com'
+    task_set = NewUser
+    min_wait = 1000
+    max_wait = 2000

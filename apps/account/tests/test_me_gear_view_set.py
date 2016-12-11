@@ -132,7 +132,7 @@ class TestMeGearViewSetGET(TestCase):
         request = client.get('/api/me/gear')
 
         self.assertEquals(request.status_code, 500)
-        self.assertEquals(request.data.message, 'Unable to parse gear data.')
+        self.assertEquals(request.data['message'], 'Unable to parse gear data.')
 
     def test_me_gear_view_set_get_empty(self):
         """

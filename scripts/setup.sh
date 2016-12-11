@@ -11,6 +11,7 @@ DATABASES = {
         'PASSWORD': 'golden',
         'HOST': '127.0.0.1',
         'PORT': '5432',
+        'CONN_MAX_AGE': 3600,
     }
 }
 
@@ -26,6 +27,10 @@ EMAIL['EMAIL_HOST_PASSWORD'] = ''
 EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
+
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 
@@ -49,6 +54,7 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '5432'),
+        'CONN_MAX_AGE': 3600,
     }
 }
 
@@ -87,6 +93,7 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '5432'),
+        'CONN_MAX_AGE': 3600,
     }
 }
 
