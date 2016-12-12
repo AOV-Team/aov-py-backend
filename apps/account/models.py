@@ -1,6 +1,8 @@
 from apps.common import models as common_models
 from apps.common.exceptions import OverLimitException
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
 import json
@@ -192,3 +194,27 @@ class Profile(models.Model):
 
     def __str__(self):
         return '{}:\tID{}'.format(self.user.username, self.id)
+
+
+class UserInterest(models.Model):
+    """
+    Model for user likes and photo stars
+
+    References
+    https://docs.djangoproject.com/en/1.10/ref/contrib/contenttypes/#generic-relations
+    https://github.com/pinax/pinax-likes/blob/master/pinax/likes/models.py
+    http://stackoverflow.com/questions/21212654/with-django-how-can-i-retrieve-if-the-user-likes-the-article-of-other-items
+    https://makina-corpus.com/blog/metier/2015/how-to-improve-prefetch_related-performance-with-the-prefetch-object
+    """
+    INTEREST_TYPE_CHOICES = (
+        ('favorite', 'Favorite'),
+        ('like', 'Like')
+    )
+
+    content_object = GenericForeignKey('content_type', 'object_id')
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    interest_type = models.CharField(max_length=10, choices=INTEREST_TYPE_CHOICES)
+
+    def __str__(self):
+        return '{} {}: {}'.format(self.interest_type, self.content_object, self.object_id)

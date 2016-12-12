@@ -1,3 +1,5 @@
+from apps.account import models as account_models
+from apps.account import serializers as account_serializers
 from apps.common import models as common_models
 from apps.common.views import get_default_response, handle_jquery_empty_array, remove_pks_from_payload
 from apps.photo import models as photo_models
@@ -343,3 +345,40 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
                 raise NotFound
         else:
             raise PermissionDenied
+
+
+class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.ListCreateAPIView):
+    """
+    /api/photos/{}/interests
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = account_models.UserInterest.objects.all()
+    serializer_class = account_serializers.UserInterestSerializer
+
+    def delete(self, request, **kwargs):
+        """
+
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+
+    def get(self, request, **kwargs):
+        """
+
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+
+    def post(self, request, **kwargs):
+        """
+
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
