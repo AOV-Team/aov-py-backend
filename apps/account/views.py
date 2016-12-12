@@ -486,9 +486,40 @@ class UserPhotosViewSet(generics.ListAPIView):
         return response
 
 
+class UserSingleViewSet(generics.RetrieveAPIView):
+    """
+    /api/users/{}
+
+    """
+    permission_classes = (permissions.AllowAny,)
+    queryset = account_models.User.objects.all()
+    serializer_class = account_serializers.UserPublicSerializer
+
+    def get(self, request, **kwargs):
+        """
+        GET a user's public info
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        response = get_default_response('200')
+
+        try:
+            user = account_models.User.objects.get(id=kwargs.get('pk'), is_active=True)
+
+            response.data = account_serializers.UserPublicSerializer(user).data
+        except ObjectDoesNotExist:
+            response = get_default_response('404')
+            response.data['message'] = 'User does not exist.'
+            response.data['userMessage'] = 'User does not exist.'
+
+        return response
+
+
 class UserViewSet(generics.CreateAPIView):
     """
-    /api/user
+    /api/users
 
     Endpoint class for User model
     http://stackoverflow.com/questions/27468552/changing-serializer-fields-on-the-fly/#answer-27471503

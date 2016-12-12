@@ -2,6 +2,12 @@ from apps.account import models
 from rest_framework import serializers
 
 
+class UserPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'last_name', 'location', 'social_name', 'username')
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
