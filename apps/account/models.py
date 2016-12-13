@@ -207,10 +207,12 @@ class UserInterest(models.Model):
     https://makina-corpus.com/blog/metier/2015/how-to-improve-prefetch_related-performance-with-the-prefetch-object
     """
     INTEREST_TYPE_CHOICES = (
-        ('favorite', 'Favorite'),
-        ('like', 'Like')
+        ('follow', 'Follow'),
+        ('like', 'Like'),
+        ('star', 'Star'),
     )
 
+    user = models.ForeignKey(User)
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()

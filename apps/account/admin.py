@@ -49,6 +49,11 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ['id', 'user', 'bio', 'gear']
 
 
+class UserInterestAdmin(admin.ModelAdmin):
+    list_display = ['user', 'content_object', 'interest_type', 'id']
+    search_fields = ['id', 'user']
+
+
 class UserObjectPermissionAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'permission', 'content_type', 'object_pk']
     search_fields = ['id', 'user', 'permission']
@@ -56,4 +61,5 @@ class UserObjectPermissionAdmin(admin.ModelAdmin):
 
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Profile, ProfileAdmin)
+admin.site.register(models.UserInterest, UserInterestAdmin)
 admin.site.register(guardian.UserObjectPermission, UserObjectPermissionAdmin)
