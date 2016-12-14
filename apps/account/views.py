@@ -1,7 +1,9 @@
 from apps.account import models as account_models
+from apps.account import password
 from apps.account import serializers as account_serializers
 from apps.account import tasks as account_tasks
 from apps.common import models as common_models
+from apps.common.mailer import send_transactional_email
 from apps.common.exceptions import ForbiddenValue, OverLimitException
 from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
@@ -77,6 +79,49 @@ class AuthenticateViewSet(APIView):
                 response = get_default_response('401')
                 response.data['message'] = 'Authentication failed'
                 response.data['userMessage'] = 'Email or password incorrect. Please try again.'
+
+        return response
+
+
+class AuthenticateResetViewSet(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def patch(self, request, **kwargs):
+        """
+        Update password
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        response = get_default_response('400')
+        payload = request.data
+
+        return response
+
+    def post(self, request, **kwargs):
+        """
+        Request a code to reset password
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        response = get_default_response('400')
+        payload = request.data
+
+        if 'email' in payload:
+            response = get_default_response('201')
+
+            try:
+                # Create code in Redis
+                user = account_models.User.objects.get(email=payload['email'])
+                code = password.create_password_reset_code(user)
+
+                # Send email to user
+                send_transactional_email(user, 'password-reset-code', password_reset_code=code)
+            except ObjectDoesNotExist:
+                pass
 
         return response
 

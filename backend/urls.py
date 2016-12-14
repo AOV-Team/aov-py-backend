@@ -26,6 +26,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 urlpatterns = [
     # account
     url(r'api/auth$', account_views.AuthenticateViewSet.as_view()),
+    url(r'api/auth/reset$', account_views.AuthenticateResetViewSet.as_view()),
     url(r'api/auth/social$', account_views.SocialSignUpViewSet.as_view()),
     url(r'api/me$', account_views.MeViewSet.as_view()),
     url(r'api/me/gear$', account_views.MeGearViewSet.as_view()),

@@ -33,6 +33,12 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
 
+REDIS_DB = dict()
+
+REDIS_DB['PASSWORD_CODES'] = 1
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 
 STORAGE = dict()
@@ -75,6 +81,12 @@ EMAIL['EMAIL_HOST_PASSWORD'] = ''
 EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
+
+REDIS_DB = dict()
+
+REDIS_DB['PASSWORD_CODES'] = 1
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 
@@ -123,6 +135,12 @@ EMAIL['EMAIL_HOST_PASSWORD'] = ''
 EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = ''
 EMAIL['SERVER_EMAIL'] = ''
+
+REDIS_DB = dict()
+
+REDIS_DB['PASSWORD_CODES'] = 1
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 
