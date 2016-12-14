@@ -40,7 +40,7 @@ class TestAuthenticateResetViewSetPATCH(TestCase):
         # Check that we can authenticate w/ new password
         login_request = client.post('/api/auth', data={'email': 'test@test.com', 'password': 'aaa'}, format='json')
 
-        self.assertEquals(login_request, 201)
+        self.assertEquals(login_request.status_code, 201)
         self.assertIn('token', login_request.data)
 
     def test_authenticate_reset_view_set_patch_bad_code(self):
@@ -67,7 +67,7 @@ class TestAuthenticateResetViewSetPATCH(TestCase):
         # Check that we cannot authenticate w/ new password
         login_request = client.post('/api/auth', data={'email': 'test@test.com', 'password': 'aaa'}, format='json')
 
-        self.assertEquals(login_request, 401)
+        self.assertEquals(login_request.status_code, 401)
 
     def test_authenticate_reset_view_set_patch_no_code(self):
         """
@@ -92,7 +92,43 @@ class TestAuthenticateResetViewSetPATCH(TestCase):
         # Check that we cannot authenticate w/ new password
         login_request = client.post('/api/auth', data={'email': 'test@test.com', 'password': 'aaa'}, format='json')
 
-        self.assertEquals(login_request, 401)
+        self.assertEquals(login_request.status_code, 401)
+
+    def test_authenticate_reset_view_set_patch_no_user(self):
+        """
+        Test that we get 404 if user no longer exists
+
+        :return: None
+        """
+        # Create test data
+        user = account_models.User.objects.create_user(email='test@test.com', username='aov1')
+
+        client = APIClient()
+
+        payload = {
+            'email': user.email
+        }
+
+        request = client.post('/api/auth/reset', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 201)
+
+        # Delete user
+        user.delete()
+
+        payload = {
+            'code': 'fail',
+            'password': 'aaa'
+        }
+
+        request = client.patch('/api/auth/reset', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 404)
+
+        # Check that there are no users in db
+        users = account_models.User.objects.all()
+
+        self.assertEquals(len(users), 0)
 
 
 class TestAuthenticateResetViewSetPOST(TestCase):
@@ -123,17 +159,12 @@ class TestAuthenticateResetViewSetPOST(TestCase):
 
         self.assertEquals(request.status_code, 201)
 
-        # Check that there's a code
-        r = redis.StrictRedis(host='localhost', port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
-
-        self.assertIsNotNone(r.get(user.email))
-
         # Check that an email was sent
         self.assertEquals(len(mail.outbox), 1)
 
     def test_authenticate_reset_view_set_post_already_requested(self):
         """
-        Test that if code already exists for a user, it gets overridden
+        Test that if code already exists for a user, another email is sent out
 
         :return: None
         """
@@ -150,11 +181,6 @@ class TestAuthenticateResetViewSetPOST(TestCase):
         request = client.post('/api/auth/reset', data=payload, format='json')
 
         self.assertEquals(request.status_code, 201)
-
-        # Check that code is different
-        r = redis.StrictRedis(host='localhost', port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
-
-        self.assertNotEqual(code, r.get(user.email).decode('ascii'))
 
         # Check that an email was sent
         self.assertEquals(len(mail.outbox), 1)

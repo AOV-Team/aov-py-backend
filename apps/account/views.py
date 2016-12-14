@@ -97,6 +97,29 @@ class AuthenticateResetViewSet(APIView):
         response = get_default_response('400')
         payload = request.data
 
+        if 'code' in payload and 'password' in payload:
+            try:
+                saved_email = password.get_password_reset_email(payload['code'])
+
+                if saved_email:
+                    user = account_models.User.objects.get(email=saved_email, is_active=True)
+                    user.set_password(payload['password'])
+                    user.save()
+
+                    response = get_default_response('200')
+                    response.data['message'] = 'Password updated'
+                    response.data['userMessage'] = 'Your password has been updated'
+                else:
+                    raise KeyError
+            except ObjectDoesNotExist:
+                response = get_default_response('404')
+                response.data['message'] = 'User does not exist'
+                response.data['userMessage'] = 'The user does not exist.'
+            except KeyError:
+                response = get_default_response('403')
+                response.data['message'] = 'Code is not valid'
+                response.data['userMessage'] = 'Your code is not valid'
+
         return response
 
     def post(self, request, **kwargs):

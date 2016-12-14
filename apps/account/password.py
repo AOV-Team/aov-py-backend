@@ -14,6 +14,21 @@ def create_password_reset_code(user):
     :return: generated code
     """
     code = ''.join(random.choice(string.digits) for i in range(6))
-    r.set(user.email, code)
+    r.set(code, user.email)
 
     return code
+
+
+def get_password_reset_email(code):
+    """
+    Look for code for given user and return email
+
+    :param code: Code to get email for
+    :return: email or None
+    """
+    email = r.get(code)
+
+    if email:
+        return email.decode('ascii')
+
+    return None
