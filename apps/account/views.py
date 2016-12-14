@@ -1,7 +1,9 @@
 from apps.account import models as account_models
+from apps.account import password
 from apps.account import serializers as account_serializers
 from apps.account import tasks as account_tasks
 from apps.common import models as common_models
+from apps.common.mailer import send_transactional_email
 from apps.common.exceptions import ForbiddenValue, OverLimitException
 from apps.common.views import get_default_response, remove_pks_from_payload
 from apps.photo import models as photo_models
@@ -77,6 +79,70 @@ class AuthenticateViewSet(APIView):
                 response = get_default_response('401')
                 response.data['message'] = 'Authentication failed'
                 response.data['userMessage'] = 'Email or password incorrect. Please try again.'
+
+        return response
+
+
+class AuthenticateResetViewSet(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def patch(self, request, **kwargs):
+        """
+        Update password
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        response = get_default_response('400')
+        payload = request.data
+
+        if 'code' in payload and 'password' in payload:
+            try:
+                saved_email = password.get_password_reset_email(payload['code'])
+
+                if saved_email:
+                    user = account_models.User.objects.get(email=saved_email, is_active=True)
+                    user.set_password(payload['password'])
+                    user.save()
+
+                    response = get_default_response('200')
+                    response.data['message'] = 'Password updated'
+                    response.data['userMessage'] = 'Your password has been updated'
+                else:
+                    response = get_default_response('403')
+                    response.data['message'] = 'Code is not valid'
+                    response.data['userMessage'] = 'Your code is not valid'
+            except ObjectDoesNotExist:
+                response = get_default_response('404')
+                response.data['message'] = 'User does not exist'
+                response.data['userMessage'] = 'The user does not exist.'
+
+        return response
+
+    def post(self, request, **kwargs):
+        """
+        Request a code to reset password
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        response = get_default_response('400')
+        payload = request.data
+
+        if 'email' in payload:
+            response = get_default_response('201')
+
+            try:
+                # Create code in Redis
+                user = account_models.User.objects.get(email=payload['email'])
+                code = password.create_password_reset_code(user)
+
+                # Send email to user
+                send_transactional_email(user, 'password-reset-code', password_reset_code=code)
+            except ObjectDoesNotExist:
+                pass
 
         return response
 
