@@ -12,9 +12,12 @@ class TestAuthenticateResetViewSetPATCH(TestCase):
     Test that we can reset password
 
     """
+
+    def setUp(self):
+        self.r = redis.StrictRedis(host='localhost', port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
+
     def tearDown(self):
-        r = redis.StrictRedis(host='localhost', port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
-        r.flushdb()
+        self.r.flushdb()
 
     def test_authenticate_reset_view_set_patch_successful(self):
         """
@@ -101,23 +104,22 @@ class TestAuthenticateResetViewSetPATCH(TestCase):
         :return: None
         """
         # Create test data
-        user = account_models.User.objects.create_user(email='test@test.com', username='aov1')
-
-        client = APIClient()
-
-        payload = {
-            'email': user.email
-        }
-
-        request = client.post('/api/auth/reset', data=payload, format='json')
-
-        self.assertEquals(request.status_code, 201)
+        user = account_models.User.objects.create_user(email='test123@test.com', username='aov12')
+        code = password.create_password_reset_code(user)
 
         # Delete user
         user.delete()
 
+        # Check that user does not exist
+        users = account_models.User.objects.filter(email=user.email)
+
+        self.assertEquals(len(users), 0)
+
+        # Try to set password
+        client = APIClient()
+
         payload = {
-            'code': 'fail',
+            'code': code,
             'password': 'aaa'
         }
 
@@ -125,20 +127,18 @@ class TestAuthenticateResetViewSetPATCH(TestCase):
 
         self.assertEquals(request.status_code, 404)
 
-        # Check that there are no users in db
-        users = account_models.User.objects.all()
-
-        self.assertEquals(len(users), 0)
-
 
 class TestAuthenticateResetViewSetPOST(TestCase):
     """
     Test that we can request to reset password
 
     """
+
+    def setUp(self):
+        self.r = redis.StrictRedis(host='localhost', port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
+
     def tearDown(self):
-        r = redis.StrictRedis(host='localhost', port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
-        r.flushdb()
+        self.r.flushdb()
 
     def test_authenticate_reset_view_set_post_successful(self):
         """
@@ -200,9 +200,7 @@ class TestAuthenticateResetViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 400)
 
         # Check that user has no code
-        r = redis.StrictRedis(host='localhost', port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
-
-        self.assertIsNone(r.get(user.email))
+        self.assertIsNone(self.r.get(user.email))
 
         # Check that an email was sent
         self.assertEquals(len(mail.outbox), 0)
@@ -224,9 +222,7 @@ class TestAuthenticateResetViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 201)
 
         # Check that code is different
-        r = redis.StrictRedis(host='localhost', port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
-
-        self.assertIsNone(r.get('fake@test.com'))
+        self.assertIsNone(self.r.get('fake@test.com'))
 
         # Check that an email was sent
         self.assertEquals(len(mail.outbox), 0)

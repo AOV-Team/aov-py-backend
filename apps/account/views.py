@@ -110,15 +110,13 @@ class AuthenticateResetViewSet(APIView):
                     response.data['message'] = 'Password updated'
                     response.data['userMessage'] = 'Your password has been updated'
                 else:
-                    raise KeyError
+                    response = get_default_response('403')
+                    response.data['message'] = 'Code is not valid'
+                    response.data['userMessage'] = 'Your code is not valid'
             except ObjectDoesNotExist:
                 response = get_default_response('404')
                 response.data['message'] = 'User does not exist'
                 response.data['userMessage'] = 'The user does not exist.'
-            except KeyError:
-                response = get_default_response('403')
-                response.data['message'] = 'Code is not valid'
-                response.data['userMessage'] = 'Your code is not valid'
 
         return response
 
