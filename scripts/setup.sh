@@ -75,12 +75,12 @@ EMAIL = dict()
 
 EMAIL['EMAIL_BACKEND'] = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL['EMAIL_USE_TLS'] = True
-EMAIL['EMAIL_HOST'] = ''
+EMAIL['EMAIL_HOST'] = os.environ['EMAIL_HOST']
 EMAIL['EMAIL_PORT'] = 587
-EMAIL['EMAIL_HOST_PASSWORD'] = ''
-EMAIL['EMAIL_HOST_USER'] = ''
-EMAIL['DEFAULT_FROM_EMAIL'] = ''
-EMAIL['SERVER_EMAIL'] = ''
+EMAIL['EMAIL_HOST_PASSWORD'] = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL['EMAIL_HOST_USER'] = os.environ['EMAIL_HOST_USER']
+EMAIL['DEFAULT_FROM_EMAIL'] = 'info@artofvisuals.com'
+EMAIL['SERVER_EMAIL'] = 'info@artofvisuals.com'
 
 REDIS_DB = dict()
 
@@ -129,12 +129,12 @@ EMAIL = dict()
 
 EMAIL['EMAIL_BACKEND'] = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL['EMAIL_USE_TLS'] = True
-EMAIL['EMAIL_HOST'] = ''
+EMAIL['EMAIL_HOST'] = os.environ['EMAIL_HOST']
 EMAIL['EMAIL_PORT'] = 587
-EMAIL['EMAIL_HOST_PASSWORD'] = ''
-EMAIL['EMAIL_HOST_USER'] = ''
-EMAIL['DEFAULT_FROM_EMAIL'] = ''
-EMAIL['SERVER_EMAIL'] = ''
+EMAIL['EMAIL_HOST_PASSWORD'] = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL['EMAIL_HOST_USER'] = os.environ['EMAIL_HOST_USER']
+EMAIL['DEFAULT_FROM_EMAIL'] = 'info@artofvisuals.com'
+EMAIL['SERVER_EMAIL'] = 'info@artofvisuals.com'
 
 REDIS_DB = dict()
 
