@@ -42,6 +42,7 @@ class TestPhotoViewSetGET(TestCase):
         request = client.get('/api/photos')
         results = request.data['results']
 
+        self.assertIn('next', request.data)
         self.assertEquals(len(results), 2)
 
     def test_photo_view_set_get_public(self):

@@ -55,7 +55,7 @@ def photo_admin(request):
 
 
 class PhotoViewSet(generics.ListCreateAPIView):
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 
@@ -211,7 +211,7 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
 
 
 class PhotoClassificationPhotosViewSet(generics.ListAPIView):
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 
@@ -238,7 +238,7 @@ class PhotoFeedViewSet(generics.ListAPIView):
 
 
 class PhotoFeedPhotosViewSet(generics.ListAPIView):
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 
