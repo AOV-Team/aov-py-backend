@@ -67,6 +67,104 @@ class TestMeViewSetPATCH(TestCase):
 
         self.assertEquals(updated_user.age, 22)
 
+    def test_me_view_set_patch_password(self):
+        """
+        Test that we can update user's password
+
+        :return: None
+        """
+        # Create data
+        user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
+                                                       username='aov_hov')
+        user.set_password('ohyeah')
+        user.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = {
+            'existing_password': 'ohyeah',
+            'password': 'haha'
+        }
+
+        request = client.patch('/api/me', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 200)
+
+        # Attempt to log in with new password
+        login_request = client.post('/api/auth', data={'email': user.email, 'password': 'haha'}, format='json')
+
+        self.assertEquals(login_request.status_code, 201)
+
+    def test_me_view_set_patch_password_no_existing_pass(self):
+        """
+        Test that we cannot update password if existing password is not provided
+
+        :return: None
+        """
+        # Create data
+        user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
+                                                       username='aov_hov')
+        user.set_password('ohyeah')
+        user.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = {
+            'password': 'haha'
+        }
+
+        request = client.patch('/api/me', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 400)
+
+        # Attempt to log in with old password (not changed)
+        login_request = client.post('/api/auth', data={'email': user.email, 'password': 'ohyeah'}, format='json')
+
+        self.assertEquals(login_request.status_code, 201)
+
+    def test_me_view_set_patch_password_incorrect_pass(self):
+        """
+        Test that we cannot update password if existing password is not correct
+
+        :return: None
+        """
+        # Create data
+        user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
+                                                       username='aov_hov')
+        user.set_password('ohyeah')
+        user.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = {
+            'existing_password': 'srts',
+            'password': 'haha'
+        }
+
+        request = client.patch('/api/me', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 403)
+
+        # Attempt to log in with old password (not changed)
+        login_request = client.post('/api/auth', data={'email': user.email, 'password': 'ohyeah'}, format='json')
+
+        self.assertEquals(login_request.status_code, 201)
+
     def test_me_view_set_patch_sanitize_successful(self):
         """
         Test that payload is sanitized (PK doesn't change)

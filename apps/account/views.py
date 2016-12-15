@@ -17,7 +17,7 @@ from json.decoder import JSONDecodeError
 from rest_framework import generics, permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.views import APIView
 from social.apps.django_app.utils import load_strategy
 from social.apps.django_app.utils import load_backend
@@ -197,6 +197,21 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
             del payload['username']
 
         updated_user = account_models.User.objects.get(id=authenticated_user.id)
+
+        # Password
+        if 'password' in payload:
+            if 'existing_password' in payload:
+                existing = authenticate(email=authenticated_user.email, password=payload['existing_password'])
+
+                if existing:
+                    updated_user.set_password(payload['password'])
+                else:
+                    raise PermissionDenied('Old password is not correct')
+            else:
+                raise ValidationError('Existing password is required')
+
+            # We don't want this in the next step
+            del payload['password']
 
         # Update user
         for key in payload:
