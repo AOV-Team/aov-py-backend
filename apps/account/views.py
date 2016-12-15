@@ -599,8 +599,8 @@ class UserSingleViewSet(generics.RetrieveAPIView):
         return response
 
 
-class UserStarsViewSet(generics.CreateAPIView, generics.RetrieveDestroyAPIView):
-    authentication_classes = (TokenAuthentication,)
+class UserSingleStarsViewSet(generics.CreateAPIView, generics.RetrieveDestroyAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     queryset = account_models.User.objects.all()
     serializer_class = account_serializers.UserSerializer

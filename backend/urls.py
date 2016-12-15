@@ -35,7 +35,7 @@ urlpatterns = [
     url(r'api/users$', account_views.UserViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)$', account_views.UserSingleViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/photos$', account_views.UserPhotosViewSet.as_view()),
-    url(r'api/users/(?P<pk>[0-9^/]+)/stars$', account_views.UserStarsViewSet.as_view()),
+    url(r'api/users/(?P<pk>[0-9^/]+)/stars$', account_views.UserSingleStarsViewSet.as_view()),
 
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
@@ -45,7 +45,7 @@ urlpatterns = [
     url(r'api/photo_feeds/(?P<photo_feed_id>[0-9^/]+)/photos$', photo_views.PhotoFeedPhotosViewSet.as_view()),
     url(r'api/photos$', photo_views.PhotoViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)$', photo_views.PhotoSingleViewSet.as_view()),
-    url(r'api/photos/(?P<pk>[0-9^/]+)/interests$', photo_views.PhotoSingleInterestsViewSet.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/stars', photo_views.PhotoSingleStarsViewSet.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
