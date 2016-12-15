@@ -1,6 +1,9 @@
 from apps.account import models as account_models
 from apps.common import models as common_models
+from django.contrib.contenttypes.fields import GenericRelation
+from apps.utils import models as utils_models
 from django.conf import settings
+
 from django.db import models
 from django.utils.safestring import mark_safe
 
@@ -78,6 +81,8 @@ class Photo(models.Model):
     photo_feed = models.ManyToManyField(PhotoFeed, blank=True)
     tag = models.ManyToManyField(PhotoClassification, blank=True, related_name='tag')
     user = models.ForeignKey(account_models.User, blank=True, null=True)
+    user_action = GenericRelation(utils_models.UserAction)
+
     attribution_name = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path)
     location = models.CharField(max_length=255, blank=True, null=True)
