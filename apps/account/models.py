@@ -50,9 +50,6 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     class Meta:
         verbose_name_plural = "Users"
 
-    def __str__(self):
-        return self.email
-
     def get_short_name(self):
         return self.email
 
@@ -213,10 +210,11 @@ class UserInterest(models.Model):
     )
 
     user = models.ForeignKey(User)
-    content_object = GenericForeignKey('content_type', 'object_id')
+    interest_type = models.CharField(max_length=10, choices=INTEREST_TYPE_CHOICES)
+
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    interest_type = models.CharField(max_length=10, choices=INTEREST_TYPE_CHOICES)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
         return '{} {}: {}'.format(self.interest_type, self.content_object, self.object_id)

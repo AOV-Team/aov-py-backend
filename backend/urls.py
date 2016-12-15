@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'api/users$', account_views.UserViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)$', account_views.UserSingleViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/photos$', account_views.UserPhotosViewSet.as_view()),
+    url(r'api/users/(?P<pk>[0-9^/]+)/stars$', account_views.UserStarsViewSet.as_view()),
 
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
