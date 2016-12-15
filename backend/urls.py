@@ -15,6 +15,7 @@ Including another URLconf
 """
 from apps.account import views as account_views
 from apps.photo import views as photo_views
+from apps.utils import views as utils_views
 from django.conf import settings
 from django.conf.urls import url
 from django.conf.urls.static import static
@@ -46,6 +47,9 @@ urlpatterns = [
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
+
+    # utils
+    url(r'api/me/actions$', utils_views.MeActionsViewSet.as_view()),
 
     # admin
     url(r'^admin/', admin.site.urls),
