@@ -50,6 +50,7 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
         request = client.get('/api/photo_feeds/{}/photos'.format(feed.id))
         results = request.data['results']
 
+        self.assertIn('next', request.data)
         self.assertEquals(len(results), 2)
 
     def test_photo_feed_photos_view_set_get_public(self):

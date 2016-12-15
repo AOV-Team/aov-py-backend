@@ -42,6 +42,7 @@ class TestPhotoViewSetGET(TestCase):
         request = client.get('/api/photos')
         results = request.data['results']
 
+        self.assertIn('next', request.data)
         self.assertEquals(len(results), 2)
 
     def test_photo_view_set_get_public(self):
@@ -281,6 +282,7 @@ class TestPhotoViewSetPOST(TestCase):
         photos = photo_models.Photo.objects.all()
 
         self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
 
         # Test that original uploaded image is saved (before resized and compressed)
         matched_images = test_helpers.find_file_by_pattern(settings.MEDIA_ROOT, '*_md-portrait.jpg')
@@ -337,6 +339,7 @@ class TestPhotoViewSetPOST(TestCase):
         photos = photo_models.Photo.objects.all()
 
         self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
 
     def test_photo_view_set_post_bad_request_fields_missing(self):
         """

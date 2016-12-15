@@ -30,6 +30,8 @@ class TestUsersViewSetPOST(TestCase):
         self.assertIn('username', result)
 
         user = account_models.User.objects.get(email='mr@mypapaya.io')
+
+        self.assertTrue(user.is_active)
         self.assertFalse(user.is_superuser)
 
         # Attempt to log user in
@@ -39,7 +41,6 @@ class TestUsersViewSetPOST(TestCase):
         login_result = login_request.data
 
         self.assertIn('token', login_result)
-
 
     def test_users_view_set_post_cannot_set_superuser(self):
         """
@@ -61,6 +62,8 @@ class TestUsersViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 201)
 
         user = account_models.User.objects.get(email='mrsneakytest@mypapaya.io')
+
+        self.assertTrue(user.is_active)
         self.assertFalse(user.is_superuser)
 
     def test_users_view_set_post_full_successful(self):
@@ -98,6 +101,7 @@ class TestUsersViewSetPOST(TestCase):
         self.assertIsNotNone(user.avatar)
         self.assertEquals(user.email, 'mrtest@mypapaya.io')
         self.assertEquals(user.first_name, 'Martin')
+        self.assertTrue(user.is_active)
         self.assertEquals(user.last_name, 'Ronquillo')
         self.assertEquals(user.location, 'Boise')
         self.assertEquals(user.username, 'aov_hov')

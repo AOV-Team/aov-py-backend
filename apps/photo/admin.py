@@ -19,16 +19,30 @@ class PhotoAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Image', {'fields': ('image', 'original_image_url', 'user', 'location', 'public',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
-        ('Misc', {'fields': ('attribution_name', 'photo_data')}),
+        ('Misc', {'fields': ('attribution_name', 'photo_data',)}),
     )
 
     filter_horizontal = ('category', 'tag', 'photo_feed')
     # form = forms.get_image_preview_form(photo_models.Photo)
 
-    list_display = ['photo_tag', 'user_info', 'location', 'public', 'id']
+    list_display = ['photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'id']
     ordering = ['-id']
     readonly_fields = ('original_image_url',)
     search_fields = ['image', 'id']
+
+    def photo_clicks(self, obj):
+        """
+        Show number of photo views (clicks)
+
+        :param obj: instance of Photo
+        :return: String w/ photo view count
+        """
+        view_count = obj.user_action.filter(action='photo_click')
+
+        return u'{}'.format(len(view_count))
+
+    photo_clicks.allow_tags = True
+    photo_clicks.short_description = 'Clicks'
 
     def user_info(self, obj):
         if obj.user:

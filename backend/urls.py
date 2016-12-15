@@ -15,6 +15,7 @@ Including another URLconf
 """
 from apps.account import views as account_views
 from apps.photo import views as photo_views
+from apps.utils import views as utils_views
 from django.conf import settings
 from django.conf.urls import url
 from django.conf.urls.static import static
@@ -26,6 +27,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 urlpatterns = [
     # account
     url(r'api/auth$', account_views.AuthenticateViewSet.as_view()),
+    url(r'api/auth/reset$', account_views.AuthenticateResetViewSet.as_view()),
     url(r'api/auth/social$', account_views.SocialSignUpViewSet.as_view()),
     url(r'api/me$', account_views.MeViewSet.as_view()),
     url(r'api/me/gear$', account_views.MeGearViewSet.as_view()),
@@ -46,6 +48,9 @@ urlpatterns = [
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
+
+    # utils
+    url(r'api/me/actions$', utils_views.MeActionsViewSet.as_view()),
 
     # admin
     url(r'^admin/', admin.site.urls),

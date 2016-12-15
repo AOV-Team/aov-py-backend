@@ -21,17 +21,23 @@ EMAIL = dict()
 
 EMAIL['EMAIL_BACKEND'] = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL['EMAIL_USE_TLS'] = True
-EMAIL['EMAIL_HOST'] = ''
+EMAIL['EMAIL_HOST'] = 'smtp-relay.sendinblue.com'
 EMAIL['EMAIL_PORT'] = 587
-EMAIL['EMAIL_HOST_PASSWORD'] = ''
-EMAIL['EMAIL_HOST_USER'] = ''
-EMAIL['DEFAULT_FROM_EMAIL'] = ''
-EMAIL['SERVER_EMAIL'] = ''
+EMAIL['EMAIL_HOST_PASSWORD'] = 'TzNv13Ohx0tSUwnL'
+EMAIL['EMAIL_HOST_USER'] = 'ronquillo.m@gmail.com'
+EMAIL['DEFAULT_FROM_EMAIL'] = 'info@artofvisuals.com'
+EMAIL['SERVER_EMAIL'] = 'ronquillo.m@gmail.com'
 
 # Simpler hasher for DEV/TESTING only
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
+
+REDIS_DB = dict()
+
+REDIS_DB['PASSWORD_CODES'] = 1
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 
@@ -69,12 +75,18 @@ EMAIL = dict()
 
 EMAIL['EMAIL_BACKEND'] = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL['EMAIL_USE_TLS'] = True
-EMAIL['EMAIL_HOST'] = ''
+EMAIL['EMAIL_HOST'] = os.environ['EMAIL_HOST']
 EMAIL['EMAIL_PORT'] = 587
-EMAIL['EMAIL_HOST_PASSWORD'] = ''
-EMAIL['EMAIL_HOST_USER'] = ''
-EMAIL['DEFAULT_FROM_EMAIL'] = ''
-EMAIL['SERVER_EMAIL'] = ''
+EMAIL['EMAIL_HOST_PASSWORD'] = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL['EMAIL_HOST_USER'] = os.environ['EMAIL_HOST_USER']
+EMAIL['DEFAULT_FROM_EMAIL'] = 'info@artofvisuals.com'
+EMAIL['SERVER_EMAIL'] = os.environ['EMAIL_HOST_USER']
+
+REDIS_DB = dict()
+
+REDIS_DB['PASSWORD_CODES'] = 1
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 
@@ -117,12 +129,18 @@ EMAIL = dict()
 
 EMAIL['EMAIL_BACKEND'] = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL['EMAIL_USE_TLS'] = True
-EMAIL['EMAIL_HOST'] = ''
+EMAIL['EMAIL_HOST'] = os.environ['EMAIL_HOST']
 EMAIL['EMAIL_PORT'] = 587
-EMAIL['EMAIL_HOST_PASSWORD'] = ''
-EMAIL['EMAIL_HOST_USER'] = ''
-EMAIL['DEFAULT_FROM_EMAIL'] = ''
-EMAIL['SERVER_EMAIL'] = ''
+EMAIL['EMAIL_HOST_PASSWORD'] = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL['EMAIL_HOST_USER'] = os.environ['EMAIL_HOST_USER']
+EMAIL['DEFAULT_FROM_EMAIL'] = 'info@artofvisuals.com'
+EMAIL['SERVER_EMAIL'] = os.environ['EMAIL_HOST_USER']
+
+REDIS_DB = dict()
+
+REDIS_DB['PASSWORD_CODES'] = 1
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
 
