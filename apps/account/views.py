@@ -182,7 +182,8 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         response = get_default_response('200')
 
         # Remove PKs and other fields that cannot be updated via API
-        payload = remove_pks_from_payload('user', payload)
+        # Explicitedly converting to dict just in case...
+        payload = dict(remove_pks_from_payload('user', payload))
 
         if 'email' in payload:
             del payload['email']
@@ -205,6 +206,7 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
 
                 if existing:
                     updated_user.set_password(payload['password'])
+                    del payload['existing_password']
                 else:
                     raise PermissionDenied('Old password is not correct')
             else:
