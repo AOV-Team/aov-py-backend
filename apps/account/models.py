@@ -20,7 +20,10 @@ class UserCustomManager(BaseUserManager):
                           is_superuser=is_superuser,
                           last_login=now,
                           username=username, **extra_fields)
-        user.set_password(password)
+
+        if password:
+            user.set_password(password)
+
         user.save(using=self._db)
         return user
 

@@ -154,3 +154,183 @@ class TestAuthViewSetPOST(TestCase):
 
         request = client.post('/api/auth', data=payload, format='json')
         self.assertEquals(request.status_code, 401)
+
+
+# TODO remove this a few weeks after transition to Django backend
+class TestAuthViewSetPOSTTransition(TestCase):
+    """
+    Test that we can set a user's password if they don't have one.
+    """
+    def test_authenticate_view_set_post_transition_successful(self):
+        """
+        Test that user's password is set
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
+
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'email': user.email,
+            'password': 'lala',
+            'set': True,  # necessary
+            'auth': 'okgo'  # necessary
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+        result = request.data
+
+        self.assertEquals(request.status_code, 201)
+
+        # Logout
+        client.credentials(HTTP_AUTHORIZATION='Token ' + result['token'])
+
+        logout_request = client.delete('/api/auth')
+
+        self.assertEquals(logout_request.status_code, 200)
+
+        # Make sure we can log in with new password
+        payload2 = {
+            'email': user.email,
+            'password': 'lala',
+        }
+
+        login_request = client.post('/api/auth', data=payload2, format='json')
+
+        self.assertEquals(login_request.status_code, 201)
+
+    def test_authenticate_view_set_post_transition_password_already_set(self):
+        """
+        Test that user's password is not set if user already has one
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
+        user.set_password('pass')
+        user.save()
+
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'email': user.email,
+            'password': 'lala',
+            'set': True,
+            'auth': 'okgo'
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 401)
+
+        # Make sure we cannot log in with new password
+        payload2 = {
+            'email': user.email,
+            'password': 'lala',
+        }
+
+        login_request = client.post('/api/auth', data=payload2, format='json')
+
+        self.assertEquals(login_request.status_code, 401)
+
+        # Make sure we can log in with old password
+        payload3 = {
+            'email': user.email,
+            'password': 'pass',
+        }
+
+        login_request_2 = client.post('/api/auth', data=payload3, format='json')
+
+        self.assertEquals(login_request_2.status_code, 201)
+
+    def test_authenticate_view_set_post_transition_bad_auth(self):
+        """
+        Test that user's password is not set if auth key is incorrect
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
+
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'email': user.email,
+            'password': 'lala',
+            'set': True,
+            'auth': 'bad'
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 401)
+
+        # Make sure we cannot log in with new password
+        payload2 = {
+            'email': user.email,
+            'password': 'lala',
+        }
+
+        login_request = client.post('/api/auth', data=payload2, format='json')
+
+        self.assertEquals(login_request.status_code, 401)
+
+    def test_authenticate_view_set_post_transition_missing_auth(self):
+        """
+        Test that user's password is not set if auth key is missing
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
+
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'email': user.email,
+            'password': 'lala',
+            'set': True,
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 401)
+
+        # Make sure we cannot log in with new password
+        payload2 = {
+            'email': user.email,
+            'password': 'lala',
+        }
+
+        login_request = client.post('/api/auth', data=payload2, format='json')
+
+        self.assertEquals(login_request.status_code, 401)
+
+    def test_authenticate_view_set_post_transition_no_user(self):
+        """
+        Test that user's password is not set and we get HTTP 401 if user not found
+
+        :return: None
+        """
+        # Test data
+        account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
+
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'email': 'mr@test.com',
+            'password': 'lala',
+            'set': True,
+            'auth': 'bad'
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 401)

@@ -64,6 +64,23 @@ class AuthenticateViewSet(APIView):
         response = get_default_response('400')
 
         if email and password:
+            # TODO remove this a few weeks after transition to Django backend
+            # This is for smoothly transitioning users to the new backend
+            try:
+                if 'set' in payload and 'auth' in payload:
+                    if payload['set'] and payload['auth'] == 'okgo':
+                        user = account_models.User.objects.get(email=payload['email'])
+
+                        if not user.password:
+                            user.set_password(payload['password'])
+                            user.save()
+            except ObjectDoesNotExist:
+                response = get_default_response('401')
+                response.data['message'] = 'Authentication failed'
+                response.data['userMessage'] = 'Email or password incorrect. Please try again.'
+                return response
+            # END TODO
+
             user = authenticate(email=email, password=password)
 
             if user:
