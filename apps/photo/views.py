@@ -365,7 +365,8 @@ class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
         :param kwargs:
         :return: Response object
         """
-        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
         response = get_default_response('200')
         starred_photo_id = kwargs.get('pk')
 
@@ -397,7 +398,8 @@ class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
         :param kwargs:
         :return: Response object
         """
-        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
         response = get_default_response('400')
         photo_id = kwargs.get('pk')
 

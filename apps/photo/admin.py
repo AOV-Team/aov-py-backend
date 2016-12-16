@@ -1,7 +1,10 @@
+from apps.account import models as account_models
 # from apps.common import forms
 from apps.photo import models as photo_models
 from django.contrib import admin
+from django.contrib.contenttypes.models import ContentType
 from django.core import urlresolvers
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class PhotoClassificationAdmin(admin.ModelAdmin):
@@ -25,10 +28,41 @@ class PhotoAdmin(admin.ModelAdmin):
     filter_horizontal = ('category', 'tag', 'photo_feed')
     # form = forms.get_image_preview_form(photo_models.Photo)
 
-    list_display = ['photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'id']
+    list_display = ['photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id']
     ordering = ['-id']
     readonly_fields = ('original_image_url',)
     search_fields = ['image', 'id']
+
+    # Override get_changelist so we can get logged-in user
+    def get_changelist(self, request, **kwargs):
+        qs = super(PhotoAdmin, self).get_changelist(request, **kwargs)
+        self.current_user = request.user
+        return qs
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of Photo
+        :return: String w/ HTML
+        """
+        starred = ' '
+
+        try:
+            photo_type = ContentType.objects.get_for_model(obj)
+            interest = account_models.UserInterest.objects \
+                .get(user=self.current_user, interest_type='star', content_type__pk=photo_type.id, object_id=obj.id)
+
+            if interest:
+                starred = ' starred '
+        except ObjectDoesNotExist:
+            pass
+
+        return u'<span data-content-type="photos" data-id="{}" class="star-button{}fa fa-star"></span>' \
+            .format(obj.id, starred)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
 
     def photo_clicks(self, obj):
         """

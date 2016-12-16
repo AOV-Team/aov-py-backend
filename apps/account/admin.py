@@ -2,7 +2,52 @@ from apps.account import models
 from apps.photo import models as photo_models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from guardian import models as guardian
+
+
+class StarUserFilter(admin.SimpleListFilter):
+    title = 'Starred'
+    parameter_name = 'starred'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Starred'),
+            ('no', 'Unstarred')
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            starred_users = list()
+            user_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+
+            if user_type:
+                for q in queryset:
+                    interest = models.UserInterest.objects\
+                        .filter(user=request.user, interest_type='star', content_type__pk=user_type.id, object_id=q.id)
+
+                    if len(interest) > 0:
+                        starred_users.append(q.id)
+
+                return queryset.filter(id__in=starred_users)
+            else:
+                return queryset
+        elif self.value() == 'no':
+            unstarred_users = list()
+            user_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+
+            if user_type:
+                for q in queryset:
+                    interest = models.UserInterest.objects \
+                        .filter(user=request.user, interest_type='star', content_type__pk=user_type.id, object_id=q.id)
+
+                    if len(interest) == 0:
+                        unstarred_users.append(q.id)
+
+                return queryset.filter(id__in=unstarred_users)
+            else:
+                return queryset
 
 
 class UserAdmin(BaseUserAdmin):
@@ -21,13 +66,44 @@ class UserAdmin(BaseUserAdmin):
     )
 
     list_display = ['username', 'email', 'social_name', 'location', 'age', 'created_at', 'photo_count',
-                    'id']
-    list_filter = ['is_active', 'is_superuser']
+                    'id', 'action_buttons']
+    list_filter = [StarUserFilter, 'is_active', 'is_superuser']
     ordering = ['username']
 
     readonly_fields = ('created_at', 'id', 'last_login')
 
     search_fields = ['age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name']
+
+    # Override get_changelist so we can get logged-in user
+    def get_changelist(self, request, **kwargs):
+        qs = super(UserAdmin, self).get_changelist(request, **kwargs)
+        self.current_user = request.user
+        return qs
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of User
+        :return: String w/ HTML
+        """
+        starred = ' '
+
+        try:
+            user_type = ContentType.objects.get_for_model(obj)
+            interest = models.UserInterest.objects \
+                .get(user=self.current_user, interest_type='star', content_type__pk=user_type.id, object_id=obj.id)
+
+            if interest:
+                starred = ' starred '
+        except ObjectDoesNotExist:
+            pass
+
+        return u'<span data-content-type="users" data-id="{}" class="star-button{}fa fa-star"></span>'\
+            .format(obj.id, starred)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
 
     def photo_count(self, obj):
         """

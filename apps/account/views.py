@@ -16,7 +16,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from json.decoder import JSONDecodeError
 from rest_framework import generics, permissions
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.views import APIView
@@ -613,7 +613,8 @@ class UserSingleStarsViewSet(generics.CreateAPIView, generics.RetrieveDestroyAPI
         :param kwargs:
         :return: Response object
         """
-        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
         response = get_default_response('200')
         starred_user_id = kwargs.get('pk')
 
@@ -644,7 +645,8 @@ class UserSingleStarsViewSet(generics.CreateAPIView, generics.RetrieveDestroyAPI
         :param kwargs:
         :return: Response object
         """
-        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
         response = get_default_response('400')
         star_user_id = kwargs.get('pk')
 
