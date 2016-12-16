@@ -8,6 +8,9 @@ from guardian import models as guardian
 
 
 class StarUserFilter(admin.SimpleListFilter):
+    """
+    Filter to filter by users that have/have not been starred by logging user
+    """
     title = 'Starred'
     parameter_name = 'starred'
 

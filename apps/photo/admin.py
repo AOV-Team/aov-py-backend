@@ -18,6 +18,52 @@ class PhotoFeedAdmin(admin.ModelAdmin):
     search_fields = ['name', 'id']
 
 
+class StarPhotoFilter(admin.SimpleListFilter):
+    """
+    Filter to filter by photos that have/have not been starred by logging user
+    """
+    title = 'Starred'
+    parameter_name = 'starred'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Starred'),
+            ('no', 'Unstarred')
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            starred_photos = list()
+            photo_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+
+            if photo_type:
+                for q in queryset:
+                    interest = account_models.UserInterest.objects\
+                        .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=q.id)
+
+                    if len(interest) > 0:
+                        starred_photos.append(q.id)
+
+                return queryset.filter(id__in=starred_photos)
+            else:
+                return queryset
+        elif self.value() == 'no':
+            unstarred_photos = list()
+            photo_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+
+            if photo_type:
+                for q in queryset:
+                    interest = account_models.UserInterest.objects \
+                        .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=q.id)
+
+                    if len(interest) == 0:
+                        unstarred_photos.append(q.id)
+
+                return queryset.filter(id__in=unstarred_photos)
+            else:
+                return queryset
+
+
 class PhotoAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Image', {'fields': ('image', 'original_image_url', 'user', 'location', 'public',)}),
@@ -29,6 +75,7 @@ class PhotoAdmin(admin.ModelAdmin):
     # form = forms.get_image_preview_form(photo_models.Photo)
 
     list_display = ['photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id']
+    list_filter = (StarPhotoFilter,)
     ordering = ['-id']
     readonly_fields = ('original_image_url',)
     search_fields = ['image', 'id']
