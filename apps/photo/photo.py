@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
-# from django.core.files.storage import default_storage as storage
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from io import BufferedReader, BytesIO
 from PIL import Image as PillowImage

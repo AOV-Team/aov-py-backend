@@ -1,3 +1,5 @@
+from apps.account import models as account_models
+from apps.account import serializers as account_serializers
 from apps.common import models as common_models
 from apps.common.views import get_default_response, handle_jquery_empty_array, remove_pks_from_payload
 from apps.photo import models as photo_models
@@ -5,6 +7,7 @@ from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
@@ -343,3 +346,81 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
                 raise NotFound
         else:
             raise PermissionDenied
+
+
+class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
+    """
+    /api/photos/{}/interests
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = account_models.UserInterest.objects.all()
+    serializer_class = account_serializers.UserInterestSerializer
+
+    def delete(self, request, **kwargs):
+        """
+        Delete photo star
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
+        response = get_default_response('200')
+        starred_photo_id = kwargs.get('pk')
+
+        try:
+            try:
+                photo = photo_models.Photo.objects.get(id=starred_photo_id)
+            except ObjectDoesNotExist:
+                response = get_default_response('404')
+                response.data['message'] = 'Photo does not exist'
+                return response
+
+            photo_type = ContentType.objects.get_for_model(photo)
+            interest = account_models.UserInterest.objects.filter(user=authenticated_user, interest_type='star',
+                                                                  content_type__pk=photo_type.id,
+                                                                  object_id=photo.id)
+
+            interest.delete()
+        except ObjectDoesNotExist:
+            # Return 200 even if user wasn't starred
+            pass
+
+        return response
+
+    def post(self, request, **kwargs):
+        """
+        Star a photo
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
+        response = get_default_response('400')
+        photo_id = kwargs.get('pk')
+
+        try:
+            photo = photo_models.Photo.objects.get(id=photo_id)
+
+            # Make sure there is no existing entry
+            photo_type = ContentType.objects.get_for_model(photo)
+            interest = account_models.UserInterest.objects \
+                .filter(user=authenticated_user, interest_type='star', content_type__pk=photo_type.id,
+                        object_id=photo.id) \
+                .first()
+
+            if not interest:
+                account_models.UserInterest.objects.create(content_object=photo,
+                                                           user=authenticated_user, interest_type='star')
+                response = get_default_response('201')
+            else:
+                response = get_default_response('409')
+        except ObjectDoesNotExist:
+            response = get_default_response('404')
+            response.data['message'] = 'User you attempted to star does not exist'
+
+        return response

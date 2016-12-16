@@ -24,3 +24,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         """
         model = models.Profile
         fields = ('user', 'bio', 'cover_image')
+
+
+class UserInterestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserInterest
+        fields = ('id', 'interest_type')
