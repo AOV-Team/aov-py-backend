@@ -76,7 +76,7 @@ class PhotoFeed(models.Model):
         return '{},\tID: {}'.format(self.name, self.id)
 
 
-class Photo(models.Model):
+class Photo(common_models.EditMixin):
     category = models.ManyToManyField(PhotoClassification, related_name='category')
     photo_feed = models.ManyToManyField(PhotoFeed, blank=True)
     tag = models.ManyToManyField(PhotoClassification, blank=True, related_name='tag')

@@ -68,7 +68,7 @@ class PhotoAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Image', {'fields': ('image', 'original_image_url', 'user', 'location', 'public',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
-        ('Misc', {'fields': ('attribution_name', 'photo_data',)}),
+        ('Misc', {'fields': ('attribution_name', 'photo_data', 'created_at',)}),
     )
 
     filter_horizontal = ('category', 'tag', 'photo_feed')
@@ -77,7 +77,7 @@ class PhotoAdmin(admin.ModelAdmin):
     list_display = ['photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id']
     list_filter = (StarPhotoFilter,)
     ordering = ['-id']
-    readonly_fields = ('original_image_url',)
+    readonly_fields = ('created_at', 'original_image_url',)
     search_fields = ['image', 'id']
 
     # Override get_changelist so we can get logged-in user

@@ -129,8 +129,9 @@ class ProfileAdmin(admin.ModelAdmin):
 
 
 class UserInterestAdmin(admin.ModelAdmin):
-    list_display = ['user', 'content_object', 'interest_type', 'id']
-    search_fields = ['id', 'user']
+    list_display = ('content_type', 'id', 'content_object', 'interest_type', 'user',)
+    readonly_fields = ('user', 'interest_type', 'content_type', 'object_id',)
+    search_fields = ('id', 'user',)
 
 
 class UserObjectPermissionAdmin(admin.ModelAdmin):
