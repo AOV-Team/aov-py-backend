@@ -17,12 +17,27 @@ AOV's Django backend.
 To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
 
 ## Endpoints
-* `/api/auth`
-..* DELETE
-..* POST 
+### `/api/auth`
+* DELETE
+* POST 
 ```javascript
 {
     "email": "",
     "password": ""
 }
 ````
+
+### `/api/auth/reset`
+* PATCH
+```javascript
+{
+    "code": "",
+    "password": ""
+}
+```
+* POST
+```javascript
+{
+    "email": ""
+}
+```
