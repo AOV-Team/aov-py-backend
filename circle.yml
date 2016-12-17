@@ -1,0 +1,15 @@
+machine:
+  python:
+    version: 3.5.2
+  services:
+    - postgresql
+    - redis
+  environment:
+    AWS_ACCESS_KEY_ID: AKIAJTGZF3MZUTBNE56Q
+    AWS_SECRET_ACCESS_KEY: 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
+    DB_NAME: circleci
+    DB_USER: ubuntu
+    REDIS_HOST: localhost
+dependencies:
+  post:
+    - ./scripts/setup.sh staging
