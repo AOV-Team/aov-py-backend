@@ -327,6 +327,7 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
             payload = request.data
             payload = remove_pks_from_payload('photo', payload)
             payload = handle_jquery_empty_array('photo_feed', payload)
+            payload = remove_pks_from_payload('user', payload)
 
             # Cannot change image
             if 'image' in payload:

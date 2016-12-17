@@ -33,3 +33,4 @@ class PhotoSerializer(serializers.ModelSerializer):
         extra_kwargs = {'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
+        read_only_fields = ('original_image_url', 'photo_data')
