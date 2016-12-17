@@ -559,7 +559,7 @@ class UserPhotosViewSet(generics.ListAPIView):
     """
     /api/users/{}/photos
     """
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     queryset = photo_models.Photo.objects.all()
     serializer_class = photo_serializers.PhotoSerializer
@@ -572,7 +572,8 @@ class UserPhotosViewSet(generics.ListAPIView):
         :param kwargs:
         :return: Response object
         """
-        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
 
         photos = photo_models.Photo.objects.filter(user=authenticated_user, public=True).order_by('-id')
         paginated_photos = self.paginate_queryset(photos)
