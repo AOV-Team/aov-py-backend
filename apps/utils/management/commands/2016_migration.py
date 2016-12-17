@@ -1,10 +1,14 @@
 from apps.account import models as account_models
+from apps.common import models as common_models
 from apps.photo import models as photo_models
+from apps.photo.photo import Photo
+from django.conf import settings
 from django.core.management import BaseCommand
 from django.db.utils import IntegrityError
 import collections
 import csv
 import datetime
+import os
 import random
 import string
 
@@ -80,7 +84,69 @@ def import_users():
 
 
 def import_images():
-    pass
+    counter = 0
+    already_processed = list()
+
+    # See if there's a record file
+    if os.path.isfile('processed_images.txt'):
+        already_processed = [line.rstrip('\n') for line in open('processed_images.txt')]
+
+    with open('image.csv', 'r') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+
+        for row in reader:
+            image_file = 'upload/' + row[5]
+
+            # Check if image has already been imported
+            if image_file in already_processed:
+                continue
+
+            # Check that we have the image file
+            # If not, skip
+            if not os.path.isfile(image_file):
+                continue
+
+            # Get user
+            user = account_models.User.objects.filter(email=row[1]).first()
+
+            if user:
+                print('Currently processing {}'.format(image_file))
+
+                category = photo_models.PhotoClassification.objects\
+                    .filter(classification_type='category', name=row[2])\
+                    .first()
+
+                # If category does not exist, default to Other
+                if not category:
+                    category = photo_models.PhotoClassification.objects.get(id=8)
+
+                # Now that know file exists and we have the image user and category, import image
+                photo = Photo(open(image_file, 'rb'))
+                remote_key = photo.save('u{}_{}_{}'
+                                        .format(user.id, common_models.get_date_stamp_str(), photo.name),
+                                        custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
+
+                # Original image url
+                original_image = '{}{}'.format(settings.ORIGINAL_MEDIA_URL, remote_key)
+
+                # Process image to save
+                image = photo.compress()
+
+                # Save image
+                pic = photo_models.Photo.objects\
+                    .create(user=user, image=image, location=row[7], original_image_url=original_image)
+                pic.save()
+                pic.category = [category]
+                pic.save()
+
+                # Record that image has been uploaded in case import blows up we can start again and not dupe images
+                f = open('processed_images.txt', 'a+')
+                f.write(image_file + '\n')
+                f.close()
+
+                counter += 1
+
+    print('Imported {} images'.format(counter))
 
 
 class Command(BaseCommand):
