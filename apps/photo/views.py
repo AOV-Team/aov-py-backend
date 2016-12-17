@@ -255,7 +255,9 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
             photo_feed_id = self.kwargs['photo_feed_id']
             photo_feed = photo_models.PhotoFeed.objects.get(id=photo_feed_id)
 
-            return photo_models.Photo.objects.filter(photo_feed=photo_feed, public=True).order_by('-id')
+            return photo_models.Photo.objects.filter(photo_feed=photo_feed, public=True)\
+                .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
+                .order_by('-creation_seq')
         except ObjectDoesNotExist:
             raise NotFound
 
