@@ -25,7 +25,60 @@ def photo_admin(request):
     :param request: Request object
     :return: render()
     """
-    photos = photo_models.Photo.objects.filter(public=True).order_by('-id')
+    category = request.GET.get('category')
+    feed = request.GET.get('feed')
+    q = request.GET.get('q')
+    u = request.GET.get('u')
+
+    # Default is none
+    photos = photo_models.Photo.objects.none()
+
+    if category:
+        cat = photo_models.PhotoClassification.objects\
+            .filter(classification_type='category', name__icontains=category).first()
+
+        if cat:
+            photos = photo_models.Photo.objects.filter(category=cat, public=True)
+    elif feed:
+        feed = photo_models.PhotoFeed.objects.filter(name__icontains=feed, public=True)
+
+        if feed:
+            photos = photo_models.Photo.objects.filter(photo_feed=feed, public=True)
+    elif q or u:
+        photos = photo_models.Photo.objects.none()
+
+        # Search for a tag
+        if q:
+            tag = photo_models.PhotoClassification.objects.filter(classification_type='tag', name__icontains=q).first()
+
+            if tag:
+                photos = photos | photo_models.Photo.objects.filter(Q(tag=tag) | Q(location__icontains=q), public=True)
+            else:
+                photos = photos | photo_models.Photo.objects.filter(location__icontains=q, public=True)
+
+        # User search
+        # Only active users
+        if u:
+            try:
+                age = int(u)
+            except ValueError:
+                age = -1
+
+            users = account_models.User.objects\
+                .filter(Q(age=age) | Q(email__icontains=u) | Q(first_name__icontains=u) |
+                        Q(last_name__icontains=u) | Q(location__icontains=u) | Q(username__icontains=u), is_active=True)
+
+            for user in users:
+                photos = photos | photo_models.Photo.objects.filter(user=user)
+    else:
+        # Build search attributes for photo
+        search = {
+            'public': True
+        }
+
+        photos = photo_models.Photo.objects.filter(**search).order_by('-id')
+
+    # Pagination
     paginator = Paginator(photos, 30)
     page = request.GET.get('page')
 
@@ -38,17 +91,29 @@ def photo_admin(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         photos = paginator.page(paginator.num_pages)
 
-    # Add list of names of feeds that image is in
+    # Add lists of names of feeds and tags that image is in
     # Makes it easier to work with in the HTML template
     for photo in photos:
         if not getattr(photo, 'photo_feed_names', None):
             photo.photo_feed_names = list()
 
+        if not getattr(photo, 'photo_tag_names', None):
+            photo.photo_tag_names = list()
+
         for feed in photo.photo_feed.all():
             if feed.public:
                 photo.photo_feed_names.append(feed.name)
 
+        for tag in photo.tag.all():
+            if tag.public:
+                photo.photo_tag_names.append(tag.name)
+
+    # Categories
+    categories = photo_models.PhotoClassification.objects\
+        .filter(classification_type='category', public=True).order_by('name')
+
     context = {
+        'categories': categories,
         'media_url': settings.MEDIA_URL,
         'photo_feeds': photo_models.PhotoFeed.objects.filter(public=True),
         'photos': photos

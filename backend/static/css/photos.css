@@ -83,6 +83,17 @@ input[type="checkbox"] {
     width: 100%;
 }
 
+.feeds-modal .tag {
+    background-color: #47bac1;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.feeds-modal .tag + .feeds-modal .tag {
+    margin-left: 5px;
+}
+
 .overlay {
     display: none;
     background-color: rgba(0, 0, 0, .75);
