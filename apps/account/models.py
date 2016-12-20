@@ -17,6 +17,7 @@ class UserCustomManager(BaseUserManager):
 
         email = self.normalize_email(email)
         user = self.model(email=email,
+                          is_admin=is_superuser,
                           is_superuser=is_superuser,
                           last_login=now,
                           username=username, **extra_fields)
@@ -41,6 +42,7 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=64, blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False, verbose_name='staff account')
     last_name = models.CharField(max_length=64, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
     social_name = models.CharField(max_length=64, blank=True,
@@ -58,7 +60,7 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
 
     @property
     def is_staff(self):
-        return self.is_superuser
+        return self.is_admin
 
     def __str__(self):
         return '{},\t{},\tID{}'.format(self.username, self.email, self.id)

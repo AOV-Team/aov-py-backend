@@ -11,9 +11,9 @@ class UserPublicSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'is_active', 'is_superuser', 'last_login', 'last_name',
+        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'is_active', 'last_login', 'last_name',
                   'location', 'password', 'social_name', 'username')
-        read_only_fields = ('is_superuser', 'last_login')
+        read_only_fields = ('last_login',)
         extra_kwargs = {'is_active': {'default': True, 'write_only': True}, 'password': {'write_only': True}}
 
 

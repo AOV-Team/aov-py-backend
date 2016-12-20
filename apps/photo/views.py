@@ -26,7 +26,7 @@ def photo_admin(request):
     :return: render()
     """
     photos = photo_models.Photo.objects.filter(public=True).order_by('-id')
-    paginator = Paginator(photos, 20)
+    paginator = Paginator(photos, 30)
     page = request.GET.get('page')
 
     try:

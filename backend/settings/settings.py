@@ -36,6 +36,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = [
+    'jet.dashboard',
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -67,6 +69,21 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
+
+
+# Admin
+
+JET_INDEX_DASHBOARD = 'apps.common.dashboard.AOVDashboard'
+
+JET_SIDE_MENU_COMPACT = True
+
+JET_SIDE_MENU_CUSTOM_APPS = [
+    ('account', ['__all__']),
+    ('photo', ['__all__']),
+    ('utils', ['__all__']),
+    ('authtoken', ['__all__']),
+    ('dbmail', ['MailTemplate']),
+]
 
 
 # Templates
@@ -211,6 +228,7 @@ STATIC_ROOT = '/var/media/backend/static'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
 
 # Image Storage
 

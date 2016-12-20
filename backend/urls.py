@@ -17,7 +17,7 @@ from apps.account import views as account_views
 from apps.photo import views as photo_views
 from apps.utils import views as utils_views
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework import routers
@@ -54,6 +54,8 @@ urlpatterns = [
     url(r'api/me/actions$', utils_views.MeActionsViewSet.as_view()),
 
     # admin
+    url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
+    url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     url(r'^admin/', admin.site.urls),
     url(r'^admin/photos/$', photo_views.photo_admin)
 ]
