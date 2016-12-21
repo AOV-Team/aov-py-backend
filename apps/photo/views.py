@@ -76,9 +76,10 @@ def photo_admin(request):
             'public': True
         }
 
-        photos = photo_models.Photo.objects.filter(**search).order_by('-id')
+        photos = photo_models.Photo.objects.filter(**search)
 
     # Pagination
+    photos = photos.order_by('-id').distinct()
     paginator = Paginator(photos, 30)
     page = request.GET.get('page')
 
