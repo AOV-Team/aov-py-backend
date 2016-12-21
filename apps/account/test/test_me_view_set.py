@@ -217,17 +217,20 @@ class TestMeViewSetPATCH(TestCase):
 
         payload = {
             'age': 22,
-            'is_superuser': True
+            'is_active': False,
+            'is_admin': True,
+            'is_superuser': True,
         }
 
         request = client.patch('/api/me', data=payload, format='json')
         result = request.data
 
         self.assertEquals(result['age'], 22)
-        self.assertEquals(result['is_superuser'], False)
 
         # Also check entry
         updated_user = account_models.User.objects.get(id=user.id)
 
         self.assertEquals(updated_user.age, 22)
+        self.assertEquals(updated_user.is_active, True)
+        self.assertEquals(updated_user.is_admin, False)
         self.assertEquals(updated_user.is_superuser, False)

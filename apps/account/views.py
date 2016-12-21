@@ -209,6 +209,9 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         if 'is_active' in payload:
             del payload['is_active']
 
+        if 'is_admin' in payload:
+            del payload['is_admin']
+
         if 'is_superuser' in payload:
             del payload['is_superuser']
 
