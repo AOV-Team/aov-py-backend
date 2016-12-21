@@ -98,6 +98,15 @@ class Photo(common_models.EditMixin):
         """
         return mark_safe(u'<img style="width: 100px;" src="{}{}">'.format(settings.MEDIA_URL, self.image))
 
+    @property
+    def url(self):
+        """
+        Image remote URL
+
+        :return: Remote URL
+        """
+        return '{}{}'.format(settings.MEDIA_URL, self.image)
+
     def __str__(self):
         return '{}:\t{},\tID: {}'\
             .format(self.user.username if self.user else self.attribution_name, self.image, self.id)

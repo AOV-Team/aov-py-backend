@@ -65,11 +65,10 @@ class UserAdmin(BaseUserAdmin):
         ('User', {'fields': ('email', 'username', 'social_name', 'password', )}),
         ('User Details',
             {'fields': ('id', 'first_name', 'last_name', 'age', 'location', 'avatar', 'created_at', 'last_login', )}),
-        ('Permissions', {'fields': ('groups', 'is_active', 'is_superuser', 'user_permissions')}),
+        ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ['username', 'email', 'social_name', 'location', 'age', 'created_at', 'photo_count',
-                    'id', 'action_buttons']
+    list_display = ['username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'action_buttons']
     list_filter = [StarUserFilter, 'is_active', 'is_superuser']
     ordering = ['username']
 
