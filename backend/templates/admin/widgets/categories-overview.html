@@ -1,0 +1,17 @@
+<ul>
+    <li class="contrast">
+        Most Active Categories
+    </li>
+    {% for category in module.children %}
+        <li>
+            {{ category.name }}
+            <span class="float-right">
+                {{ category.photos }}
+            </span>
+        </li>
+    {% empty %}
+        <li>
+            No photos!
+        </li>
+    {% endfor %}
+</ul>

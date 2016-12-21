@@ -5,11 +5,26 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import urlresolvers
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 
 
 class PhotoClassificationAdmin(admin.ModelAdmin):
-    list_display = ['name', 'classification_type', 'public', 'id']
-    search_fields = ['name', 'classification_type', 'id']
+    """
+    Categories and tags
+    """
+    list_display = ('name', 'classification_type', 'photo_count', 'public', 'id',)
+    ordering = ('classification_type', 'name',)
+    search_fields = ('name', 'classification_type', 'id',)
+
+    def get_queryset(self, request):
+        return super(PhotoClassificationAdmin, self).get_queryset(request)\
+            .annotate(photos_in_category=Count('category'), photos_in_tag=Count('tag'))
+
+    def photo_count(self, obj):
+        return obj.photos_in_category + obj.photos_in_tag
+
+    photo_count.admin_order_field = 'photos'
+    photo_count.short_description = 'Photos'
 
 
 class PhotoFeedAdmin(admin.ModelAdmin):
