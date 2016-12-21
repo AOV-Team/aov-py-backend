@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 from guardian import models as guardian
 
 
@@ -68,11 +69,12 @@ class UserAdmin(BaseUserAdmin):
         ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ['username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'action_buttons']
-    list_filter = [StarUserFilter, 'is_active', 'is_superuser']
-    ordering = ['username']
+    list_display = ['username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'created_at', 'action_buttons']
+    list_filter = (StarUserFilter, 'is_active', 'is_superuser',)
+    list_per_page = 100
+    ordering = ('-photo__count', '-id', 'username',)
 
-    readonly_fields = ('created_at', 'id', 'last_login')
+    readonly_fields = ('created_at', 'id', 'last_login', 'photo_count')
 
     search_fields = ['age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name']
 
@@ -81,6 +83,9 @@ class UserAdmin(BaseUserAdmin):
         qs = super(UserAdmin, self).get_changelist(request, **kwargs)
         self.current_user = request.user
         return qs
+
+    def get_queryset(self, request):
+        return super(UserAdmin, self).get_queryset(request).annotate(Count('photo'))
 
     def action_buttons(self, obj):
         """
@@ -108,17 +113,9 @@ class UserAdmin(BaseUserAdmin):
     action_buttons.short_description = 'Actions'
 
     def photo_count(self, obj):
-        """
-        Show number of photos that user has uploaded
+        return obj.photo__count
 
-        :param obj: instance of User
-        :return: String w/ photo count
-        """
-        user_photos = photo_models.Photo.objects.filter(user=obj)
-
-        return u'{}'.format(len(user_photos))
-
-    photo_count.allow_tags = True
+    photo_count.admin_order_field = 'photo__count'
     photo_count.short_description = 'Photos'
 
 
