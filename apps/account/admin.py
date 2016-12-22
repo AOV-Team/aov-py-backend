@@ -1,5 +1,4 @@
 from apps.account import models
-from apps.photo import models as photo_models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.contenttypes.models import ContentType
@@ -69,7 +68,8 @@ class UserAdmin(BaseUserAdmin):
         ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ['username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'created_at', 'action_buttons']
+    list_display = ('username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'created_at',
+                    'action_buttons',)
     list_filter = (StarUserFilter, 'is_active', 'is_superuser',)
     list_per_page = 100
     ordering = ('-photo__count', '-id', 'username',)

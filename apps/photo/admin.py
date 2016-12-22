@@ -89,11 +89,11 @@ class PhotoAdmin(admin.ModelAdmin):
     filter_horizontal = ('category', 'tag', 'photo_feed')
     # form = forms.get_image_preview_form(photo_models.Photo)
 
-    list_display = ['photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id']
+    list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id')
     list_filter = (StarPhotoFilter,)
-    ordering = ['-id']
-    readonly_fields = ('created_at', 'original_image_url',)
-    search_fields = ['image', 'id']
+    ordering = ('-id',)
+    readonly_fields = ('created_at', 'original_image_url', 'photo_clicks',)
+    search_fields = ('image', 'id')
 
     # Override get_changelist so we can get logged-in user
     def get_changelist(self, request, **kwargs):

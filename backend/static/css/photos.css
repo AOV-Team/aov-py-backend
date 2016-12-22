@@ -24,6 +24,12 @@
     height: 140px;
 }
 
+@media screen and (max-width: 567px) {
+    .img-wrapper img {
+        height: auto;
+    }
+}
+
 .pagination {
     display: block;
     margin: 10px auto;
