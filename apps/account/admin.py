@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from guardian import models as guardian
+from guardian.admin import GuardedModelAdmin
 
 
 class StarUserFilter(admin.SimpleListFilter):
@@ -119,18 +120,18 @@ class UserAdmin(BaseUserAdmin):
     photo_count.short_description = 'Photos'
 
 
-class ProfileAdmin(admin.ModelAdmin):
+class ProfileAdmin(GuardedModelAdmin):
     list_display = ['user', 'bio', 'gear', 'id']
     search_fields = ['id', 'user', 'bio', 'gear']
 
 
-class UserInterestAdmin(admin.ModelAdmin):
+class UserInterestAdmin(GuardedModelAdmin):
     list_display = ('content_type', 'id', 'content_object', 'interest_type', 'user',)
     readonly_fields = ('user', 'interest_type', 'content_type', 'object_id',)
     search_fields = ('id', 'user',)
 
 
-class UserObjectPermissionAdmin(admin.ModelAdmin):
+class UserObjectPermissionAdmin(GuardedModelAdmin):
     list_display = ['id', 'user', 'permission', 'content_type', 'object_pk']
     search_fields = ['id', 'user', 'permission']
 

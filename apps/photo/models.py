@@ -29,6 +29,9 @@ class PhotoClassificationManager(models.Manager):
         new_photo_classification.save()
         return new_photo_classification
 
+    class Meta:
+        default_permissions = ('add', 'change', 'delete', 'view')
+
 
 class PhotoClassification(models.Model):
     CLASSIFICATION_TYPE_CHOICES = (
@@ -44,6 +47,9 @@ class PhotoClassification(models.Model):
 
     def __str__(self):
         return '{}: {},\tID: {}'.format(self.classification_type, self.name, self.id)
+
+    class Meta:
+        default_permissions = ('add', 'change', 'delete', 'view')
 
 
 class PhotoFeedManager(models.Manager):
@@ -74,6 +80,9 @@ class PhotoFeed(models.Model):
 
     def __str__(self):
         return '{},\tID: {}'.format(self.name, self.id)
+
+    class Meta:
+        default_permissions = ('add', 'change', 'delete', 'view')
 
 
 class Photo(common_models.EditMixin):
@@ -110,3 +119,6 @@ class Photo(common_models.EditMixin):
     def __str__(self):
         return '{}:\t{},\tID: {}'\
             .format(self.user.username if self.user else self.attribution_name, self.image, self.id)
+
+    class Meta:
+        default_permissions = ('add', 'change', 'delete', 'view')

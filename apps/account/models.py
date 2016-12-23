@@ -65,6 +65,9 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     def __str__(self):
         return '{},\t{},\tID{}'.format(self.username, self.email, self.id)
 
+    class Meta:
+        default_permissions = ('add', 'change', 'delete', 'view')
+
 
 class Gear:
     """
@@ -197,6 +200,9 @@ class Profile(models.Model):
     def __str__(self):
         return '{}:\tID{}'.format(self.user.username, self.id)
 
+    class Meta:
+        default_permissions = ('add', 'change', 'delete', 'view')
+
 
 class UserInterest(models.Model):
     """
@@ -223,3 +229,6 @@ class UserInterest(models.Model):
 
     def __str__(self):
         return '{} {}: {}'.format(self.interest_type, self.content_object, self.object_id)
+
+    class Meta:
+        default_permissions = ('add', 'change', 'delete', 'view')

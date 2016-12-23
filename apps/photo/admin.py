@@ -6,9 +6,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import urlresolvers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
+from guardian.admin import GuardedModelAdmin
 
 
-class PhotoClassificationAdmin(admin.ModelAdmin):
+class PhotoClassificationAdmin(GuardedModelAdmin):
     """
     Categories and tags
     """
@@ -27,7 +28,7 @@ class PhotoClassificationAdmin(admin.ModelAdmin):
     photo_count.short_description = 'Photos'
 
 
-class PhotoFeedAdmin(admin.ModelAdmin):
+class PhotoFeedAdmin(GuardedModelAdmin):
     list_display = ['name', 'public', 'id']
     ordering = ['name']
     search_fields = ['name', 'id']
@@ -79,7 +80,7 @@ class StarPhotoFilter(admin.SimpleListFilter):
                 return queryset
 
 
-class PhotoAdmin(admin.ModelAdmin):
+class PhotoAdmin(GuardedModelAdmin):
     fieldsets = (
         ('Image', {'fields': ('image', 'original_image_url', 'user', 'location', 'public',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
