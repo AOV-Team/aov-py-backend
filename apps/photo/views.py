@@ -5,6 +5,7 @@ from apps.common.views import get_default_response, handle_jquery_empty_array, r
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.contenttypes.models import ContentType
@@ -26,6 +27,7 @@ def photo_admin(request):
     :return: render()
     """
     category = request.GET.get('category')
+    date = request.GET.get('date')
     feed = request.GET.get('feed')
     g = request.GET.get('g')
     q = request.GET.get('q')
@@ -39,29 +41,39 @@ def photo_admin(request):
             .filter(classification_type='category', name__icontains=category).first()
 
         if cat:
-            photos = photo_models.Photo.objects.filter(category=cat, public=True)
-    elif feed:
-        feed = photo_models.PhotoFeed.objects.filter(name__icontains=feed, public=True)
+            photos = photos | photo_models.Photo.objects.filter(category=cat)
+
+    if date:
+        dates = date.split(' - ')
+
+        if len(dates) == 2:
+            start = datetime.strptime(dates[0], '%Y-%m-%d')
+            end = datetime.strptime(dates[1], '%Y-%m-%d') + timedelta(days=1)
+
+            photos = photos | photo_models.Photo.objects.filter(created_at__gte=start, created_at__lte=end)
+
+    if feed:
+        feed = photo_models.PhotoFeed.objects.filter(name__icontains=feed)
 
         if feed:
-            photos = photo_models.Photo.objects.filter(photo_feed=feed, public=True)
-    elif g:
+            photos = photos | photo_models.Photo.objects.filter(photo_feed=feed)
+
+    if g:
         # Search gear
         gear = account_models.Gear.objects.search(g)
 
         for g in gear:
             photos = photos | photo_models.Photo.objects.filter(user=g['user'])
-    elif q or u:
-        photos = photo_models.Photo.objects.none()
 
+    if q or u:
         # Search for a tag
         if q:
             tag = photo_models.PhotoClassification.objects.filter(classification_type='tag', name__icontains=q).first()
 
             if tag:
-                photos = photos | photo_models.Photo.objects.filter(Q(tag=tag) | Q(location__icontains=q), public=True)
+                photos = photos | photo_models.Photo.objects.filter(Q(tag=tag) | Q(location__icontains=q))
             else:
-                photos = photos | photo_models.Photo.objects.filter(location__icontains=q, public=True)
+                photos = photos | photo_models.Photo.objects.filter(location__icontains=q)
 
         # User search
         # Only active users
@@ -77,7 +89,9 @@ def photo_admin(request):
 
             for user in users:
                 photos = photos | photo_models.Photo.objects.filter(user=user)
-    else:
+
+    # Default query
+    if not category and not date and not feed and not g and not q and not u:
         # Build search attributes for photo
         search = {
             'public': True
@@ -86,7 +100,7 @@ def photo_admin(request):
         photos = photo_models.Photo.objects.filter(**search)
 
     # Pagination
-    photos = photos.order_by('-id').distinct()
+    photos = photos.filter(public=True).order_by('-id').distinct()
     paginator = Paginator(photos, 30)
     page = request.GET.get('page')
 

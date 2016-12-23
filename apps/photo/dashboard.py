@@ -16,7 +16,7 @@ class CategoriesOverview(DashboardModule):
 class RecentPhotos(DashboardModule):
     title = 'Recent Photos'
     template = 'admin/widgets/recent-photos.html'
-    limit = 8
+    limit = 4
 
     def init_with_context(self, context):
-        self.children = photo_models.Photo.objects.order_by('-id')[:self.limit]
+        self.children = photo_models.Photo.objects.filter(public=True).order_by('-id')[:self.limit]
