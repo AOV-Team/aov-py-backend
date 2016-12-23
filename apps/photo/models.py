@@ -82,7 +82,7 @@ class PhotoFeed(models.Model):
         return '{},\tID: {}'.format(self.name, self.id)
 
     class Meta:
-        default_permissions = ('add', 'change', 'delete', 'view')
+        default_permissions = ('add', 'change', 'delete', 'manage', 'view')
 
 
 class Photo(common_models.EditMixin):

@@ -123,16 +123,18 @@ $( document ).ready(function() {
                 <span class="fa fa-window-close"></span>
                 <div class="pure-g">
                     <div data-photo-id="{{ photo.id }}" class="pure-u-1 pure-u-md-2-5">
-                        <h2>Feeds</h2>
-                        {% for feed in photo_feeds %}
-                            <label>{{ feed.name }}</label>
-                            {% if feed.name in photo.photo_feed_names %}
-                                <input data-feed-id="{{ feed.id }}" class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked><br>
-                            {% else %}
-                                <input data-feed-id="{{ feed.id }}" class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}"><br>
-                            {% endif %}
-                        {% endfor %}
-                        {% csrf_token %}
+                        {% if perms.photo.manage_photofeed %}
+                            <h2>Feeds</h2>
+                            {% for feed in photo_feeds %}
+                                <label>{{ feed.name }}</label>
+                                {% if feed.name in photo.photo_feed_names %}
+                                    <input data-feed-id="{{ feed.id }}" class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked><br>
+                                {% else %}
+                                    <input data-feed-id="{{ feed.id }}" class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}"><br>
+                                {% endif %}
+                            {% endfor %}
+                            {% csrf_token %}
+                        {% endif %}
                         <div class="info">
                             <h2>Photo info</h2>
                             <p>
