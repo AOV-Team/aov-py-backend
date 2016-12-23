@@ -107,8 +107,11 @@ class UserAdmin(BaseUserAdmin):
         except ObjectDoesNotExist:
             pass
 
-        return u'<span data-content-type="users" data-id="{}" class="star-button{}fa fa-star"></span>'\
-            .format(obj.id, starred)
+        photo_link = u'<a class="action" href="/admin/photos/?u={}"><span class="fa fa-picture-o"></span></a>'\
+            .format(obj.username)
+
+        return u'<span data-content-type="users" data-id="{}" class="action star-button{}fa fa-star"></span>{}'\
+            .format(obj.id, starred, photo_link)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'

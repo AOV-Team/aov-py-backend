@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
 import json
+import re
 
 
 class UserCustomManager(BaseUserManager):
@@ -69,10 +70,42 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
         default_permissions = ('add', 'change', 'delete', 'view')
 
 
+class GearManager:
+    def search(self, query):
+        """
+        Search gear
+
+        :param query: search string
+        :return: results in a list()
+        """
+        gear = list()
+        query = query.lower()
+        profiles = Profile.objects.none()
+        query_pieces = re.split('\s|,', query)
+
+        # Search through profiles using each piece of the query string
+        for q in query_pieces:
+            profiles = profiles | Profile.objects.filter(gear__icontains=q)
+
+        profiles = profiles.distinct()
+
+        # Now find all gear that matches query
+        for p in profiles:
+            gear_list = Gear(p).all
+
+            for g in gear_list:
+                if '{} {}'.format(g['make'], g['model']).lower().find(query) != -1:
+                    gear.append(g)
+
+        return gear
+
+
 class Gear:
     """
     Class for managing a profile's gear
     """
+    objects = GearManager()
+
     def __init__(self, profile, gear=None):
         """
         Format for gear

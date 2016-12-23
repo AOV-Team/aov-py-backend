@@ -13,13 +13,31 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
     """
     Categories and tags
     """
-    list_display = ('name', 'classification_type', 'photo_count', 'public', 'id',)
+    list_display = ('name', 'classification_type', 'photo_count', 'public', 'id', 'action_buttons',)
     ordering = ('classification_type', 'name',)
     search_fields = ('name', 'classification_type', 'id',)
 
     def get_queryset(self, request):
         return super(PhotoClassificationAdmin, self).get_queryset(request)\
             .annotate(photos_in_category=Count('category'), photos_in_tag=Count('tag'))
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of PhotoClassification
+        :return: String w/ HTML
+        """
+        parameter = 'category={}'.format(obj.name)
+
+        if obj.classification_type == 'tag':
+            parameter = 'q={}'.format(obj.name)
+
+        return u'<a class="action" href="/admin/photos/?{}"><span class="fa fa-picture-o"></span></a>' \
+            .format(parameter)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
 
     def photo_count(self, obj):
         return obj.photos_in_category + obj.photos_in_tag
@@ -29,9 +47,32 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
 
 
 class PhotoFeedAdmin(GuardedModelAdmin):
-    list_display = ['name', 'public', 'id']
-    ordering = ['name']
-    search_fields = ['name', 'id']
+    list_display = ('name', 'public', 'photo_count', 'id', 'action_buttons',)
+    ordering = ('name',)
+    search_fields = ('name', 'id',)
+
+    def get_queryset(self, request):
+        return super(PhotoFeedAdmin, self).get_queryset(request) \
+            .annotate(Count('photo'))
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of PhotoFeed
+        :return: String w/ HTML
+        """
+        return u'<a class="action" href="/admin/photos/?feed={}"><span class="fa fa-picture-o"></span></a>' \
+            .format(obj.name)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
+
+    def photo_count(self, obj):
+        return obj.photo__count
+
+    photo_count.admin_order_field = 'photos'
+    photo_count.short_description = 'Photos'
 
 
 class StarPhotoFilter(admin.SimpleListFilter):

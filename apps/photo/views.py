@@ -113,9 +113,14 @@ def photo_admin(request):
     categories = photo_models.PhotoClassification.objects\
         .filter(classification_type='category', public=True).order_by('name')
 
+    # Ensure we retain query string even when paginating
+    get_copy = request.GET.copy()
+    parameters = get_copy.pop('page', True) and get_copy.urlencode()
+
     context = {
         'categories': categories,
         'media_url': settings.MEDIA_URL,
+        'parameters': parameters,
         'photo_feeds': photo_models.PhotoFeed.objects.filter(public=True),
         'photos': photos
     }
