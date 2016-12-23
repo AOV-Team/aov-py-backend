@@ -82,6 +82,7 @@ JET_SIDE_MENU_CUSTOM_APPS = [
     ('photo', ['__all__']),
     ('utils', ['__all__']),
     ('authtoken', ['__all__']),
+    ('auth', ['__all__']),
     ('dbmail', ['MailTemplate']),
 ]
 
