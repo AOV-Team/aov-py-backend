@@ -75,7 +75,7 @@ class UserAdmin(BaseUserAdmin):
     list_per_page = 100
     ordering = ('-photo__count', '-id', 'username',)
 
-    readonly_fields = ('created_at', 'id', 'last_login', 'photo_count')
+    readonly_fields = ('created_at', 'id', 'last_login', 'photo_count',)
 
     search_fields = ['age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name']
 
@@ -86,7 +86,7 @@ class UserAdmin(BaseUserAdmin):
         return qs
 
     def get_queryset(self, request):
-        return super(UserAdmin, self).get_queryset(request).annotate(Count('photo'))
+        return super(UserAdmin, self).get_queryset(request).annotate(photos=Count('photo'))
 
     def action_buttons(self, obj):
         """
@@ -117,15 +117,24 @@ class UserAdmin(BaseUserAdmin):
     action_buttons.short_description = 'Actions'
 
     def photo_count(self, obj):
-        return obj.photo__count
+        return obj.photos
 
     photo_count.admin_order_field = 'photo__count'
     photo_count.short_description = 'Photos'
 
 
 class ProfileAdmin(GuardedModelAdmin):
-    list_display = ['user', 'bio', 'gear', 'id']
-    search_fields = ['id', 'user', 'bio', 'gear']
+    list_display = ('user', 'bio', 'gear', 'id',)
+    readonly_fields = ('gear', 'user',)
+    search_fields = ('id', 'user', 'bio', 'gear',)
+
+    # Not needed if user is readonly
+    # def render_change_form(self, request, context, *args, **kwargs):
+    #     """
+    #     Fixes issue where form won't render due to annotation
+    #     """
+    #     context['adminform'].form.fields['user'].queryset = models.User.objects.all()
+    #     return super(ProfileAdmin, self).render_change_form(request, context, args, kwargs)
 
 
 class UserInterestAdmin(GuardedModelAdmin):

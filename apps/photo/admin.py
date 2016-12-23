@@ -134,7 +134,7 @@ class PhotoAdmin(GuardedModelAdmin):
     list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id')
     list_filter = (StarPhotoFilter,)
     ordering = ('-id',)
-    readonly_fields = ('created_at', 'original_image_url', 'photo_clicks',)
+    readonly_fields = ('created_at', 'original_image_url', 'photo_clicks', 'user',)
     search_fields = ('image', 'id')
 
     # Override get_changelist so we can get logged-in user
