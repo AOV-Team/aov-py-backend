@@ -6,19 +6,38 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import urlresolvers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
+from guardian.admin import GuardedModelAdmin
 
 
-class PhotoClassificationAdmin(admin.ModelAdmin):
+class PhotoClassificationAdmin(GuardedModelAdmin):
     """
     Categories and tags
     """
-    list_display = ('name', 'classification_type', 'photo_count', 'public', 'id',)
+    list_display = ('name', 'classification_type', 'photo_count', 'public', 'id', 'action_buttons',)
     ordering = ('classification_type', 'name',)
     search_fields = ('name', 'classification_type', 'id',)
 
     def get_queryset(self, request):
         return super(PhotoClassificationAdmin, self).get_queryset(request)\
             .annotate(photos_in_category=Count('category'), photos_in_tag=Count('tag'))
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of PhotoClassification
+        :return: String w/ HTML
+        """
+        parameter = 'category={}'.format(obj.name)
+
+        if obj.classification_type == 'tag':
+            parameter = 'q={}'.format(obj.name)
+
+        return u'<a class="action" href="/admin/photos/?{}"><span class="fa fa-picture-o"></span></a>' \
+            .format(parameter)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
 
     def photo_count(self, obj):
         return obj.photos_in_category + obj.photos_in_tag
@@ -27,10 +46,33 @@ class PhotoClassificationAdmin(admin.ModelAdmin):
     photo_count.short_description = 'Photos'
 
 
-class PhotoFeedAdmin(admin.ModelAdmin):
-    list_display = ['name', 'public', 'id']
-    ordering = ['name']
-    search_fields = ['name', 'id']
+class PhotoFeedAdmin(GuardedModelAdmin):
+    list_display = ('name', 'public', 'photo_count', 'id', 'action_buttons',)
+    ordering = ('name',)
+    search_fields = ('name', 'id',)
+
+    def get_queryset(self, request):
+        return super(PhotoFeedAdmin, self).get_queryset(request) \
+            .annotate(Count('photo'))
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of PhotoFeed
+        :return: String w/ HTML
+        """
+        return u'<a class="action" href="/admin/photos/?feed={}"><span class="fa fa-picture-o"></span></a>' \
+            .format(obj.name)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
+
+    def photo_count(self, obj):
+        return obj.photo__count
+
+    photo_count.admin_order_field = 'photos'
+    photo_count.short_description = 'Photos'
 
 
 class StarPhotoFilter(admin.SimpleListFilter):
@@ -79,7 +121,7 @@ class StarPhotoFilter(admin.SimpleListFilter):
                 return queryset
 
 
-class PhotoAdmin(admin.ModelAdmin):
+class PhotoAdmin(GuardedModelAdmin):
     fieldsets = (
         ('Image', {'fields': ('image', 'original_image_url', 'user', 'location', 'public',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
@@ -89,11 +131,11 @@ class PhotoAdmin(admin.ModelAdmin):
     filter_horizontal = ('category', 'tag', 'photo_feed')
     # form = forms.get_image_preview_form(photo_models.Photo)
 
-    list_display = ['photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id']
+    list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id')
     list_filter = (StarPhotoFilter,)
-    ordering = ['-id']
-    readonly_fields = ('created_at', 'original_image_url',)
-    search_fields = ['image', 'id']
+    ordering = ('-id',)
+    readonly_fields = ('created_at', 'original_image_url', 'photo_clicks', 'user',)
+    search_fields = ('image', 'id')
 
     # Override get_changelist so we can get logged-in user
     def get_changelist(self, request, **kwargs):

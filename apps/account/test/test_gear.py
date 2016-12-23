@@ -363,3 +363,121 @@ class TestGear(TestCase):
 
         # Check profile
         self.assertEquals(profile.gear, '[]')
+
+    def test_gear_search_successful(self):
+        """
+        Test that we can search gear
+
+        :return: None
+        """
+        user = User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        profile = Profile.objects.create_or_update(user=user, bio='I am a tester.')
+
+        gear = Gear(profile, [
+            {
+                'make': 'Canon',
+                'model': 'T3i',
+                'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
+            },
+            {
+                'make': 'Manfrotto',
+                'model': 'Tripod',
+                'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
+            },
+            {
+                'make': 'Canon',
+                'model': 'EF 50mm',
+                'link': 'https://www.amazon.com/Canon-50mm-1-8-Camera-Lens/dp/B00007E7JU'
+            }
+        ])
+        gear.save()
+
+        user_2 = User.objects.create_user(email='mr@mypapaya.io', password='pass', username='aov_hovy')
+        profile_2 = Profile.objects.create_or_update(user=user_2, bio='I am a tester.')
+
+        gear = Gear(profile_2, [
+            {
+                'make': 'Canon',
+                'model': 'EOS 7D',
+                'link': 'https://shop.usa.canon.com/shop/en/catalog/eos-7d-mark-ii-body'
+            },
+            {
+                'make': 'Canon',
+                'model': 'EF-S 60mm',
+                'link': 'https://shop.usa.canon.com/shop/en/catalog/ef-s-60mm-f-28-macro-usm'
+            },
+            {
+                'make': 'Tamron',
+                'model': 'SP 85mm',
+                'link': 'http://www.tamron-usa.com/F016special/index.html'
+            },
+        ])
+        gear.save()
+
+        results = Gear.objects.search('canon')
+
+        self.assertEquals(len(results), 2)
+        self.assertEquals(len(results[0]['gear']), 2)
+        self.assertEquals(len(results[1]['gear']), 2)
+
+        results = Gear.objects.search('tamron')
+
+        self.assertEquals(len(results), 1)
+        self.assertEquals(results[0]['user'].id, user_2.id)
+        self.assertEquals(results[0]['gear'][0]['make'], 'Tamron')
+
+    def test_gear_search_two_words(self):
+        """
+        Test that we can search gear if query is 2 words
+
+        :return: None
+        """
+        user = User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        profile = Profile.objects.create_or_update(user=user, bio='I am a tester.')
+
+        gear = Gear(profile, [
+            {
+                'make': 'Canon',
+                'model': 'T3i',
+                'link': 'https://www.amazon.com/Canon-Digital-18-55mm-discontinued-manufacturer/dp/B004J3V90Y'
+            },
+            {
+                'make': 'Manfrotto',
+                'model': 'Tripod',
+                'link': 'https://www.amazon.com/gp/product/B002FGTWOC/'
+            },
+            {
+                'make': 'Canon',
+                'model': 'EF 50mm',
+                'link': 'https://www.amazon.com/Canon-50mm-1-8-Camera-Lens/dp/B00007E7JU'
+            }
+        ])
+        gear.save()
+
+        user_2 = User.objects.create_user(email='mr@mypapaya.io', password='pass', username='aov_hovy')
+        profile_2 = Profile.objects.create_or_update(user=user_2, bio='I am a tester.')
+
+        gear = Gear(profile_2, [
+            {
+                'make': 'Canon',
+                'model': 'EOS 7D',
+                'link': 'https://shop.usa.canon.com/shop/en/catalog/eos-7d-mark-ii-body'
+            },
+            {
+                'make': 'Canon',
+                'model': 'EF-S 60mm',
+                'link': 'https://shop.usa.canon.com/shop/en/catalog/ef-s-60mm-f-28-macro-usm'
+            },
+            {
+                'make': 'Tamron',
+                'model': 'SP 85mm',
+                'link': 'http://www.tamron-usa.com/F016special/index.html'
+            },
+        ])
+        gear.save()
+
+        results = Gear.objects.search('canon t3i')
+
+        self.assertEquals(len(results), 1)
+        self.assertEquals(results[0]['user'].id, user.id)
+        self.assertEquals(results[0]['gear'][0]['model'], 'T3i')

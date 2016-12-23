@@ -6,14 +6,23 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-responsive-min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/daterangepicker.min.css">
 <link rel="stylesheet" href="{% static "css/photos.css" %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
   crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/jquery.daterangepicker.min.js">
+</script>
 
 <script>
 $( document ).ready(function() {
+    // Date picker setup
+    $('#datesearchbar').dateRangePicker({
+        separator: ' - '
+    });
+
     // Update photo feed for a photo
     $('input[type="checkbox"]').click(function() {
         var photoId = $(this).parent().attr('data-photo-id'),
@@ -86,27 +95,26 @@ $( document ).ready(function() {
 
 {% block content %}
 <div id="toolbar" class="initialized">
-    <form id="changelist-search" method="get">
-            <input type="text" size="20" name="u" value="" id="usearchbar" autofocus="" placeholder="Search age|user">
-            <input type="text" size="20" name="q" value="" id="searchbar" autofocus="" placeholder="Search location|tags">
-            <span class="changelist-filter-select-wrapper">
-                <select class="changelist-filter-select select2-hidden-accessible" tabindex="-1" aria-hidden="true">
-                    <option data-url="?" selected="selected">By category</option>
-                    <option disabled="disabled">---</option>
-                    {% for category in categories %}
-                        <option data-url="?category={{ category.name }}">{{ category.name }}</option>
-                    {% endfor %}
-                </select>
-                <select class="changelist-filter-select select2-hidden-accessible" tabindex="-1" aria-hidden="true">
-                    <option data-url="?" selected="selected">By feed</option>
-                    <option disabled="disabled">---</option>
-                    {% for feed in photo_feeds %}
-                        <option data-url="?feed={{ feed.name }}">{{ feed.name }}</option>
-                    {% endfor %}
-                </select>
-            </span>
-            <input type="submit" value="Search">
-        </div>
+    <form id="photo-mgmt-search" method="get">
+        <input type="text" size="15" name="q" value="" id="searchbar" placeholder="Location|tags">
+        <input type="text" size="8" name="u" value="" id="usearchbar" autofocus="" placeholder="Age|user">
+        <input type="text" size="8" name="g" value="" id="gsearchbar" placeholder="Gear">
+        <input type="text" size="10" name="date" value="" id="datesearchbar" placeholder="Date">
+        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true">
+            <option data-url="?" selected="selected">By category</option>
+            <option disabled="disabled">---</option>
+            {% for category in categories %}
+                <option data-url="?category={{ category.name }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true">
+            <option data-url="?" selected="selected">By feed</option>
+            <option disabled="disabled">---</option>
+            {% for feed in photo_feeds %}
+                <option data-url="?feed={{ feed.name }}">{{ feed.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Search">
     </form>
 </div>
 <div class="pure-g photo-mgmt">
@@ -123,16 +131,18 @@ $( document ).ready(function() {
                 <span class="fa fa-window-close"></span>
                 <div class="pure-g">
                     <div data-photo-id="{{ photo.id }}" class="pure-u-1 pure-u-md-2-5">
-                        <h2>Feeds</h2>
-                        {% for feed in photo_feeds %}
-                            <label>{{ feed.name }}</label>
-                            {% if feed.name in photo.photo_feed_names %}
-                                <input data-feed-id="{{ feed.id }}" class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked><br>
-                            {% else %}
-                                <input data-feed-id="{{ feed.id }}" class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}"><br>
-                            {% endif %}
-                        {% endfor %}
-                        {% csrf_token %}
+                        {% if perms.photo.manage_photofeed %}
+                            <h2>Feeds</h2>
+                            {% for feed in photo_feeds %}
+                                <label>{{ feed.name }}</label>
+                                {% if feed.name in photo.photo_feed_names %}
+                                    <input data-feed-id="{{ feed.id }}" class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}" checked><br>
+                                {% else %}
+                                    <input data-feed-id="{{ feed.id }}" class="feed-{{ feed.id }}" type="checkbox" value="{{ feed.id }}"><br>
+                                {% endif %}
+                            {% endfor %}
+                            {% csrf_token %}
+                        {% endif %}
                         <div class="info">
                             <h2>Photo info</h2>
                             <p>
@@ -141,6 +151,7 @@ $( document ).ready(function() {
                                 <strong>Social name:</strong> {{ photo.user.social_name }}<br>
                                 <strong>User age:</strong> {{ photo.user.age }}<br>
                                 <strong>Photo location:</strong> {{ photo.location }}<br>
+                                <strong>Uploaded:</strong> {{ photo.created_at }}<br>
                             </p>
                         </div>
                         <p>
@@ -169,7 +180,7 @@ $( document ).ready(function() {
 <div class="pagination">
     <span class="step-links">
         {% if photos.has_previous %}
-            <a href="?page={{ photos.previous_page_number }}"><span class="fa fa-arrow-circle-left"></span></a>
+            <a href="?page={{ photos.previous_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-left"></span></a>
         {% endif %}
 
         <span class="current">
@@ -177,7 +188,7 @@ $( document ).ready(function() {
         </span>
 
         {% if photos.has_next %}
-            <a href="?page={{ photos.next_page_number }}"><span class="fa fa-arrow-circle-right"></span></a>
+            <a href="?page={{ photos.next_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-right"></span></a>
         {% endif %}
     </span>
 </div>

@@ -1,11 +1,11 @@
 from apps.account import models
-from apps.photo import models as photo_models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from guardian import models as guardian
+from guardian.admin import GuardedModelAdmin
 
 
 class StarUserFilter(admin.SimpleListFilter):
@@ -69,12 +69,13 @@ class UserAdmin(BaseUserAdmin):
         ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ['username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'created_at', 'action_buttons']
+    list_display = ('username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'created_at',
+                    'action_buttons',)
     list_filter = (StarUserFilter, 'is_active', 'is_superuser',)
     list_per_page = 100
     ordering = ('-photo__count', '-id', 'username',)
 
-    readonly_fields = ('created_at', 'id', 'last_login', 'photo_count')
+    readonly_fields = ('created_at', 'id', 'last_login', 'photo_count',)
 
     search_fields = ['age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name']
 
@@ -106,8 +107,11 @@ class UserAdmin(BaseUserAdmin):
         except ObjectDoesNotExist:
             pass
 
-        return u'<span data-content-type="users" data-id="{}" class="star-button{}fa fa-star"></span>'\
-            .format(obj.id, starred)
+        photo_link = u'<a class="action" href="/admin/photos/?u={}"><span class="fa fa-picture-o"></span></a>'\
+            .format(obj.username)
+
+        return u'<span data-content-type="users" data-id="{}" class="action star-button{}fa fa-star"></span>{}'\
+            .format(obj.id, starred, photo_link)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -119,18 +123,27 @@ class UserAdmin(BaseUserAdmin):
     photo_count.short_description = 'Photos'
 
 
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'bio', 'gear', 'id']
-    search_fields = ['id', 'user', 'bio', 'gear']
+class ProfileAdmin(GuardedModelAdmin):
+    list_display = ('user', 'bio', 'gear', 'id',)
+    readonly_fields = ('gear', 'user',)
+    search_fields = ('id', 'user', 'bio', 'gear',)
+
+    # Not needed if user is readonly
+    # def render_change_form(self, request, context, *args, **kwargs):
+    #     """
+    #     Fixes issue where form won't render due to annotation
+    #     """
+    #     context['adminform'].form.fields['user'].queryset = models.User.objects.all()
+    #     return super(ProfileAdmin, self).render_change_form(request, context, args, kwargs)
 
 
-class UserInterestAdmin(admin.ModelAdmin):
+class UserInterestAdmin(GuardedModelAdmin):
     list_display = ('content_type', 'id', 'content_object', 'interest_type', 'user',)
     readonly_fields = ('user', 'interest_type', 'content_type', 'object_id',)
     search_fields = ('id', 'user',)
 
 
-class UserObjectPermissionAdmin(admin.ModelAdmin):
+class UserObjectPermissionAdmin(GuardedModelAdmin):
     list_display = ['id', 'user', 'permission', 'content_type', 'object_pk']
     search_fields = ['id', 'user', 'permission']
 
