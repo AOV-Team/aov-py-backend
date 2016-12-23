@@ -86,7 +86,7 @@ class UserAdmin(BaseUserAdmin):
         return qs
 
     def get_queryset(self, request):
-        return super(UserAdmin, self).get_queryset(request).annotate(photos=Count('photo'))
+        return super(UserAdmin, self).get_queryset(request).annotate(Count('photo'))
 
     def action_buttons(self, obj):
         """
@@ -117,7 +117,7 @@ class UserAdmin(BaseUserAdmin):
     action_buttons.short_description = 'Actions'
 
     def photo_count(self, obj):
-        return obj.photos
+        return obj.photo__count
 
     photo_count.admin_order_field = 'photo__count'
     photo_count.short_description = 'Photos'
