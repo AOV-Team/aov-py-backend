@@ -89,13 +89,19 @@ class GearManager:
 
         profiles = profiles.distinct()
 
-        # Now find all gear that matches query
-        for p in profiles:
-            gear_list = Gear(p).all
+        if profiles:
+            # Now find all gear that matches query
+            for p in profiles:
+                gear_list = Gear(p).all
+                gear_matches = list()
 
-            for g in gear_list:
-                if '{} {}'.format(g['make'], g['model']).lower().find(query) != -1:
-                    gear.append(g)
+                for g in gear_list:
+                    if '{} {}'.format(g['make'], g['model']).lower().find(query) != -1:
+                        gear_matches.append(g)
+
+                # Append to gear if there was at least 1 match
+                if len(gear_matches) > 0:
+                    gear.append({'user': p.user, 'gear': gear_matches})
 
         return gear
 

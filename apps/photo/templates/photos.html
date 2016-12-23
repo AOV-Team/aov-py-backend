@@ -87,8 +87,9 @@ $( document ).ready(function() {
 {% block content %}
 <div id="toolbar" class="initialized">
     <form id="changelist-search" method="get">
-            <input type="text" size="20" name="u" value="" id="usearchbar" autofocus="" placeholder="Search age|user">
-            <input type="text" size="20" name="q" value="" id="searchbar" autofocus="" placeholder="Search location|tags">
+            <input type="text" size="10" name="u" value="" id="usearchbar" autofocus="" placeholder="Search age|user">
+            <input type="text" size="15" name="q" value="" id="searchbar" autofocus="" placeholder="Search location|tags">
+            <input type="text" size="10" name="g" value="" id="gsearchbar" autofocus="" placeholder="Search gear">
             <span class="changelist-filter-select-wrapper">
                 <select class="changelist-filter-select select2-hidden-accessible" tabindex="-1" aria-hidden="true">
                     <option data-url="?" selected="selected">By category</option>

@@ -416,12 +416,15 @@ class TestGear(TestCase):
 
         results = Gear.objects.search('canon')
 
-        # print(results)
-        self.assertEquals(len(results), 4)
+        self.assertEquals(len(results), 2)
+        self.assertEquals(len(results[0]['gear']), 2)
+        self.assertEquals(len(results[1]['gear']), 2)
 
         results = Gear.objects.search('tamron')
 
         self.assertEquals(len(results), 1)
+        self.assertEquals(results[0]['user'].id, user_2.id)
+        self.assertEquals(results[0]['gear'][0]['make'], 'Tamron')
 
     def test_gear_search_two_words(self):
         """
@@ -476,4 +479,5 @@ class TestGear(TestCase):
         results = Gear.objects.search('canon t3i')
 
         self.assertEquals(len(results), 1)
-        self.assertEquals(results[0]['model'], 'T3i')
+        self.assertEquals(results[0]['user'].id, user.id)
+        self.assertEquals(results[0]['gear'][0]['model'], 'T3i')

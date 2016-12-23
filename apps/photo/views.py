@@ -27,6 +27,7 @@ def photo_admin(request):
     """
     category = request.GET.get('category')
     feed = request.GET.get('feed')
+    g = request.GET.get('g')
     q = request.GET.get('q')
     u = request.GET.get('u')
 
@@ -44,6 +45,9 @@ def photo_admin(request):
 
         if feed:
             photos = photo_models.Photo.objects.filter(photo_feed=feed, public=True)
+    elif g:
+        # Search gear
+
     elif q or u:
         photos = photo_models.Photo.objects.none()
 
