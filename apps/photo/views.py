@@ -47,7 +47,10 @@ def photo_admin(request):
             photos = photo_models.Photo.objects.filter(photo_feed=feed, public=True)
     elif g:
         # Search gear
+        gear = account_models.Gear.objects.search(g)
 
+        for g in gear:
+            photos = photos | photo_models.Photo.objects.filter(user=g['user'])
     elif q or u:
         photos = photo_models.Photo.objects.none()
 
