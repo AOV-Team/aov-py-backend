@@ -1,5 +1,6 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
+from apps.photo.photo import Photo
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -54,7 +55,9 @@ class TestMeViewSetPATCH(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
-            'age': 22
+            'email': user.email,
+            'age': 22,
+            'username': user.username
         }
 
         request = client.patch('/api/me', data=payload, format='json')
@@ -66,6 +69,47 @@ class TestMeViewSetPATCH(TestCase):
         updated_user = account_models.User.objects.get(id=user.id)
 
         self.assertEquals(updated_user.age, 22)
+
+    def test_me_view_set_patch_avatar(self):
+        """
+        Test that we can update user's photo
+
+        :return: None
+        """
+        # Create data
+        user = account_models.User.objects\
+            .create_user(avatar=Photo(open('apps/common/test/data/photos/cover.jpg', 'rb')), age=23,
+                         email='test@test.com', social_name='aeon', username='aov_hov')
+
+        self.assertIsNotNone(user.avatar)
+        avatar = user.avatar
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open('apps/common/test/data/photos/avatar.jpg', 'rb') as image:
+            payload = {
+                'avatar': image,
+                'email': user.email,
+                'username': user.username
+            }
+
+            request = client.patch('/api/me', data=payload, format='multipart')
+
+        result = request.data
+        print('RR', result)
+
+        self.assertIsNotNone(result['avatar'])
+
+        # Should have compressed and saved image
+        updated_user = account_models.User.objects.get(id=user.id)
+
+        self.assertIsNotNone(updated_user.avatar)
+        self.assertNotEqual(avatar, updated_user.avatar)
 
     def test_me_view_set_patch_password(self):
         """

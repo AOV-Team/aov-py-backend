@@ -57,7 +57,7 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
 ```javascript
 {
     "age": __,
-    "avatar": "",  // Currently not supported
+    "avatar": "",
     "existing_password": "",  // Necessary to update password
     "first_name": "",
     "last_name": "",

@@ -200,8 +200,20 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         response = get_default_response('200')
 
         # Remove PKs and other fields that cannot be updated via API
-        # Explicitedly converting to dict just in case...
-        payload = dict(remove_pks_from_payload('user', payload))
+        payload = remove_pks_from_payload('user', payload)
+
+        # Avatar
+        if 'avatar' in payload:
+            # Save original photo to media
+            try:
+                photo = Photo(payload['avatar'])
+                photo.save('AVATAR_NEW_USER_{}_{}'.format(common_models.get_date_stamp_str(), photo.name),
+                           custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
+
+                # Process image to save
+                payload['avatar'] = photo.compress()
+            except TypeError:
+                raise ValidationError('Avatar image is not of type image')
 
         if 'email' in payload:
             del payload['email']
@@ -242,7 +254,7 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
 
         updated_user.save()
 
-        response.data = account_serializers.UserSerializer(updated_user).data
+        response.data = account_serializers.UserSerializer(updated_user).datag
 
         return response
 
