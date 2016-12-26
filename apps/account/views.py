@@ -254,7 +254,7 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
 
         updated_user.save()
 
-        response.data = account_serializers.UserSerializer(updated_user).datag
+        response.data = account_serializers.UserSerializer(updated_user).data
 
         return response
 
