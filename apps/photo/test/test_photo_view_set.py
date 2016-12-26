@@ -4,6 +4,8 @@ from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from django.conf import settings
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import Point
 from django.test import override_settings, TestCase
 from os.path import getsize
 from rest_framework.test import APIClient
@@ -25,7 +27,8 @@ class TestPhotoViewSetGET(TestCase):
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
         photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+            .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                   user=user)
         photo1.save()
 
         photo2 = photo_models \
@@ -44,6 +47,8 @@ class TestPhotoViewSetGET(TestCase):
 
         self.assertIn('next', request.data)
         self.assertEquals(len(results), 2)
+        self.assertEquals(results[1]['latitude'], 43.0)
+        self.assertEquals(results[1]['longitude'], -116.0)
 
     def test_photo_view_set_get_public(self):
         """
@@ -267,6 +272,7 @@ class TestPhotoViewSetPOST(TestCase):
         with open(image, 'rb') as i:
             payload = {
                 'category': category.id,
+                'geo_location': 'POINT ({} {})'.format(-116.2023436, 43.6169233),
                 'image': i
             }
 
@@ -276,6 +282,8 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(result['category'][0], category.id)
         self.assertEquals(result['user'], user.id)
+        self.assertEquals(result['latitude'], 43.6169233)
+        self.assertEquals(result['longitude'], -116.2023436)
 
         # Query for entry
         photos = photo_models.Photo.objects.all()
@@ -338,6 +346,39 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(len(photos), 1)
         self.assertTrue(photos[0].public)
+
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+    def test_photo_view_set_post_bad_geo_location(self):
+        """
+        Test that we get a 403 if geo_location is not in "POINT (long, lat)" format
+
+        :return: None
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/cover.jpg'
+
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects \
+            .create_or_update(name='Landscape', classification_type='category')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'geo_location': '{} {}'.format(-116.2023436, 43.6169233),
+                'image': i
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        self.assertEquals(request.status_code, 400)
 
     def test_photo_view_set_post_bad_request_fields_missing(self):
         """
