@@ -84,6 +84,8 @@ class PhotoFeed(models.Model):
 
     class Meta:
         default_permissions = ('add', 'change', 'delete', 'manage', 'view')
+        verbose_name = 'feed'
+        verbose_name_plural = 'feeds'
 
 
 class Photo(geo_models.Model):
