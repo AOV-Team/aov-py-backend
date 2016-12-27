@@ -13,6 +13,10 @@
         width: 100%;
     }
 </style>
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
 <script src="https://openlayers.org/en/v3.20.1/build/ol.js" type="text/javascript"></script>
 {% endblock %}
 
@@ -21,20 +25,31 @@
     <div id="map" class="map"></div>
 </div>
 <script type="text/javascript">
+    createMarker = function(index, photo) {
+        var iconFeature = new ol.Feature({
+          geometry: new
+            ol.geom.Point(ol.proj.transform([photo.longitude, photo.latitude], 'EPSG:4326', 'EPSG:3857'))
+        });
+        console.log(iconFeature);
+        vectorSource.addFeature(iconFeature);
+    }
+
     var updateImages = function(e) {
-        var extent = map.getView().calculateExtent(map.getSize());
-        extent = ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
-        console.log(extent);
+        var box = map.getView().calculateExtent(map.getSize());
+        box = ol.proj.transformExtent(box, 'EPSG:3857', 'EPSG:4326');
+
+        $.ajax({
+            url: '/api/photos?geo_location=' + box[0] + ',' + box[1] + ',' + box[2] + ',' + box[3],
+            method: 'get'
+        })
+        .done(function(data) {
+            vectorSource.clear();
+            $.each(data.results, createMarker);
+        });
     }
 
     var vectorSource = new ol.source.Vector({
     });
-
-    var iconFeature = new ol.Feature({
-      geometry: new
-        ol.geom.Point(ol.proj.transform([-116.2023436, 43.6169233], 'EPSG:4326', 'EPSG:3857'))
-    });
-    vectorSource.addFeature(iconFeature);
 
     //create the style
     var iconStyle = new ol.style.Style({
