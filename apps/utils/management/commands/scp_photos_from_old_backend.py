@@ -28,8 +28,8 @@ def scp_images():
             if local_image_file_path in already_processed:
                 continue
 
-            commands = ['scp', '-r',
-                        'ec2-user@35.161.253.169:"\'/var/www/html/ArtOfVisuals/upload/{}\'"'.format(row[5]), 'upload']
+            commands = ['scp', 'ec2-user@35.161.253.169:"/var/www/html/ArtOfVisuals/upload/{}"'.format(row[5]),
+                        './upload']
 
             print(commands)
             subprocess.call(commands)
