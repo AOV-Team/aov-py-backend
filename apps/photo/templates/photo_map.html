@@ -3,9 +3,6 @@
 
 {% block extrahead %}
 {% load static %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-responsive-min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://openlayers.org/en/v3.20.1/css/ol.css" type="text/css">
 <style>
     #info {
@@ -45,9 +42,7 @@
 
 {% block content %}
 <div id="info"></div>
-<div id="map-container" class="pure-g">
-    <div id="map" class="map"></div>
-</div>
+<div id="map" class="map"></div>
 <script type="text/javascript">
     var photoSearchBoxes = [];
 
@@ -109,7 +104,18 @@
       style: iconStyle
     });
 
+    var mousePositionControl = new ol.control.MousePosition({
+        coordinateFormat: ol.coordinate.createStringXY(4),
+        projection: 'EPSG:4326',
+        undefinedHTML: '&nbsp;'
+      });
+
     var map = new ol.Map({
+        controls: ol.control.defaults({
+          attributionOptions: ({
+            collapsible: false
+          })
+        }).extend([mousePositionControl]),
         target: 'map',
         layers: [
           new ol.layer.Tile({
@@ -118,7 +124,7 @@
           vectorLayer
         ],
         view: new ol.View({
-          center: ol.proj.fromLonLat([-116.2023436, 43.6169233]),
+          center: ol.proj.fromLonLat([-97.4, 39]),
           zoom: 4
         })
       });

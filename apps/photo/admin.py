@@ -143,6 +143,9 @@ class PhotoAdmin(GuardedModelAdmin):
         self.current_user = request.user
         return qs
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     def action_buttons(self, obj):
         """
         Show action buttons
@@ -193,6 +196,81 @@ class PhotoAdmin(GuardedModelAdmin):
     user_info.short_description = 'Username / Social Name'
 
 
+class StarredPhoto(photo_models.Photo):
+    class Meta:
+        proxy = True
+
+
+class StarredPhotoAdmin(admin.ModelAdmin):
+    filter_horizontal = ('category', 'tag', 'photo_feed')
+
+    list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id')
+    ordering = ('-id',)
+    readonly_fields = ('coordinates', 'created_at', 'location', 'original_image_url', 'photo_clicks', 'user',)
+    search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
+
+    def get_queryset(self, request):
+        queryset = super(StarredPhotoAdmin, self).get_queryset(request)
+        starred_photos = list()
+        photo_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+
+        if photo_type:
+            for q in queryset:
+                interest = account_models.UserInterest.objects \
+                    .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=q.id)
+
+                if len(interest) > 0:
+                    starred_photos.append(q.id)
+
+            return queryset.filter(id__in=starred_photos)
+        else:
+            return queryset
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of Photo
+        :return: String w/ HTML
+        """
+        return u'<span data-content-type="photos" data-id="{}" class="star-button starred fa fa-star"></span>'\
+            .format(obj.id)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
+
+    def photo_clicks(self, obj):
+        """
+        Show number of photo views (clicks)
+
+        :param obj: instance of Photo
+        :return: String w/ photo view count
+        """
+        view_count = obj.user_action.filter(action='photo_click')
+
+        return u'{}'.format(len(view_count))
+
+    photo_clicks.allow_tags = True
+    photo_clicks.short_description = 'Clicks'
+
+    def user_info(self, obj):
+        if obj.user:
+            link = urlresolvers.reverse("admin:account_user_change", args=[obj.user.id])
+            return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
+        else:
+            return '--empty--'
+
+    user_info.allow_tags = True
+    user_info.short_description = 'Username / Social Name'
+
+
 admin.site.register(photo_models.PhotoClassification, PhotoClassificationAdmin)
 admin.site.register(photo_models.PhotoFeed, PhotoFeedAdmin)
 admin.site.register(photo_models.Photo, PhotoAdmin)
+admin.site.register(StarredPhoto, StarredPhotoAdmin)
