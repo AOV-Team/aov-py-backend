@@ -135,7 +135,7 @@ class PhotoAdmin(GuardedModelAdmin):
     list_filter = (StarPhotoFilter,)
     ordering = ('-id',)
     readonly_fields = ('coordinates', 'created_at', 'location', 'original_image_url', 'photo_clicks', 'user',)
-    search_fields = ('image', 'id')
+    search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
 
     # Override get_changelist so we can get logged-in user
     def get_changelist(self, request, **kwargs):

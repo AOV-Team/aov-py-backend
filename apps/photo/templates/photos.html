@@ -100,18 +100,18 @@ $( document ).ready(function() {
         <input type="text" size="8" name="u" value="" id="usearchbar" autofocus="" placeholder="Age|user">
         <input type="text" size="8" name="g" value="" id="gsearchbar" placeholder="Gear">
         <input type="text" size="10" name="date" value="" id="datesearchbar" placeholder="Date">
-        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true">
-            <option data-url="?" selected="selected">By category</option>
+        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true" onchange="javascript:location.search = this.value;">
+            <option value="?" selected="selected">By category</option>
             <option disabled="disabled">---</option>
             {% for category in categories %}
-                <option data-url="?category={{ category.name }}">{{ category.name }}</option>
+                <option value="?category={{ category.name }}">{{ category.name }}</option>
             {% endfor %}
         </select>
-        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true">
-            <option data-url="?" selected="selected">By feed</option>
+        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true" onchange="javascript:location.search = this.value;">
+            <option value="?" selected="selected">By feed</option>
             <option disabled="disabled">---</option>
             {% for feed in photo_feeds %}
-                <option data-url="?feed={{ feed.name }}">{{ feed.name }}</option>
+                <option value="?feed={{ feed.name }}">{{ feed.name }}</option>
             {% endfor %}
         </select>
         <input type="submit" value="Search">
