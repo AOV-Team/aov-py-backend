@@ -1,7 +1,8 @@
 from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.common import models as common_models
-from apps.common.views import get_default_response, handle_jquery_empty_array, remove_pks_from_payload
+from apps.common.views import get_default_response, handle_jquery_empty_array, LargeResultsSetPagination, \
+    remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -165,6 +166,7 @@ def photo_map_admin(request):
 
 class PhotoViewSet(generics.ListCreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    pagination_class = LargeResultsSetPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 
