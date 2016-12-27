@@ -116,6 +116,7 @@ def photo_admin(request):
         photos = paginator.page(paginator.num_pages)
 
     # Add lists of names of feeds and tags that image is in
+    # Also check if photo has been starred by user
     # Makes it easier to work with in the HTML template
     for photo in photos:
         if not getattr(photo, 'photo_feed_names', None):
@@ -131,6 +132,16 @@ def photo_admin(request):
         for tag in photo.tag.all():
             if tag.public:
                 photo.photo_tag_names.append(tag.name)
+
+        # Has user starred photo?
+        photo_type = ContentType.objects.get_for_model(photo)
+        interest = account_models.UserInterest.objects \
+            .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=photo.id).first()
+
+        if interest:
+            photo.starred = True
+        else:
+            photo.starred = False
 
     # Categories
     categories = photo_models.PhotoClassification.objects\

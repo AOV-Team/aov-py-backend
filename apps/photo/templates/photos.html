@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/daterangepicker.min.css">
 <link rel="stylesheet" href="{% static "css/photos.css" %}">
+<link rel="stylesheet" href="{% static "css/change_list.css" %}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -15,6 +16,8 @@
   crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/jquery.daterangepicker.min.js">
 </script>
+<script src="{% static "js/common.js" %}"></script>
+<script src="{% static "js/change_list.js" %}"></script>
 
 <script>
 $( document ).ready(function() {
@@ -146,6 +149,12 @@ $( document ).ready(function() {
                         <div class="info">
                             <h2>Photo info</h2>
                             <p>
+                                {% if photo.starred %}
+                                    <span data-content-type="photos" data-id="{{ photo.id }}" class="star-button starred fa fa-star"></span>
+                                {% else %}
+                                    <span data-content-type="photos" data-id="{{ photo.id }}" class="star-button fa fa-star"></span>
+                                {% endif %}
+                                <br>
                                 <strong>Email:</strong> {{ photo.user.email }}<br>
                                 <strong>Username:</strong> {{ photo.user.username }}<br>
                                 <strong>Social name:</strong> {{ photo.user.social_name }}<br>
