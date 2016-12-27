@@ -210,6 +210,90 @@ class TestPhotoViewSetGET(TestCase):
 
         self.assertEquals(len(results), 1)
 
+    def test_photo_view_set_get_geo_location(self):
+        """
+        Test that we get photos filtered by a box of coordinates
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        photo1 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                   location='boise', user=user)
+        photo1.geo_location = 'POINT (-116.21 43.62)'
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.geo_location = 'POINT (-116.25 43.61699)'
+        photo2.save()
+
+        photo3 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo3.geo_location = 'POINT (-118.25 45.61699)'
+        photo3.save()
+
+        photo4 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo4.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        # Case insensitive
+        request = client.get('/api/photos?geo_location=-118,42,-115,44')
+        results = request.data['results']
+
+        self.assertEquals(len(results), 2)
+
+    def test_photo_view_set_get_geo_missing_coordinate(self):
+        """
+        Test that we get 400 if geo_location is not properly formatted (missing a coord)
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        # Case insensitive
+        request = client.get('/api/photos?geo_location=-118,42,-115')
+
+        self.assertEquals(request.status_code, 400)
+
+    def test_photo_view_set_get_geo_bad_type(self):
+        """
+        Test that we get 400 if geo_location is a string
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        # Case insensitive
+        request = client.get('/api/photos?geo_location=a,b,c,d')
+
+        self.assertEquals(request.status_code, 400)
+
     def test_photo_view_set_get_location(self):
         """
         Test that we get photos filtered by location
