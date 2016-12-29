@@ -1,7 +1,8 @@
 from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.common import models as common_models
-from apps.common.views import get_default_response, handle_jquery_empty_array, remove_pks_from_payload
+from apps.common.views import get_default_response, handle_jquery_empty_array, LargeResultsSetPagination, \
+    remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -9,6 +10,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
@@ -114,6 +116,7 @@ def photo_admin(request):
         photos = paginator.page(paginator.num_pages)
 
     # Add lists of names of feeds and tags that image is in
+    # Also check if photo has been starred by user
     # Makes it easier to work with in the HTML template
     for photo in photos:
         if not getattr(photo, 'photo_feed_names', None):
@@ -129,6 +132,16 @@ def photo_admin(request):
         for tag in photo.tag.all():
             if tag.public:
                 photo.photo_tag_names.append(tag.name)
+
+        # Has user starred photo?
+        photo_type = ContentType.objects.get_for_model(photo)
+        interest = account_models.UserInterest.objects \
+            .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=photo.id).first()
+
+        if interest:
+            photo.starred = True
+        else:
+            photo.starred = False
 
     # Categories
     categories = photo_models.PhotoClassification.objects\
@@ -149,8 +162,22 @@ def photo_admin(request):
     return render(request, 'photos.html', context)
 
 
+@staff_member_required
+def photo_map_admin(request):
+    """
+    Map photos
+
+    :param request:
+    :return: render()
+    """
+    context = {}
+
+    return render(request, 'photo_map.html', context)
+
+
 class PhotoViewSet(generics.ListCreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    pagination_class = LargeResultsSetPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 
@@ -161,6 +188,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
         :return: Queryset
         """
         classification_param = self.request.query_params.get('classification')
+        geo_location = self.request.query_params.get('geo_location')
         location = self.request.query_params.get('location')
         query_params = {
             'public': True
@@ -168,6 +196,25 @@ class PhotoViewSet(generics.ListCreateAPIView):
 
         if location:
             query_params['location__iexact'] = location
+
+        # If searching by a box of coordinates
+        # Format ?geo_location=SW LONG,SW LAT,NE LONG, NE LAT
+        if geo_location:
+            coordinates = tuple(geo_location.split(','))
+
+            # Check that we have 4 coordinates
+            # And each coordinate needs to be a number
+            if len(coordinates) != 4:
+                raise ValidationError('Expecting geo_location to have 4 coordinates: "SW LONG,SW LAT,NE LONG, NE LAT"')
+            else:
+                try:
+                    for c in coordinates:
+                        float(c)
+                except ValueError:
+                    raise ValidationError('Expecting number format for coordinates')
+
+            rectangle = Polygon.from_bbox(coordinates)
+            query_params['coordinates__contained'] = rectangle
 
         if classification_param:
             try:

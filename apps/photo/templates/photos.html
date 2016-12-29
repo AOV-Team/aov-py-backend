@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/daterangepicker.min.css">
 <link rel="stylesheet" href="{% static "css/photos.css" %}">
+<link rel="stylesheet" href="{% static "css/change_list.css" %}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -15,6 +16,8 @@
   crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/jquery.daterangepicker.min.js">
 </script>
+<script src="{% static "js/common.js" %}"></script>
+<script src="{% static "js/change_list.js" %}"></script>
 
 <script>
 $( document ).ready(function() {
@@ -100,18 +103,18 @@ $( document ).ready(function() {
         <input type="text" size="8" name="u" value="" id="usearchbar" autofocus="" placeholder="Age|user">
         <input type="text" size="8" name="g" value="" id="gsearchbar" placeholder="Gear">
         <input type="text" size="10" name="date" value="" id="datesearchbar" placeholder="Date">
-        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true">
-            <option data-url="?" selected="selected">By category</option>
+        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true" onchange="javascript:location.search = this.value;">
+            <option value="?" selected="selected">By category</option>
             <option disabled="disabled">---</option>
             {% for category in categories %}
-                <option data-url="?category={{ category.name }}">{{ category.name }}</option>
+                <option value="?category={{ category.name }}">{{ category.name }}</option>
             {% endfor %}
         </select>
-        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true">
-            <option data-url="?" selected="selected">By feed</option>
+        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true" onchange="javascript:location.search = this.value;">
+            <option value="?" selected="selected">By feed</option>
             <option disabled="disabled">---</option>
             {% for feed in photo_feeds %}
-                <option data-url="?feed={{ feed.name }}">{{ feed.name }}</option>
+                <option value="?feed={{ feed.name }}">{{ feed.name }}</option>
             {% endfor %}
         </select>
         <input type="submit" value="Search">
@@ -146,6 +149,12 @@ $( document ).ready(function() {
                         <div class="info">
                             <h2>Photo info</h2>
                             <p>
+                                {% if photo.starred %}
+                                    <span data-content-type="photos" data-id="{{ photo.id }}" class="star-button starred fa fa-star"></span>
+                                {% else %}
+                                    <span data-content-type="photos" data-id="{{ photo.id }}" class="star-button fa fa-star"></span>
+                                {% endif %}
+                                <br>
                                 <strong>Email:</strong> {{ photo.user.email }}<br>
                                 <strong>Username:</strong> {{ photo.user.username }}<br>
                                 <strong>Social name:</strong> {{ photo.user.social_name }}<br>

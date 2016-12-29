@@ -8,6 +8,68 @@ from guardian import models as guardian
 from guardian.admin import GuardedModelAdmin
 
 
+class StarredUser(models.User):
+    class Meta:
+        proxy = True
+
+
+class StarredUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'action_buttons')
+
+    list_filter = ('is_active',)
+    list_per_page = 100
+    ordering = ('-photo__count', '-id', 'username',)
+
+    readonly_fields = ('created_at', 'id', 'last_login', 'photo_count',)
+
+    search_fields = ('age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name',)
+
+    def get_queryset(self, request):
+        queryset = super(StarredUserAdmin, self).get_queryset(request).annotate(Count('photo'))
+        starred_users = list()
+        user_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+
+        if user_type:
+            for q in queryset:
+                interest = models.UserInterest.objects \
+                    .filter(user=request.user, interest_type='star', content_type__pk=user_type.id, object_id=q.id)
+
+                if len(interest) > 0:
+                    starred_users.append(q.id)
+
+            return queryset.filter(id__in=starred_users)
+        else:
+            return queryset
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of User
+        :return: String w/ HTML
+        """
+        photo_link = u'<a class="action" href="/admin/photos/?u={}"><span class="fa fa-picture-o"></span></a>' \
+            .format(obj.username)
+
+        return u'<span data-content-type="users" data-id="{}" class="action star-button starred fa fa-star"></span>{}' \
+            .format(obj.id, photo_link)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
+
+    def photo_count(self, obj):
+        return obj.photo__count
+
+    photo_count.admin_order_field = 'photo__count'
+    photo_count.short_description = 'Photos'
+
+
 class StarUserFilter(admin.SimpleListFilter):
     """
     Filter to filter by users that have/have not been starred by logging user
@@ -77,7 +139,7 @@ class UserAdmin(BaseUserAdmin):
 
     readonly_fields = ('created_at', 'id', 'last_login', 'photo_count',)
 
-    search_fields = ['age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name']
+    search_fields = ('age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name',)
 
     # Override get_changelist so we can get logged-in user
     def get_changelist(self, request, **kwargs):
@@ -87,6 +149,9 @@ class UserAdmin(BaseUserAdmin):
 
     def get_queryset(self, request):
         return super(UserAdmin, self).get_queryset(request).annotate(Count('photo'))
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     def action_buttons(self, obj):
         """
@@ -128,6 +193,9 @@ class ProfileAdmin(GuardedModelAdmin):
     readonly_fields = ('gear', 'user',)
     search_fields = ('id', 'user', 'bio', 'gear',)
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     # Not needed if user is readonly
     # def render_change_form(self, request, context, *args, **kwargs):
     #     """
@@ -142,12 +210,19 @@ class UserInterestAdmin(GuardedModelAdmin):
     readonly_fields = ('user', 'interest_type', 'content_type', 'object_id',)
     search_fields = ('id', 'user',)
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class UserObjectPermissionAdmin(GuardedModelAdmin):
-    list_display = ['id', 'user', 'permission', 'content_type', 'object_pk']
-    search_fields = ['id', 'user', 'permission']
+    list_display = ('id', 'user', 'permission', 'content_type', 'object_pk',)
+    search_fields = ('id', 'user', 'permission',)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
+admin.site.register(StarredUser, StarredUserAdmin)
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Profile, ProfileAdmin)
 admin.site.register(models.UserInterest, UserInterestAdmin)

@@ -1,0 +1,178 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Photo Map{% endblock %}
+
+{% block extrahead %}
+{% load static %}
+<link rel="stylesheet" href="https://openlayers.org/en/v3.20.1/css/ol.css" type="text/css">
+<style>
+    #info {
+        display: none;
+        background-color: #fcfcfc;
+        position: fixed;
+        left: 25%;
+        right: 25%;
+        top: 25%;
+        bottom: 25%;
+        box-shadow: 0 0 25px 10px #888;
+        z-index: 9999;
+    }
+
+    #info .details {
+        box-sizing: border-box;
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.9);
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        padding: 5px;
+    }
+
+    #map {
+        height: 400px;
+        width: 100%;
+    }
+</style>
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+<script src="https://openlayers.org/en/v3.20.1/build/ol.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+<div id="info"></div>
+<div id="map" class="map"></div>
+<script type="text/javascript">
+    var photoSearchBoxes = [];
+
+    createMarker = function(index, photo) {
+        var iconFeature = new ol.Feature({
+          data: photo,
+          geometry: new
+            ol.geom.Point(ol.proj.transform([photo.longitude, photo.latitude], 'EPSG:4326', 'EPSG:3857'))
+        });
+        vectorSource.addFeature(iconFeature);
+    }
+
+    var enqueueSearch = function(e) {
+        var box = map.getView().calculateExtent(map.getSize());
+        box = ol.proj.transformExtent(box, 'EPSG:3857', 'EPSG:4326');
+
+        photoSearchBoxes.push(box);
+        vectorSource.clear();
+    }
+
+    var getPhotos = function(box) {
+        $.ajax({
+            url: '/api/photos?page_size=500&geo_location=' + box[0] + ',' + box[1] + ',' + box[2] + ',' + box[3],
+            method: 'get'
+        })
+        .done(function(data) {
+            $.each(data.results, createMarker);
+        });
+    }
+
+    var vectorSource = new ol.source.Vector({
+    });
+
+    //create the style
+    var iconStyle = new ol.style.Style({
+      image: new ol.style.Icon(({
+        anchor: [0.5, 1.0],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'fraction',
+        opacity: 0.75,
+        scale: 0.1,
+        src: '/static/img/map-marker.png'
+      }))
+    });
+
+    var selectedStyle = new ol.style.Style({
+      image: new ol.style.Icon(({
+        anchor: [0.5, 1.0],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'fraction',
+        opacity: 1.0,
+        scale: 0.2,
+        src: '/static/img/map-marker.png'
+      }))
+    });
+
+    var vectorLayer = new ol.layer.Vector({
+      source: vectorSource,
+      style: iconStyle
+    });
+
+    var mousePositionControl = new ol.control.MousePosition({
+        coordinateFormat: ol.coordinate.createStringXY(4),
+        projection: 'EPSG:4326',
+        undefinedHTML: '&nbsp;'
+      });
+
+    var map = new ol.Map({
+        controls: ol.control.defaults({
+          attributionOptions: ({
+            collapsible: false
+          })
+        }).extend([mousePositionControl]),
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          }),
+          vectorLayer
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([-97.4, 39]),
+          zoom: 4
+        })
+      });
+
+    map.on('moveend', enqueueSearch);
+    map.getView().on('change:resolution', enqueueSearch);
+
+    var select = new ol.interaction.Select({
+      layers: [vectorLayer],
+      style: selectedStyle
+    });
+
+    map.addInteraction(select);
+
+    var selectedFeatures = select.getFeatures();
+
+    selectedFeatures.on('add', function(e) {
+      var i = $('#info');
+      var feature = e.target.item(0),
+        data = feature.get('data');
+
+      var content = '<div class="details"><span><strong>Location:</strong> '
+        + data.location
+        + '</span> <span>('
+        + data.longitude
+        + ' LNG, '
+        + data.latitude
+        + ' LAT)</span></div>';
+
+      i.css('background', '#fcfcfc url(' + data.image + ') center center / cover no-repeat');
+      i.html(content);
+      i.show();
+    });
+
+    selectedFeatures.on('remove', function(event) {
+        var i = $('#info');
+
+        i.empty();
+        i.hide();
+    });
+
+    setInterval(function() {
+        if (photoSearchBoxes.length > 0) {
+            var latestSearchBox = photoSearchBoxes[photoSearchBoxes.length - 1];
+            photoSearchBoxes = [];
+
+            getPhotos(latestSearchBox);
+        }
+    }, 1000);
+</script>
+{% endblock %}

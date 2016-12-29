@@ -53,6 +53,7 @@ project_config.py
 !requirements.txt
 *.dir
 *.bak
+upload/
 # Exceptions for text files
 !*_sample.txt
 

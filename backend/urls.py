@@ -57,7 +57,8 @@ urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     url(r'^admin/', admin.site.urls),
-    url(r'^admin/photos/$', photo_views.photo_admin)
+    url(r'^admin/photos/$', photo_views.photo_admin),
+    url(r'^admin/photos/map/$', photo_views.photo_map_admin)
 ]
 
 # Enable images for runserver

@@ -206,13 +206,13 @@ class Command(BaseCommand):
         action = options['action']
         today = int(str(datetime.datetime.today().date()).replace('-', ''))
 
-        # Command expires on Dec 25, 2016
-        if today <= 20161225:
+        # Command expires on Jan 25, 2016
+        if today <= 20170125:
             if action == 'user':
                 import_users()
             elif action == 'photo':
                 import_images()
-            if action == 'feed':
+            elif action == 'feed':
                 import_feed()
             else:
                 print('Invalid command')

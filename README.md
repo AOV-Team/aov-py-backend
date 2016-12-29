@@ -153,6 +153,7 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
     "tag": __,
     "user": __,
     "attribution_name": "",
+    "geo_location": "POINT (long lat)",
     "image": [file],
     "location": ""
 }
