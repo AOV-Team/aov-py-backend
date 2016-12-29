@@ -445,40 +445,47 @@ class MeProfileViewSet(generics.RetrieveAPIView):
         payload = request.data
         response = get_default_response('400')
 
-        # Gear not allowed
-        if 'gear' in payload:
-            raise ValidationError('Gear not editable. Use /api/me/gear')
+        existing_profile = account_models.Profile.objects.filter(user=authenticated_user).first()
 
-        if 'bio' in payload or 'cover_image' in payload:
-            # Clean up and assign user
-            payload = remove_pks_from_payload('profile', payload)
-            payload = remove_pks_from_payload('user', payload)
-            payload['user'] = authenticated_user.id
+        # Only create a profile if user doesn't have one
+        if not existing_profile:
+            # Gear not allowed
+            if 'gear' in payload:
+                raise ValidationError('Gear not editable. Use /api/me/gear')
 
-            # Image compression
-            # Save original first
-            if 'cover_image' in payload:
-                # Save original photo to media
-                try:
-                    photo = Photo(payload['cover_image'])
-                    photo.save('COVER_u{}_{}_{}'
-                               .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
-                               custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
+            if 'bio' in payload or 'cover_image' in payload:
+                # Clean up and assign user
+                payload = remove_pks_from_payload('profile', payload)
+                payload = remove_pks_from_payload('user', payload)
+                payload['user'] = authenticated_user.id
 
-                    # Process image to save
-                    payload['cover_image'] = photo.compress()
-                except TypeError:
-                    raise ValidationError('Cover image is not of type image')
+                # Image compression
+                # Save original first
+                if 'cover_image' in payload:
+                    # Save original photo to media
+                    try:
+                        photo = Photo(payload['cover_image'])
+                        photo.save('COVER_u{}_{}_{}'
+                                   .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
+                                   custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
 
-            serializer = account_serializers.ProfileSerializer(data=payload)
+                        # Process image to save
+                        payload['cover_image'] = photo.compress()
+                    except TypeError:
+                        raise ValidationError('Cover image is not of type image')
 
-            if serializer.is_valid():
-                serializer.save()
+                serializer = account_serializers.ProfileSerializer(data=payload)
 
-                response = get_default_response('200')
-                response.data = serializer.data
-            else:
-                response.data['message'] = serializer.errors
+                if serializer.is_valid():
+                    serializer.save()
+
+                    response = get_default_response('200')
+                    response.data = serializer.data
+                else:
+                    response.data['message'] = serializer.errors
+        else:
+            response = get_default_response('409')
+            response.data['message'] = 'User already has a profile'
 
         return response
 

@@ -284,6 +284,31 @@ class TestMeProfileViewSetPOST(TestCase):
         self.assertEquals(len(profile), 1)
         self.assertEquals(profile[0].user, user)
 
+    def test_me_profile_view_set_post_already_created(self):
+        """
+        Test that we cannot create more than one profile for a user
+
+        :return: None
+        """
+        # Create test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = {
+            'bio': 'This is cool!'
+        }
+
+        request = client.post('/api/me/profile', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 409)
+
     def test_me_profile_view_set_post_bad_request_invalid_field(self):
         """
         Test that we can still save even if there's an invalid field in payload
