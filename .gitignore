@@ -139,3 +139,6 @@ $RECYCLE.BIN/
 # Node
 node_modules
 bower_components
+
+# Vagrant/dev
+.vagrant/
