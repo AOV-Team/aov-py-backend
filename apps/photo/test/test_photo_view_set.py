@@ -374,6 +374,7 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(len(photos), 1)
         self.assertTrue(photos[0].public)
+        self.assertIsNotNone(photos[0].original_image_url)
 
         # Test that original uploaded image is saved (before resized and compressed)
         matched_images = test_helpers.find_file_by_pattern(settings.MEDIA_ROOT, '*_md-portrait.jpg')
@@ -424,6 +425,7 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(result['category'][0], category.id)
         self.assertEquals(result['user'], user.id)
+        self.assertNotIn('original_image_url', result)
 
         # Query for entry
         photos = photo_models.Photo.objects.all()

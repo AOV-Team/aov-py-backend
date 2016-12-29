@@ -39,8 +39,9 @@ class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Photo
         fields = ('id', 'category', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image', 'latitude', 'location',
-                  'longitude', 'photo_data', 'public', 'photo_feed')
-        extra_kwargs = {'public': {'default': True, 'write_only': True}}
+                  'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed')
+        extra_kwargs = {'original_image_url':  {'write_only': True},
+                        'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
         read_only_fields = ('photo_data',)
