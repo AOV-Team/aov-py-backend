@@ -210,7 +210,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
-    'PAGE_SIZE': 30,
+    'PAGE_SIZE': 10,
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
