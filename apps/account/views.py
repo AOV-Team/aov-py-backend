@@ -69,7 +69,7 @@ class AuthenticateViewSet(APIView):
             try:
                 if 'set' in payload and 'auth' in payload:
                     if payload['set'] and payload['auth'] == 'okgo':
-                        user = account_models.User.objects.get(email=payload['email'])
+                        user = account_models.User.objects.get(email=payload['email'].lower())
 
                         if not user.password:
                             user.set_password(payload['password'])
@@ -81,7 +81,7 @@ class AuthenticateViewSet(APIView):
                 return response
             # END TODO
 
-            user = authenticate(email=email, password=password)
+            user = authenticate(email=email.lower(), password=password)
 
             if user:
                 # User exists and is active, get/create token and return
@@ -254,7 +254,7 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
 
         updated_user.save()
 
-        response.data = account_serializers.UserSerializer(updated_user).datag
+        response.data = account_serializers.UserSerializer(updated_user).data
 
         return response
 
@@ -740,6 +740,10 @@ class UserViewSet(generics.CreateAPIView):
                 payload['avatar'] = photo.compress()
             except TypeError:
                 raise ValidationError('Avatar image is not of type image')
+
+        # Make all emails lowercase
+        if 'email' in payload:
+            payload['email'] = payload['email'].lower()
 
         serializer = account_serializers.UserSerializer(data=payload)
 

@@ -30,15 +30,22 @@ mkvirtualenv --python=python3.5 backend > /dev/null 2>&1
 
 # Set up db
 sudo -u postgres bash -c "psql -c \"CREATE USER djangodev WITH PASSWORD 'golden';\""
-sudo -u postgres bash -c "psql -c \"CREATE DATABASE aov  WITH OWNER djangodev;\""
+sudo -u postgres bash -c "psql -c \"CREATE DATABASE aov WITH OWNER djangodev;\""
+sudo -u postgres bash -c "psql -c \"ALTER USER djangodev WITH SUPERUSER;\""
 
 # Set up project deps
+echo "Setting up project"
 cd /vagrant
 setvirtualenvproject
 workon backend
-pip install -r requirements.txt
+pip install -r requirements.txt > /dev/null 2>&1
 ./scripts/setup.sh dev > /dev/null
 ./manage.py migrate
+
+# Redis
+echo "Installing Redis"
+./scripts/install_redis.sh > /dev/null 2>&1
+redis-server --daemonize yes
 
 # Set virtualenvs owner
 sudo chown -R vagrant:vagrant ~vagrant/virtualenvs

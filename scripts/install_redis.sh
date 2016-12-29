@@ -2,7 +2,7 @@
 echo "Installing Redis 3.0.7"
 echo
 echo "Installing outside repository"
-cd ../../
+cd ~vagrant
 echo
 wget http://download.redis.io/releases/redis-3.0.7.tar.gz
 echo
@@ -11,4 +11,5 @@ echo
 cd redis-3.0.7
 echo
 make
+sudo make install
 echo "Done"

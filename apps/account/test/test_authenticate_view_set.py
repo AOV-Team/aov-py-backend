@@ -74,6 +74,65 @@ class TestAuthViewSetPOST(TestCase):
 
         self.assertIsNotNone(response['token'])
 
+    def test_authenticate_view_set_post_case_insensitive(self):
+        """
+        /api/auth POST - test that email is case insensitive
+
+        :return: None
+        """
+        # Create user
+        account_models.User.objects\
+            .create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov1')
+
+        # Log user in
+        client = APIClient()
+
+        payload = {
+            'email': 'MRtest@mypapaya.io',
+            'password': 'WhoWantsToBeAMillionaire?'
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+        response = request.data
+
+        self.assertIsNotNone(response['token'])
+
+    def test_authenticate_view_set_post_case_insensitive_2_accounts(self):
+        """
+        /api/auth POST - test that if there are two email accounts that are the same but different case,
+        it authenticates to the first one that matches the password
+
+        :return: None
+        """
+        # Create users
+        user = account_models.User.objects\
+            .create_user(email='mrtest@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov1')
+
+        account_models.User.objects \
+            .create_user(email='MRtest@mypapaya.io', password='WhosAMillionaire', username='aov2')
+
+        # Log user in
+        client = APIClient()
+
+        payload = {
+            'email': 'MRtest@mypapaya.io',
+            'password': 'WhoWantsToBeAMillionaire?'
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+        response = request.data
+        token = response['token']
+
+        self.assertIsNotNone(token)
+
+        # Get user data
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        me_request = client.get('/api/me', format='json')
+        me_result = me_request.data
+
+        self.assertEquals(me_result['id'], user.id)
+
     def test_authenticate_view_set_post_bad_request(self):
         """
         Test that we get a HTTP 400 code if email and/or password missing in payload
