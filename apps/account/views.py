@@ -733,7 +733,9 @@ class UserViewSet(generics.CreateAPIView):
         :param request: Request object
         :return: Response object
         """
-        payload = request.data
+        # .copy() fixes 500 error when content type is
+        # application/x-www-form-urlencoded;
+        payload = request.data.copy()
         response = get_default_response('400')
 
         if 'avatar' in payload:

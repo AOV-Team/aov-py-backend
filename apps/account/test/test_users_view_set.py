@@ -107,6 +107,41 @@ class TestUsersViewSetPOST(TestCase):
         self.assertEquals(user.username, 'aov_hov')
         self.assertFalse(user.is_superuser)
 
+    def test_users_view_set_post_app_data_successful(self):
+        """
+        Successful /api/users POST with the data that we expect from the app
+
+        :return: None
+        """
+        client = APIClient()
+
+        payload = {
+            'age': 20,
+            'email': 'nortongumbo@u.boisestate.edu',
+            'is_active': 1,
+            'location': 'Boise',
+            'password': 'pass',
+            'social_name': '@ngumbo3',
+            'username': 'gumbno'
+        }
+
+        request = client.post('/api/users', data=payload)
+        result = request.data
+
+        self.assertEquals(request.status_code, 201)
+        self.assertIn('email', result)
+        self.assertIn('social_name', result)
+        self.assertIn('username', result)
+
+        user = account_models.User.objects.get(email='nortongumbo@u.boisestate.edu')
+
+        self.assertEquals(user.age, 20)
+        self.assertTrue(user.is_active)
+        self.assertEquals(user.location, 'Boise')
+        self.assertEquals(user.social_name, '@ngumbo3')
+        self.assertEquals(user.username, 'gumbno')
+        self.assertFalse(user.is_superuser)
+
     def test_users_view_set_post_already_exists(self):
         """
         /api/users POST (user already exists)
