@@ -1,8 +1,9 @@
-from apps.photo.photo import Photo
+from apps.photo.photo import Photo, WidthResize
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.test import override_settings, TestCase
 from os.path import getsize
+from PIL import Image
 
 
 class TestPhoto(TestCase):
@@ -69,3 +70,50 @@ class TestPhoto(TestCase):
         saved = photo.save('custom_bucket.jpg', custom_bucket='aovdev1', quality=80)
 
         self.assertIsNotNone(saved)
+
+
+class TestWidthResize(TestCase):
+    def test_width_resize_successful(self):
+        """
+        Test that we can resize an image
+
+        :return: None
+        """
+        file = 'apps/common/test/data/photos/4mb.jpg'
+        img = Image.open(file)
+
+        image = WidthResize(width=1242)
+        new_img = image.process(img)
+
+        self.assertEquals(new_img.size[0], 1242)
+        self.assertEquals(new_img.size[1], 1548)
+
+    def test_width_resize_no_upscale(self):
+        """
+        Test that we can resize an image and that it does not upscales
+
+        :return: None
+        """
+        f = 'apps/common/test/data/photos/photo1-min.jpg'
+        img = Image.open(f)
+
+        image = WidthResize(width=2048, upscale=False)
+        new_img = image.process(img)
+
+        self.assertEquals(new_img.size[0], 750)
+        self.assertEquals(new_img.size[1], 749)
+
+    def test_width_resize_upscale(self):
+        """
+        Test that we can resize an image and that it upscales
+
+        :return: None
+        """
+        file = 'apps/common/test/data/photos/photo1-min.jpg'
+        img = Image.open(file)
+
+        image = WidthResize(width=2048, upscale=True)
+        new_img = image.process(img)
+
+        self.assertEquals(new_img.size[0], 2048)
+        self.assertEquals(new_img.size[1], 2045)

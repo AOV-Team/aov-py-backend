@@ -61,9 +61,7 @@ class Photo(ImageFile):
         """
         # Resize if larger than max
         if self.pillow_image.size[0] > max_width:
-            img_ratio = self.pillow_image.size[0] / float(self.pillow_image.size[1])
-            new_height = int(max_width / img_ratio)
-            self.pillow_image = self.pillow_image.resize((max_width, new_height), PillowImage.ANTIALIAS)
+            return WidthResize(max_width).process(self.pillow_image)
 
         return self.pillow_image
 
@@ -93,3 +91,28 @@ class Photo(ImageFile):
             self.pillow_image.save(full_filename, format='JPEG', quality=quality)
 
             return full_filename
+
+
+class WidthResize(object):
+    """
+    Resize an image by setting the width and then calculating the height needed to maintain proportions
+    """
+    def __init__(self, width, upscale=False):
+        self.width = width
+        self.upscale = upscale
+
+    def process(self, img):
+        """
+        Resize an image
+
+        :param img: instance of Image to resize
+        :return: resized Image
+        """
+        # Resize if larger than max
+        if img.size[0] > self.width or self.upscale:
+            img_ratio = img.size[0] / float(img.size[1])
+            new_height = int(self.width / img_ratio)
+            img = img.resize((self.width, new_height), PillowImage.ANTIALIAS)
+
+        return img
+
