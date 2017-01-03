@@ -2,7 +2,7 @@ from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.common import models as common_models
 from apps.common.views import get_default_response, handle_jquery_empty_array, LargeResultsSetPagination, \
-    remove_pks_from_payload
+    MediumResultsSetPagination, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -282,8 +282,9 @@ class PhotoViewSet(generics.ListCreateAPIView):
 
 
 class PhotoClassificationViewSet(generics.ListCreateAPIView):
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = MediumResultsSetPagination
     serializer_class = photo_serializers.PhotoClassificationSerializer
 
     def get_queryset(self):

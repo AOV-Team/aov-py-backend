@@ -210,7 +210,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 12,
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
