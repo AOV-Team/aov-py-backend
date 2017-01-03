@@ -5,7 +5,7 @@ from apps.account import tasks as account_tasks
 from apps.common import models as common_models
 from apps.common.mailer import send_transactional_email
 from apps.common.exceptions import ForbiddenValue, OverLimitException
-from apps.common.views import get_default_response, remove_pks_from_payload
+from apps.common.views import get_default_response, MediumResultsSetPagination, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -163,6 +163,21 @@ class AuthenticateResetViewSet(APIView):
                 pass
 
         return response
+
+
+class GearViewSet(generics.ListCreateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = MediumResultsSetPagination
+    serializer_class = account_serializers.GearSerializer
+
+    def get_queryset(self):
+        """
+        Query for gear
+
+        :return: QuerySet
+        """
+        return account_models.Gear.objects.filter(public=True)
 
 
 class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
