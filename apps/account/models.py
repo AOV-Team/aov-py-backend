@@ -5,8 +5,51 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
-import json
-import re
+
+
+class GearManager(models.Manager):
+    def create_or_update(self, **kwargs):
+        """
+        Creates new entry or updates if Gear entry already exists
+
+        :param kwargs:
+        :return: instance of Gear
+        """
+        new_gear = Gear(**kwargs)
+        existing = Gear.objects.filter(make=new_gear.make, model=new_gear.model).first()
+
+        if existing:
+            new_gear.pk = existing.pk
+            new_gear.id = existing.id
+
+        new_gear.save()
+        return new_gear
+
+
+class Gear(models.Model):
+    link = models.URLField(blank=True, null=True)
+    make = models.TextField(max_length=128)
+    model = models.TextField(max_length=128)
+    public = models.BooleanField(default=True)
+    reviewed = models.BooleanField(default=False)  # Set to true if added/approved by AOV
+
+    objects = GearManager()
+
+    @property
+    def name(self):
+        return '{} {}'.format(self.make, self.model)
+
+    def __str__(self):
+        """
+        String representation of gear
+
+        :return: String
+        """
+
+    class Meta:
+        default_permissions = ('add', 'change', 'delete', 'view')
+        ordering = ('make', 'model',)
+        verbose_name_plural = 'gear'
 
 
 class UserCustomManager(BaseUserManager):
@@ -38,6 +81,8 @@ class UserCustomManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
+    gear = models.ManyToManyField(Gear, blank=True)
+
     age = models.PositiveSmallIntegerField(blank=True, null=True)
     avatar = models.ImageField(upload_to=common_models.get_uploaded_file_path, blank=True, null=True)
     email = models.EmailField(max_length=255, unique=True)
@@ -70,145 +115,6 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
         default_permissions = ('add', 'change', 'delete', 'view')
 
 
-class GearManager:
-    def search(self, query):
-        """
-        Search gear
-
-        :param query: search string
-        :return: results in a list()
-        """
-        gear = list()
-        query = query.lower()
-        profiles = Profile.objects.none()
-        query_pieces = re.split('\s|,', query)
-
-        # Search through profiles using each piece of the query string
-        for q in query_pieces:
-            profiles = profiles | Profile.objects.filter(gear__icontains=q)
-
-        profiles = profiles.distinct()
-
-        if profiles:
-            # Now find all gear that matches query
-            for p in profiles:
-                gear_list = Gear(p).all
-                gear_matches = list()
-
-                for g in gear_list:
-                    if '{} {}'.format(g['make'], g['model']).lower().find(query) != -1:
-                        gear_matches.append(g)
-
-                # Append to gear if there was at least 1 match
-                if len(gear_matches) > 0:
-                    gear.append({'user': p.user, 'gear': gear_matches})
-
-        return gear
-
-
-class Gear:
-    """
-    Class for managing a profile's gear
-    """
-    objects = GearManager()
-
-    def __init__(self, profile, gear=None):
-        """
-        Format for gear
-        [
-            {
-                name: ''
-                link: ''
-            }
-        ]
-
-        :param profile: instance of Profile
-        :param gear: list of dictionaries containing gear info
-        """
-        self.gear = gear
-        self.profile = profile
-
-    @property
-    def all(self):
-        """
-        Retrieve all gear
-
-        :return: list
-        """
-        if not self.profile.gear:
-            return list()
-        else:
-            return json.loads(self.profile.gear)
-
-    def links_valid(self, new_data):
-        """
-        Check that links match existing links and that no new links have been added.
-        Used by PATCH endpoint to ensure that links cannot be created via API
-
-        :param new_data: The data to be saved that needs to be checked
-        :return: boolean
-        """
-        old_data = self.all
-
-        for i in new_data:
-            if 'make' not in i or 'model' not in i:
-                raise KeyError('Make and model required')
-
-            # If there's a link in the new data, check it
-            if 'link' in i:
-                # Find matches of new data in old
-                matches = list()
-
-                for d in old_data:
-                    if d['make'] == i['make'] and d['model'] == i['model']:
-                        matches.append(d)
-
-                # Make sure that link is the same of at least one of the links of the existing items
-                link_matches = 0
-
-                for m in matches:
-                    if 'link' in m:
-                        if m['link'] == i['link']:
-                            link_matches += 1
-
-                if link_matches == 0:
-                    return False
-
-        return True
-
-    def save(self):
-        """
-        Saves gear to profile instance
-
-        :return: Profile instance
-        """
-        if self.gear:
-            # Cannot have more than 8 items
-            if len(self.gear) > 8:
-                raise OverLimitException('User cannot have more than 8 gear items')
-
-            # Perform checks on data
-            for i in self.gear:
-                # Make and model are mandatory
-                if 'make' not in i or 'model' not in i:
-                    raise KeyError('Make and model required')
-
-                # Only make, model, and link are allowed
-                for key in i.keys():
-                    if key == 'make' or key == 'model' or key == 'link':
-                        pass
-                    else:
-                        raise ValueError('Invalid key {} found'.format(key))
-
-            self.profile.gear = json.dumps(self.gear)
-            self.profile.save()
-        else:
-            self.profile.gear = json.dumps(list())
-            self.profile.save()
-
-        return self.profile
-
-
 class ProfileManager(models.Manager):
     def create_or_update(self, **kwargs):
         """
@@ -232,7 +138,6 @@ class Profile(models.Model):
     user = models.ForeignKey(User)
     bio = models.TextField(blank=True, null=True)
     cover_image = models.ImageField(upload_to=common_models.get_uploaded_file_path, blank=True, null=True)
-    gear = models.TextField(blank=True, null=True)
 
     objects = ProfileManager()
 

@@ -189,9 +189,9 @@ class UserAdmin(BaseUserAdmin):
 
 
 class ProfileAdmin(GuardedModelAdmin):
-    list_display = ('user', 'bio', 'gear', 'id',)
-    readonly_fields = ('gear', 'user',)
-    search_fields = ('id', 'user', 'bio', 'gear',)
+    list_display = ('user', 'bio', 'id',)
+    readonly_fields = ('user',)
+    search_fields = ('id', 'user', 'bio',)
 
     def has_delete_permission(self, request, obj=None):
         return False

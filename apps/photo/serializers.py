@@ -1,3 +1,5 @@
+from apps.account import models as account_models
+from apps.account import serializers as account_serializers
 from apps.photo import models
 from rest_framework import serializers
 import re
@@ -17,6 +19,7 @@ class PhotoFeedSerializer(serializers.ModelSerializer):
 
 class PhotoSerializer(serializers.ModelSerializer):
     dimensions = serializers.SerializerMethodField()
+    gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all())
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
 
     def get_dimensions(self, obj):
@@ -38,8 +41,8 @@ class PhotoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Photo
-        fields = ('id', 'category', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image', 'latitude', 'location',
-                  'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed')
+        fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
+                  'latitude', 'location', 'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed')
         extra_kwargs = {'original_image_url':  {'write_only': True},
                         'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')

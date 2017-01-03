@@ -2,6 +2,14 @@ from apps.account import models
 from rest_framework import serializers
 
 
+class GearSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Gear
+        fields = ('id', 'link', 'make', 'model', 'reviewed')
+        extra_kwargs = {'public': {'default': True, 'write_only': True}}
+        read_only_fields = ('link', 'reviewed',)
+
+
 class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
