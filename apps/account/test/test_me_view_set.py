@@ -101,7 +101,6 @@ class TestMeViewSetPATCH(TestCase):
             request = client.patch('/api/me', data=payload, format='multipart')
 
         result = request.data
-        print('RR', result)
 
         self.assertIsNotNone(result['avatar'])
 
@@ -278,3 +277,72 @@ class TestMeViewSetPATCH(TestCase):
         self.assertEquals(updated_user.is_active, True)
         self.assertEquals(updated_user.is_admin, False)
         self.assertEquals(updated_user.is_superuser, False)
+
+    def test_me_view_set_patch_username_successful(self):
+        """
+        Test that we can update user's username
+
+        :return: None
+        """
+        # Create data
+        user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
+                                                       username='aov_hov')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = {
+            'email': user.email,
+            'age': 22,
+            'username': 'hola'
+        }
+
+        request = client.patch('/api/me', data=payload, format='json')
+        result = request.data
+
+        self.assertEquals(result['age'], 22)
+        self.assertEquals(result['username'], 'hola')
+
+        # Also check entry
+        updated_user = account_models.User.objects.get(id=user.id)
+
+        self.assertEquals(updated_user.age, 22)
+        self.assertEquals(updated_user.username, 'hola')
+
+    def test_me_view_set_patch_username_conflict(self):
+        """
+        Test that we can get 409 if user tries to update username and it already exists
+
+        :return: None
+        """
+        # Create data
+        account_models.User.objects.create_user(age=23, email='test@aov.com', social_name='a', username='hola')
+        user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
+                                                       username='aov_hov')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = {
+            'email': user.email,
+            'username': 'hola'
+        }
+
+        request = client.patch('/api/me', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 409)
+
+        # Also check entry
+        # Username should remain the same
+        updated_user = account_models.User.objects.get(id=user.id)
+
+        self.assertEquals(updated_user.age, 23)
+        self.assertEquals(updated_user.username, 'aov_hov')

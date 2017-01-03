@@ -202,6 +202,17 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         # Remove PKs and other fields that cannot be updated via API
         payload = remove_pks_from_payload('user', payload)
 
+        # If user wants to change their username, ensure that no other user has it already
+        if 'username' in payload:
+            already_existing = account_models.User.objects.filter(username=payload['username'])\
+                .exclude(id=authenticated_user.id)
+
+            if already_existing:
+                response = get_default_response('409')
+                response.data['message'] = 'Username already exists.'
+                response.data['userMessage'] = 'Cannot update your information. Username is taken.'
+                return response
+
         # Avatar
         if 'avatar' in payload:
             # Save original photo to media
@@ -226,9 +237,6 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
 
         if 'is_superuser' in payload:
             del payload['is_superuser']
-
-        if 'username' in payload:
-            del payload['username']
 
         updated_user = account_models.User.objects.get(id=authenticated_user.id)
 
