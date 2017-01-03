@@ -17,7 +17,7 @@ class UserPublicSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    gear = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Gear.objects.all())
+    gear = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Gear.objects.all(), required=False)
 
     class Meta:
         model = models.User

@@ -453,6 +453,47 @@ class TestPhotoViewSetPOST(TestCase):
         self.assertEquals(len(photos), 1)
         self.assertTrue(photos[0].public)
 
+    def test_photo_view_set_post_remote_no_gear_successful(self):
+        """
+        Test that we can save a photo w/out gear. Must save remotely.
+
+        :return: None
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
+
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects \
+            .create_or_update(name='Landscape', classification_type='category')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'image': i
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(len(result['gear']), 0)
+        self.assertEquals(result['user'], user.id)
+        self.assertNotIn('original_image_url', result)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
+
     @override_settings(REMOTE_IMAGE_STORAGE=False,
                        DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_view_set_post_bad_geo_location(self):

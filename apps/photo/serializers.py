@@ -19,7 +19,7 @@ class PhotoFeedSerializer(serializers.ModelSerializer):
 
 class PhotoSerializer(serializers.ModelSerializer):
     dimensions = serializers.SerializerMethodField()
-    gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all())
+    gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
 
     def get_dimensions(self, obj):
