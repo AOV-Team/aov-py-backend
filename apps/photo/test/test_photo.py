@@ -1,4 +1,4 @@
-from apps.photo.photo import Photo, WidthResize
+from apps.photo.photo import Photo, BlurResize, WidthResize
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.test import override_settings, TestCase
@@ -72,6 +72,41 @@ class TestPhoto(TestCase):
         self.assertIsNotNone(saved)
 
 
+class TestBlurResize(TestCase):
+    """
+    Test that we can resize and blur an image
+    """
+    def test_blur_resize_successful(self):
+        """
+        Test that image is resized to 300px wide
+
+        :return: None
+        """
+        f = 'apps/common/test/data/photos/4mb.jpg'
+        img = Image.open(f)
+
+        image = BlurResize()
+        new_img = image.process(img)
+
+        self.assertEquals(new_img.size[0], 300)
+        self.assertEquals(new_img.size[1], 373)
+
+    def test_blur_resize_upscale(self):
+        """
+        Test that we can blur + resize an image and that it upscales
+
+        :return: None
+        """
+        f = 'apps/common/test/data/photos/photo1-min.jpg'
+        img = Image.open(f)
+
+        image = BlurResize(width=2048, upscale=True)
+        new_img = image.process(img)
+
+        self.assertEquals(new_img.size[0], 2048)
+        self.assertEquals(new_img.size[1], 2045)
+
+
 class TestWidthResize(TestCase):
     def test_width_resize_successful(self):
         """
@@ -79,8 +114,8 @@ class TestWidthResize(TestCase):
 
         :return: None
         """
-        file = 'apps/common/test/data/photos/4mb.jpg'
-        img = Image.open(file)
+        f = 'apps/common/test/data/photos/4mb.jpg'
+        img = Image.open(f)
 
         image = WidthResize(width=1242)
         new_img = image.process(img)
@@ -109,8 +144,8 @@ class TestWidthResize(TestCase):
 
         :return: None
         """
-        file = 'apps/common/test/data/photos/photo1-min.jpg'
-        img = Image.open(file)
+        f = 'apps/common/test/data/photos/photo1-min.jpg'
+        img = Image.open(f)
 
         image = WidthResize(width=2048, upscale=True)
         new_img = image.process(img)

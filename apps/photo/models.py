@@ -1,5 +1,6 @@
 from apps.account import models as account_models
 from apps.common import models as common_models
+from apps.photo.photo import BlurResize, WidthResize
 from apps.utils import models as utils_models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
@@ -7,6 +8,7 @@ from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import models
 from django.utils.safestring import mark_safe
+from imagekit.models import ImageSpecField
 
 
 class PhotoClassificationManager(models.Manager):
@@ -98,7 +100,12 @@ class Photo(geo_models.Model):
     attribution_name = models.CharField(max_length=255, blank=True, null=True)
     coordinates = geo_models.PointField(srid=4326, blank=True, null=True)  # Lat/long
     created_at = models.DateTimeField(auto_now_add=True)
+
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path)
+    image_blurred = ImageSpecField(source='image', processors=[BlurResize()], format='JPEG', options={'quality': 80})
+    image_small = ImageSpecField(source='image', processors=[WidthResize(640)], format='JPEG')
+    image_medium = ImageSpecField(source='image', processors=[WidthResize(1242)], format='JPEG')
+
     location = models.CharField(max_length=255, blank=True, null=True)
     original_image_url = models.URLField(blank=True, null=True)
     photo_data = models.TextField(blank=True, null=True)

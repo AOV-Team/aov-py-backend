@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'imagekit',
     'storages',
     'apps.account',
-    'apps.photo',
+    'apps.photo.apps.PhotoConfig',
     'apps.utils',
     'dbmail',
     'guardian',

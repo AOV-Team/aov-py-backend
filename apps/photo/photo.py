@@ -4,6 +4,7 @@ from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from io import BufferedReader, BytesIO
 from PIL import Image as PillowImage
+from PIL import ImageFilter
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
@@ -116,3 +117,14 @@ class WidthResize(object):
 
         return img
 
+
+class BlurResize(WidthResize):
+    """
+    Blur and resize an image
+    """
+    def __init__(self, width=300, upscale=False):
+        super(BlurResize, self).__init__(width, upscale)
+
+    def process(self, img):
+        img = super(BlurResize, self).process(img)
+        return img.filter(ImageFilter.GaussianBlur(radius=5))
