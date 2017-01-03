@@ -36,7 +36,7 @@ class Photo(ImageFile):
         else:
             raise TypeError('File object not instance of BufferedReader, InMemoryUploadedFile or TemporaryUploadedFile')
 
-    def compress(self, quality=80, max_width=2000):
+    def compress(self, quality=80, max_width=2048):
         """
         Resize and save image to memory.
         Shortcut for resize() and save() except that it returns image as in-memory bytes
@@ -53,7 +53,7 @@ class Photo(ImageFile):
 
         return InMemoryUploadedFile(content, None, self.name, 'image/jpeg', content.tell, None)
 
-    def resize(self, max_width=2000):
+    def resize(self, max_width=2048):
         """
         Resize an image
 
