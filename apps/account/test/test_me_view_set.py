@@ -16,7 +16,11 @@ class TestMeViewSetGET(TestCase):
         :return:
         """
         # Create data
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
         user = account_models.User.objects.create_user(email='test@test.com', social_name='aeon', username='aov_hov')
+        user.gear = [gear_1, gear_2]
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -29,6 +33,7 @@ class TestMeViewSetGET(TestCase):
         result = request.data
 
         self.assertEquals(result['email'], user.email)
+        self.assertEquals(len(result['gear']), 2)
         self.assertEquals(result['social_name'], user.social_name)
         self.assertEquals(result['username'], user.username)
 
@@ -47,6 +52,10 @@ class TestMeViewSetPATCH(TestCase):
         user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
                                                        username='aov_hov')
 
+        # Gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
 
@@ -57,6 +66,7 @@ class TestMeViewSetPATCH(TestCase):
         payload = {
             'email': user.email,
             'age': 22,
+            'gear': [gear_1.id, gear_2.id],
             'username': user.username
         }
 
@@ -64,11 +74,13 @@ class TestMeViewSetPATCH(TestCase):
         result = request.data
 
         self.assertEquals(result['age'], 22)
+        self.assertEquals(len(result['gear']), 2)
 
         # Also check entry
         updated_user = account_models.User.objects.get(id=user.id)
 
         self.assertEquals(updated_user.age, 22)
+        self.assertEquals(len(updated_user.gear.all()), 2)
 
     def test_me_view_set_patch_avatar(self):
         """
@@ -101,7 +113,6 @@ class TestMeViewSetPATCH(TestCase):
             request = client.patch('/api/me', data=payload, format='multipart')
 
         result = request.data
-        print('RR', result)
 
         self.assertIsNotNone(result['avatar'])
 
@@ -110,6 +121,53 @@ class TestMeViewSetPATCH(TestCase):
 
         self.assertIsNotNone(updated_user.avatar)
         self.assertNotEqual(avatar, updated_user.avatar)
+
+    def test_me_view_set_patch_gear(self):
+        """
+        Test that we can update user's gear
+
+        :return: None
+        """
+        # Create data
+        user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
+                                                       username='aov_hov')
+        user.save()
+        user.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
+                     account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
+        user.save()
+
+        # Gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS Rebel T6')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='A7')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        payload = {
+            'gear': [gear_1.id, gear_2.id]
+        }
+
+        request = client.patch('/api/me', data=payload, format='json')
+        result = request.data
+
+        self.assertEquals(result['age'], 23)
+        self.assertEquals(len(result['gear']), 2)
+
+        # Gear
+        gear = account_models.Gear.objects.all()
+
+        self.assertEquals(len(gear), 4)
+
+        # Also check entry
+        updated_user = account_models.User.objects.get(id=user.id)
+
+        self.assertEquals(updated_user.age, 23)
+        self.assertEquals(len(updated_user.gear.all()), 2)
+        self.assertEquals(updated_user.gear.all()[0].id, gear_1.id)
 
     def test_me_view_set_patch_password(self):
         """

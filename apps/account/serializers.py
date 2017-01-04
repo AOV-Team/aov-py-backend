@@ -2,6 +2,13 @@ from apps.account import models
 from rest_framework import serializers
 
 
+class GearSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Gear
+        fields = ('id', 'item_make', 'item_model', 'link', 'public', 'reviewed',)
+        extra_kwargs = {'public': {'default': True, 'write_only': True}}
+
+
 class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
@@ -9,9 +16,11 @@ class UserPublicSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    gear = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Gear.objects.all(), required=False)
+
     class Meta:
         model = models.User
-        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'is_active', 'last_login', 'last_name',
+        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'gear', 'is_active', 'last_login', 'last_name',
                   'location', 'password', 'social_name', 'username')
         read_only_fields = ('last_login',)
         extra_kwargs = {'is_active': {'default': True, 'write_only': True}, 'password': {'write_only': True}}

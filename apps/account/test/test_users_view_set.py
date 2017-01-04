@@ -14,10 +14,14 @@ class TestUsersViewSetPOST(TestCase):
 
         :return: None
         """
+        # Create gear
+        gear = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+
         client = APIClient()
 
         payload = {
             'email': 'mr@mypapaya.io',
+            'gear': [gear.id],
             'password': 'WhoWantsToBeAMillionaire?',
             'username': 'aov_hov'
         }
@@ -27,10 +31,12 @@ class TestUsersViewSetPOST(TestCase):
 
         self.assertEquals(request.status_code, 201)
         self.assertIn('email', result)
+        self.assertEquals(len(result['gear']), 1)
         self.assertIn('username', result)
 
         user = account_models.User.objects.get(email='mr@mypapaya.io')
 
+        self.assertEquals(len(user.gear.all()), 1)
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_superuser)
 

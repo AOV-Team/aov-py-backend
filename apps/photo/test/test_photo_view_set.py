@@ -4,7 +4,6 @@ from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from django.conf import settings
-from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
 from django.test import override_settings, TestCase
 from os.path import getsize
@@ -26,9 +25,15 @@ class TestPhotoViewSetGET(TestCase):
         # Test data
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
+        # Create some gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
         photo1 = photo_models \
             .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
                    user=user)
+        photo1.save()
+        photo1.gear = [gear_1, gear_2]
         photo1.save()
 
         photo2 = photo_models \
@@ -47,6 +52,9 @@ class TestPhotoViewSetGET(TestCase):
 
         self.assertIn('next', request.data)
         self.assertEquals(len(results), 2)
+        self.assertEquals(len(results[0]['gear']), 0)
+        self.assertEquals(len(results[1]['gear']), 2)
+        self.assertEquals(results[1]['gear'][0], gear_1.id)
         self.assertEquals(results[1]['latitude'], 43.0)
         self.assertEquals(results[1]['longitude'], -116.0)
 
@@ -346,6 +354,10 @@ class TestPhotoViewSetPOST(TestCase):
         category = photo_models.PhotoClassification.objects\
             .create_or_update(name='Landscape', classification_type='category')
 
+        # Gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
 
@@ -356,6 +368,7 @@ class TestPhotoViewSetPOST(TestCase):
         with open(image, 'rb') as i:
             payload = {
                 'category': category.id,
+                'gear': [gear_1.id, gear_2.id],
                 'geo_location': 'POINT ({} {})'.format(-116.2023436, 43.6169233),
                 'image': i
             }
@@ -366,6 +379,7 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(result['category'][0], category.id)
         self.assertEquals(result['user'], user.id)
+        self.assertEquals(len(result['gear']), 2)
         self.assertEquals(result['latitude'], 43.6169233)
         self.assertEquals(result['longitude'], -116.2023436)
 
@@ -406,6 +420,52 @@ class TestPhotoViewSetPOST(TestCase):
         category = photo_models.PhotoClassification.objects \
             .create_or_update(name='Landscape', classification_type='category')
 
+        # Gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'gear': [gear_1.id, gear_2.id],
+                'image': i
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(len(result['gear']), 2)
+        self.assertEquals(result['user'], user.id)
+        self.assertNotIn('original_image_url', result)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
+
+    def test_photo_view_set_post_remote_no_gear_successful(self):
+        """
+        Test that we can save a photo w/out gear. Must save remotely.
+
+        :return: None
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
+
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        category = photo_models.PhotoClassification.objects \
+            .create_or_update(name='Landscape', classification_type='category')
+
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
 
@@ -424,6 +484,7 @@ class TestPhotoViewSetPOST(TestCase):
         result = request.data
 
         self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(len(result['gear']), 0)
         self.assertEquals(result['user'], user.id)
         self.assertNotIn('original_image_url', result)
 

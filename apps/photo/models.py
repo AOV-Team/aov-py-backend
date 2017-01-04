@@ -90,6 +90,7 @@ class PhotoFeed(models.Model):
 
 class Photo(geo_models.Model):
     category = models.ManyToManyField(PhotoClassification, related_name='category')
+    gear = models.ManyToManyField(account_models.Gear, blank=True)
     photo_feed = models.ManyToManyField(PhotoFeed, blank=True)
     tag = models.ManyToManyField(PhotoClassification, blank=True, related_name='tag')
     user = models.ForeignKey(account_models.User, blank=True, null=True)

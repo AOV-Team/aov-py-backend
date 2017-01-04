@@ -2,19 +2,12 @@
 AOV's Django backend.
 
 ## Getting Started
-1. Clone repo
-2. Set up a virtual environment with Python 3.5: `virtualenv --python=python3.5 {name}`
-3. Run `pip install -r requirements.txt`
-4. Run `./scripts/start.sh dev`
-5. Create a Postgres DB using credentials from `backend/settings/project_config.py
-6. Run `./manage.py migrate`
-7. Run `./manage.py createsuperuser`
-8. Run `./scripts/install_redis.sh`
-9. Run `./scripts/start.sh`
-10. Run `./manage.py runserver` in another terminal
-
-## Commands
-To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
+1. Make sure Vagrant is installed
+2. `cd` to project root
+3. Run `vagrant up` to create VM
+4. 'vagrant ssh' to access VM
+5. In SSH, `workon backend` to enable the virtual environment and go to project root
+6. Run `runserver` alias to start Django dev server and map to `http://localhost:8000`
 
 ## Endpoints
 ### `/api/auth`
@@ -51,6 +44,32 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
 }
 ```
 
+### `/api/gear`
+* GET
+* POST
+```javascript
+{
+    "item_make": "",
+    "item_model": "",
+    "link": "",  // only admins can add
+    "public": True/False,
+    "reviewed": True/False  // Only admins can add. Used to note that gear is legit
+}
+```
+
+### `/api/gear/{}`
+* GET
+* PATCH (only admins can use this endpoint)
+```javascript
+{
+    "item_make": "",
+    "item_model": "",
+    "link": "",
+    "public": True/False,
+    "reviewed": True/False
+}
+```
+
 ### `/api/me`
 * GET
 * PATCH
@@ -60,25 +79,12 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
     "avatar": "",
     "existing_password": "",  // Necessary to update password
     "first_name": "",
+    "gear": [##, ##],
     "last_name": "",
     "location": "",
     "password": "",
     "social_name": ""
 }
-```
-
-### `/api/me/gear`
-* DELETE
-* GET
-* PATCH
-```javascript
-[
-    {
-        "make": "",
-        "model": "",
-        "link": ""  // Needs to be the same as the link retrieved with GET otherwise request will fail
-    }
-]
 ```
 
 ### `/api/me/profile`
@@ -107,6 +113,7 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
     "avatar": "",
     "email": "",
     "first_name": "",
+    "gear": [##, ##],
     "last_name": "",
     "location": "",
     "password": "",
@@ -153,6 +160,7 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
     "tag": __,
     "user": __,
     "attribution_name": "",
+    "gear": [##, ##],
     "geo_location": "POINT (long lat)",
     "image": [file],
     "location": ""
@@ -166,6 +174,7 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
 ```javascript
 {
     "category": __,
+    "gear": [##, ##],
     "tag": __,
     "attribution_name": "",
     "location": ""

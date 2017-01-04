@@ -5,7 +5,7 @@ from apps.account import tasks as account_tasks
 from apps.common import models as common_models
 from apps.common.mailer import send_transactional_email
 from apps.common.exceptions import ForbiddenValue, OverLimitException
-from apps.common.views import get_default_response, remove_pks_from_payload
+from apps.common.views import get_default_response, MediumResultsSetPagination, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -161,6 +161,111 @@ class AuthenticateResetViewSet(APIView):
                 send_transactional_email(user, 'password-reset-code', password_reset_code=code)
             except ObjectDoesNotExist:
                 pass
+
+        return response
+
+
+class GearSingleViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = MediumResultsSetPagination
+    serializer_class = account_serializers.GearSerializer
+
+    def get_queryset(self):
+        """
+        Return public gear
+
+        :return: QuerySet
+        """
+        return account_models.Gear.objects.filter(public=True)
+
+    def patch(self, request, **kwargs):
+        """
+        Update gear
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
+        payload = request.data
+        gear_id = kwargs.get('pk', None)
+        response = get_default_response('400')
+
+        # Only admins can edit gear
+        if not authenticated_user.is_admin:
+            response = get_default_response('403')
+            response.data['message'] = 'Only admins can edit gear'
+            return response
+
+        try:
+            # Get existing gear
+            gear = account_models.Gear.objects.get(id=gear_id)
+            serializer = account_serializers.GearSerializer(data=payload, partial=True)
+
+            if serializer.is_valid():
+                serializer.update(gear, serializer.validated_data)
+
+                response = get_default_response('200')
+                response.data = account_serializers.GearSerializer(account_models.Gear.objects.get(id=gear_id)).data
+            else:
+                raise ValidationError(serializer.errors)
+        except ObjectDoesNotExist:
+            response = get_default_response('404')
+
+        return response
+
+
+class GearViewSet(generics.ListCreateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = MediumResultsSetPagination
+    serializer_class = account_serializers.GearSerializer
+
+    def get_queryset(self):
+        """
+        Query for gear
+
+        :return: QuerySet
+        """
+        return account_models.Gear.objects.filter(public=True)
+
+    def post(self, request):
+        """
+        Create a gear entry
+
+        :param request: Request object
+        :return: Response object
+        """
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
+        payload = request.data
+        response = get_default_response('400')
+
+        if 'item_make' in payload and 'item_model' in payload:
+            # Only admins can add links or set reviewed=True
+            if ('link' in payload or 'reviewed' in payload) and not authenticated_user.is_admin:
+                raise PermissionDenied('You must be an admin to set "link" or "reviewed"')
+
+            # Check if existing
+            existing = account_models.Gear.objects\
+                .filter(item_make=payload['item_make'], item_model=payload['item_model']).first()
+
+            if existing:
+                response = get_default_response('409')
+                response.data['message'] = 'Gear already exists. Use PATCH to update.'
+                return response
+
+            serializer = account_serializers.GearSerializer(data=payload)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                response = get_default_response('201')
+                response.data = serializer.data
+            else:
+                raise ValidationError(serializer.errors)
 
         return response
 
