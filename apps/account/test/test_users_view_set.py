@@ -15,7 +15,7 @@ class TestUsersViewSetPOST(TestCase):
         :return: None
         """
         # Create gear
-        gear = account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II')
+        gear = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
 
         client = APIClient()
 

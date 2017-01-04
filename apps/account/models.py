@@ -16,7 +16,7 @@ class GearManager(models.Manager):
         :return: instance of Gear
         """
         new_gear = Gear(**kwargs)
-        existing = Gear.objects.filter(make=new_gear.make, model=new_gear.model).first()
+        existing = Gear.objects.filter(item_make=new_gear.item_make, item_model=new_gear.item_model).first()
 
         if existing:
             new_gear.pk = existing.pk
@@ -27,9 +27,9 @@ class GearManager(models.Manager):
 
 
 class Gear(models.Model):
+    item_make = models.TextField(max_length=128)
+    item_model = models.TextField(max_length=128)
     link = models.URLField(blank=True, null=True)
-    make = models.TextField(max_length=128)
-    model = models.TextField(max_length=128)
     public = models.BooleanField(default=True)
     reviewed = models.BooleanField(default=False)  # Set to true if added/approved by AOV
 
@@ -37,7 +37,7 @@ class Gear(models.Model):
 
     @property
     def name(self):
-        return '{} {}'.format(self.make, self.model)
+        return '{} {}'.format(self.item_make, self.item_model)
 
     def __str__(self):
         """
@@ -48,7 +48,7 @@ class Gear(models.Model):
 
     class Meta:
         default_permissions = ('add', 'change', 'delete', 'view')
-        ordering = ('make', 'model',)
+        ordering = ('item_make', 'item_model',)
         verbose_name_plural = 'gear'
 
 

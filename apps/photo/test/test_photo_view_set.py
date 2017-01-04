@@ -26,8 +26,8 @@ class TestPhotoViewSetGET(TestCase):
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
         # Create some gear
-        gear_1 = account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
         photo1 = photo_models \
             .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
@@ -355,8 +355,8 @@ class TestPhotoViewSetPOST(TestCase):
             .create_or_update(name='Landscape', classification_type='category')
 
         # Gear
-        gear_1 = account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -421,8 +421,8 @@ class TestPhotoViewSetPOST(TestCase):
             .create_or_update(name='Landscape', classification_type='category')
 
         # Gear
-        gear_1 = account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)

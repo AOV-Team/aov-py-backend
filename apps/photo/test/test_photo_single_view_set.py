@@ -87,8 +87,8 @@ class TestPhotoSingleViewSetGET(TestCase):
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.gear = [account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II'),
-                      account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')]
+        photo.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
+                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
         photo.save()
 
         # Simulate auth
@@ -176,8 +176,8 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         photo.save()
 
         # Create some gear
-        gear_1 = account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -308,13 +308,13 @@ class TestPhotoSingleViewSetPATCH(TestCase):
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
         photo.category = [category]
-        photo.gear = [account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II'),
-                      account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')]
+        photo.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
+                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
         photo.save()
 
         # Create some gear
-        gear_1 = account_models.Gear.objects.create_or_update(make='Canon', model='EOS 10D')
-        gear_2 = account_models.Gear.objects.create_or_update(make='Sony', model='A99V')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 10D')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='A99V')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)

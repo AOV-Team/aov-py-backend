@@ -16,8 +16,8 @@ class TestMeViewSetGET(TestCase):
         :return:
         """
         # Create data
-        gear_1 = account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
         user = account_models.User.objects.create_user(email='test@test.com', social_name='aeon', username='aov_hov')
         user.gear = [gear_1, gear_2]
@@ -53,8 +53,8 @@ class TestMeViewSetPATCH(TestCase):
                                                        username='aov_hov')
 
         # Gear
-        gear_1 = account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -113,7 +113,6 @@ class TestMeViewSetPATCH(TestCase):
             request = client.patch('/api/me', data=payload, format='multipart')
 
         result = request.data
-        print('RR', result)
 
         self.assertIsNotNone(result['avatar'])
 
@@ -133,13 +132,13 @@ class TestMeViewSetPATCH(TestCase):
         user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
                                                        username='aov_hov')
         user.save()
-        user.gear = [account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II'),
-                     account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')]
+        user.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
+                     account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
         user.save()
 
         # Gear
-        gear_1 = account_models.Gear.objects.create_or_update(make='Canon', model='EOS Rebel T6')
-        gear_2 = account_models.Gear.objects.create_or_update(make='Sony', model='A7')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS Rebel T6')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='A7')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)

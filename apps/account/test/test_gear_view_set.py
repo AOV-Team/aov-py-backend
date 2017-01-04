@@ -15,8 +15,9 @@ class TestGearViewSetGET(TestCase):
         :return: None
         """
         # Create test data
-        account_models.Gear.objects.create_or_update(link='http://site.com/canon', make='Canon', model='EOS 5D Mark II')
-        account_models.Gear.objects.create_or_update(make='Sony', model='a99 II', reviewed=True)
+        account_models.Gear.objects.create_or_update(link='http://site.com/canon', item_make='Canon',
+                                                     item_model='EOS 5D Mark II')
+        account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II', reviewed=True)
 
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
@@ -34,12 +35,12 @@ class TestGearViewSetGET(TestCase):
         self.assertEquals(len(results), 2)
 
         self.assertIsNotNone(results[0]['link'])
-        self.assertEquals(results[0]['make'], 'Canon')
-        self.assertEquals(results[0]['model'], 'EOS 5D Mark II')
+        self.assertEquals(results[0]['item_make'], 'Canon')
+        self.assertEquals(results[0]['item_model'], 'EOS 5D Mark II')
         self.assertFalse(results[0]['reviewed'])
 
         self.assertIsNone(results[1]['link'])
-        self.assertEquals(results[1]['make'], 'Sony')
+        self.assertEquals(results[1]['item_make'], 'Sony')
         self.assertTrue(results[1]['reviewed'])
 
     def test_gear_view_set_get_public(self):
@@ -49,9 +50,9 @@ class TestGearViewSetGET(TestCase):
         :return: None
         """
         # Create test data
-        account_models.Gear.objects.create_or_update(make='Canon', model='EOS 5D Mark II')
-        account_models.Gear.objects.create_or_update(make='Sony', model='a99 II')
-        account_models.Gear.objects.create_or_update(make='Sony', model='A7', public=False)
+        account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+        account_models.Gear.objects.create_or_update(item_make='Sony', item_model='A7', public=False)
 
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
@@ -95,15 +96,15 @@ class TestGearViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
-            'make': 'Canon',
-            'model': 'EOS 5D Mark II'
+            'item_make': 'Canon',
+            'item_model': 'EOS 5D Mark II'
         }
 
         request = client.post('/api/gear', data=payload)
         result = request.data
 
-        self.assertEquals(result['make'], 'Canon')
-        self.assertEquals(result['model'], 'EOS 5D Mark II')
+        self.assertEquals(result['item_make'], 'Canon')
+        self.assertEquals(result['item_model'], 'EOS 5D Mark II')
         self.assertNotIn('public', result)
         self.assertFalse(result['reviewed'])
 
@@ -115,8 +116,8 @@ class TestGearViewSetPOST(TestCase):
         gear = gear.first()
 
         self.assertIsNone(gear.link)
-        self.assertEquals(gear.make, 'Canon')
-        self.assertEquals(gear.model, 'EOS 5D Mark II')
+        self.assertEquals(gear.item_make, 'Canon')
+        self.assertEquals(gear.item_model, 'EOS 5D Mark II')
         self.assertTrue(gear.public)
         self.assertFalse(gear.reviewed)
 
@@ -139,15 +140,15 @@ class TestGearViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
-            'make': 'Canon',
-            'model': 'EOS 5D Mark II'
+            'item_make': 'Canon',
+            'item_model': 'EOS 5D Mark II'
         }
 
         request = client.post('/api/gear', data=payload)
         result = request.data
 
-        self.assertEquals(result['make'], 'Canon')
-        self.assertEquals(result['model'], 'EOS 5D Mark II')
+        self.assertEquals(result['item_make'], 'Canon')
+        self.assertEquals(result['item_model'], 'EOS 5D Mark II')
         self.assertNotIn('public', result)
         self.assertFalse(result['reviewed'])
 
@@ -159,8 +160,8 @@ class TestGearViewSetPOST(TestCase):
         gear = gear.first()
 
         self.assertIsNone(gear.link)
-        self.assertEquals(gear.make, 'Canon')
-        self.assertEquals(gear.model, 'EOS 5D Mark II')
+        self.assertEquals(gear.item_make, 'Canon')
+        self.assertEquals(gear.item_model, 'EOS 5D Mark II')
         self.assertTrue(gear.public)
         self.assertFalse(gear.reviewed)
 
@@ -171,7 +172,8 @@ class TestGearViewSetPOST(TestCase):
         :return: None
         """
         # Create test data
-        account_models.Gear.objects.create_or_update(link='http://site.com/canon', make='Canon', model='EOS 5D Mark II')
+        account_models.Gear.objects.create_or_update(link='http://site.com/canon', item_make='Canon',
+                                                     item_model='EOS 5D Mark II')
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
         user.is_admin = True
         user.save()
@@ -184,8 +186,8 @@ class TestGearViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
-            'make': 'Canon',
-            'model': 'EOS 5D Mark II',
+            'item_make': 'Canon',
+            'item_model': 'EOS 5D Mark II',
             'reviewed': True
         }
 
@@ -216,7 +218,7 @@ class TestGearViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
-            'make': 'Canon',
+            'item_make': 'Canon',
         }
 
         request = client.post('/api/gear', data=payload)
@@ -248,16 +250,16 @@ class TestGearViewSetPOST(TestCase):
 
         payload = {
             'link': 'https://test.com/canon',
-            'make': 'Canon',
-            'model': 'EOS 5D Mark II'
+            'item_make': 'Canon',
+            'item_model': 'EOS 5D Mark II'
         }
 
         request = client.post('/api/gear', data=payload)
         result = request.data
 
         self.assertIsNotNone(result['link'])
-        self.assertEquals(result['make'], 'Canon')
-        self.assertEquals(result['model'], 'EOS 5D Mark II')
+        self.assertEquals(result['item_make'], 'Canon')
+        self.assertEquals(result['item_model'], 'EOS 5D Mark II')
         self.assertNotIn('public', result)
         self.assertFalse(result['reviewed'])
 
@@ -269,8 +271,8 @@ class TestGearViewSetPOST(TestCase):
         gear = gear.first()
 
         self.assertIsNotNone(gear.link)
-        self.assertEquals(gear.make, 'Canon')
-        self.assertEquals(gear.model, 'EOS 5D Mark II')
+        self.assertEquals(gear.item_make, 'Canon')
+        self.assertEquals(gear.item_model, 'EOS 5D Mark II')
         self.assertTrue(gear.public)
         self.assertFalse(gear.reviewed)
 
@@ -292,8 +294,8 @@ class TestGearViewSetPOST(TestCase):
 
         payload = {
             'link': 'https://test.com/canon',
-            'make': 'Canon',
-            'model': 'EOS 5D Mark II'
+            'item_make': 'Canon',
+            'item_model': 'EOS 5D Mark II'
         }
 
         request = client.post('/api/gear', data=payload)
@@ -322,8 +324,8 @@ class TestGearViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
-            'make': 'Canon',
-            'model': 'EOS 5D Mark II',
+            'item_make': 'Canon',
+            'item_model': 'EOS 5D Mark II',
             'public': False
         }
 
@@ -331,8 +333,8 @@ class TestGearViewSetPOST(TestCase):
         result = request.data
 
         self.assertIsNone(result['link'])
-        self.assertEquals(result['make'], 'Canon')
-        self.assertEquals(result['model'], 'EOS 5D Mark II')
+        self.assertEquals(result['item_make'], 'Canon')
+        self.assertEquals(result['item_model'], 'EOS 5D Mark II')
         self.assertNotIn('public', result)
         self.assertFalse(result['reviewed'])
 
@@ -344,8 +346,8 @@ class TestGearViewSetPOST(TestCase):
         gear = gear.first()
 
         self.assertIsNone(gear.link)
-        self.assertEquals(gear.make, 'Canon')
-        self.assertEquals(gear.model, 'EOS 5D Mark II')
+        self.assertEquals(gear.item_make, 'Canon')
+        self.assertEquals(gear.item_model, 'EOS 5D Mark II')
         self.assertFalse(gear.public)
         self.assertFalse(gear.reviewed)
 
@@ -373,8 +375,8 @@ class TestGearViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
-            'make': 'Canon',
-            'model': 'EOS 5D Mark II',
+            'item_make': 'Canon',
+            'item_model': 'EOS 5D Mark II',
             'reviewed': True
         }
 
@@ -382,8 +384,8 @@ class TestGearViewSetPOST(TestCase):
         result = request.data
 
         self.assertIsNone(result['link'])
-        self.assertEquals(result['make'], 'Canon')
-        self.assertEquals(result['model'], 'EOS 5D Mark II')
+        self.assertEquals(result['item_make'], 'Canon')
+        self.assertEquals(result['item_model'], 'EOS 5D Mark II')
         self.assertNotIn('public', result)
         self.assertTrue(result['reviewed'])
 
@@ -395,8 +397,8 @@ class TestGearViewSetPOST(TestCase):
         gear = gear.first()
 
         self.assertIsNone(gear.link)
-        self.assertEquals(gear.make, 'Canon')
-        self.assertEquals(gear.model, 'EOS 5D Mark II')
+        self.assertEquals(gear.item_make, 'Canon')
+        self.assertEquals(gear.item_model, 'EOS 5D Mark II')
         self.assertTrue(gear.public)
         self.assertTrue(gear.reviewed)
 
@@ -417,8 +419,8 @@ class TestGearViewSetPOST(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
-            'make': 'Canon',
-            'model': 'EOS 5D Mark II',
+            'item_make': 'Canon',
+            'item_model': 'EOS 5D Mark II',
             'reviewed': True
         }
 

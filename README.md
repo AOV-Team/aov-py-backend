@@ -51,6 +51,32 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
 }
 ```
 
+### `/api/gear`
+* GET
+* POST
+```javascript
+{
+    "item_make": "",
+    "item_model": "",
+    "link": "",  // only admins can add
+    "public": True/False,
+    "reviewed": True/False  // Only admins can add. Used to note that gear is legit
+}
+```
+
+### `/api/gear/{}`
+* GET
+* PATCH (only admins can use this endpoint)
+```javascript
+{
+    "item_make": "",
+    "item_model": "",
+    "link": "",
+    "public": True/False,
+    "reviewed": True/False
+}
+```
+
 ### `/api/me`
 * GET
 * PATCH
@@ -60,25 +86,12 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
     "avatar": "",
     "existing_password": "",  // Necessary to update password
     "first_name": "",
+    "gear": [##, ##],
     "last_name": "",
     "location": "",
     "password": "",
     "social_name": ""
 }
-```
-
-### `/api/me/gear`
-* DELETE
-* GET
-* PATCH
-```javascript
-[
-    {
-        "make": "",
-        "model": "",
-        "link": ""  // Needs to be the same as the link retrieved with GET otherwise request will fail
-    }
-]
 ```
 
 ### `/api/me/profile`
@@ -107,6 +120,7 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
     "avatar": "",
     "email": "",
     "first_name": "",
+    "gear": [##, ##],
     "last_name": "",
     "location": "",
     "password": "",
@@ -153,6 +167,7 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
     "tag": __,
     "user": __,
     "attribution_name": "",
+    "gear": [##, ##],
     "geo_location": "POINT (long lat)",
     "image": [file],
     "location": ""
@@ -166,6 +181,7 @@ To create the Django config file: `./scripts/setup.sh {dev|staging|production}`
 ```javascript
 {
     "category": __,
+    "gear": [##, ##],
     "tag": __,
     "attribution_name": "",
     "location": ""
