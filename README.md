@@ -1,11 +1,12 @@
 # AOV Backend
-AOV's Django backend.
+AOV's Django backend. Uses Python 3.5.2 and PostgreSQL w/ PostGIS extension. This project is Vagrant-compatible to
+ensure a consistent dev environment that more closely mimics the production environment.
 
 ## Getting Started
 1. Make sure Vagrant is installed
 2. `cd` to project root
 3. Run `vagrant up` to create VM
-4. 'vagrant ssh' to access VM
+4. `vagrant ssh` to access VM
 5. In SSH, `workon backend` to enable the virtual environment and go to project root
 6. Run `runserver` alias to start Django dev server and map to `http://localhost:8000`
 
