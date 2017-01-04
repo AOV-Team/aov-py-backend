@@ -179,6 +179,43 @@ class GearViewSet(generics.ListCreateAPIView):
         """
         return account_models.Gear.objects.filter(public=True)
 
+    def post(self, request):
+        """
+        Create a gear entry
+
+        :param request: Request object
+        :return: Response object
+        """
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
+        payload = request.data
+        response = get_default_response('400')
+
+        if 'make' in payload and 'model' in payload:
+            # Only admins can add links or set reviewed=True
+            if ('link' in payload or 'reviewed' in payload) and not authenticated_user.is_admin:
+                raise PermissionDenied('You must be an admin to set "link" or "reviewed"')
+
+            # Check if existing
+            existing = account_models.Gear.objects.filter(make=payload['make'], model=payload['model']).first()
+
+            if existing:
+                response = get_default_response('409')
+                response.data['message'] = 'Gear already exists. Use PATCH to update.'
+                return response
+
+            serializer = account_serializers.GearSerializer(data=payload)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                response = get_default_response('201')
+                response.data = serializer.data
+            else:
+                raise ValidationError(serializer.errors)
+
+        return response
+
 
 class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
     """

@@ -5,9 +5,8 @@ from rest_framework import serializers
 class GearSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Gear
-        fields = ('id', 'link', 'make', 'model', 'reviewed')
+        fields = ('id', 'link', 'make', 'model', 'public', 'reviewed',)
         extra_kwargs = {'public': {'default': True, 'write_only': True}}
-        read_only_fields = ('link', 'reviewed',)
 
 
 class UserPublicSerializer(serializers.ModelSerializer):
