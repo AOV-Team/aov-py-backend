@@ -6,7 +6,7 @@
     </ul>
 </div>
 {% for photo in module.children %}
-    <img style="box-sizing: border-box; width: 25%; height: 100px; padding: 5px; float: left;" src="{{ photo.url }}">
+    <img style="box-sizing: border-box; width: 25%; height: 100px; padding: 5px; float: left;" src="{{ photo.url_small }}">
 {% empty %}
     <ul>
         <li>

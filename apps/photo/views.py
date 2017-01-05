@@ -32,6 +32,7 @@ def photo_admin(request):
     date = request.GET.get('date')
     feed = request.GET.get('feed')
     g = request.GET.get('g')
+    i = request.GET.get('i')
     q = request.GET.get('q')
     u = request.GET.get('u')
 
@@ -67,6 +68,10 @@ def photo_admin(request):
         for g in gear:
             photos = photos | photo_models.Photo.objects.filter(gear=g)
 
+    if i:
+        # ID
+        photos = photo_models.Photo.objects.filter(pk=i)
+
     if q or u:
         # Search for a tag
         if q:
@@ -93,7 +98,7 @@ def photo_admin(request):
                 photos = photos | photo_models.Photo.objects.filter(user=user)
 
     # Default query
-    if not category and not date and not feed and not g and not q and not u:
+    if not category and not date and not feed and not g and not i and not q and not u:
         # Build search attributes for photo
         search = {
             'public': True

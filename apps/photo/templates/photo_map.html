@@ -152,9 +152,11 @@
         + data.longitude
         + ' LNG, '
         + data.latitude
-        + ' LAT)</span></div>';
+        + ' LAT)</span>'
+        + '<span><a target="_blank" href="/admin/photos/?i=' + data.id + '#details"><span class="icon-book"></span> See Photo</a>'
+        + '</span></div>';
 
-      i.css('background', '#fcfcfc url(' + data.image + ') center center / cover no-repeat');
+      i.css('background', '#fcfcfc url(' + data.image_small + ') center center / cover no-repeat');
       i.html(content);
       i.show();
     });

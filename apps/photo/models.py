@@ -134,7 +134,7 @@ class Photo(geo_models.Model):
 
         :return: String with HTML content
         """
-        return mark_safe(u'<img style="width: 100px;" src="{}{}">'.format(settings.MEDIA_URL, self.image))
+        return mark_safe(u'<img style="width: 100px;" src="{}">'.format(self.url_small))
 
     @property
     def url(self):
@@ -144,6 +144,15 @@ class Photo(geo_models.Model):
         :return: Remote URL
         """
         return '{}{}'.format(settings.MEDIA_URL, self.image)
+
+    @property
+    def url_small(self):
+        """
+        Image remote URL (small version)
+
+        :return: Remote URL
+        """
+        return '{}{}'.format(settings.MEDIA_URL, self.image_small)
 
     def __str__(self):
         return '{}:\t{},\tID: {}'\

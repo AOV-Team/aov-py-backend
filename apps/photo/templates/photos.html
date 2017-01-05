@@ -21,6 +21,18 @@
 
 <script>
 $( document ).ready(function() {
+    // Open modal
+    if (window.location.hash){
+        var hash = window.location.hash.substring(1);
+
+        if (hash == 'details'){
+            var toggleParent = $('.modal-toggle').parent();
+
+            toggleParent.siblings('.overlay').show();
+            toggleParent.siblings('.feeds-modal').show();
+        }
+    }
+
     // Date picker setup
     $('#datesearchbar').dateRangePicker({
         separator: ' - '
@@ -126,7 +138,7 @@ $( document ).ready(function() {
             <div class="img-wrapper">
                 <a class="modal-toggle"
                    title="{{ photo.user.username }} / IG: {{ photo.user.social_name }} | {{ photo.location }}">
-                    <img src="{{ media_url }}{{ photo.image }}">
+                    <img src="{{ media_url }}{{ photo.image_small }}">
                 </a>
             </div>
             <div class="overlay"></div>
@@ -171,7 +183,7 @@ $( document ).ready(function() {
                         </p>
                     </div>
                     <div class="pure-u-1 pure-u-md-3-5">
-                        <img src="{{ media_url }}{{ photo.image }}">
+                        <img src="{{ media_url }}{{ photo.image_medium }}">
                     </div>
                     <div class="pure-u-1">
                         {% for tag in photo.photo_tag_names %}
