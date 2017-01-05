@@ -7,7 +7,7 @@ sudo apt-get update > /dev/null 2>&1
 sudo apt-get install python3.5 -y > /dev/null 2>&1
 
 sudo apt-get install python3-pip python3.5-dev libffi-dev libpq-dev \
-nginx git python-virtualenv libjpeg8 libjpeg62-dev libfreetype6 \
+nginx python-virtualenv libjpeg8 libjpeg62-dev libfreetype6 \
 libfreetype6-dev build-essential binutils libproj-dev gdal-bin -y > /dev/null 2>&1
 
 sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 -y > /dev/null 2>&1

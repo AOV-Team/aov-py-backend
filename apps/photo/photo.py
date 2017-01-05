@@ -4,6 +4,7 @@ from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from io import BufferedReader, BytesIO
 from PIL import Image as PillowImage
+from PIL import ImageFilter
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
@@ -35,7 +36,7 @@ class Photo(ImageFile):
         else:
             raise TypeError('File object not instance of BufferedReader, InMemoryUploadedFile or TemporaryUploadedFile')
 
-    def compress(self, quality=80, max_width=2000):
+    def compress(self, quality=80, max_width=2048):
         """
         Resize and save image to memory.
         Shortcut for resize() and save() except that it returns image as in-memory bytes
@@ -52,7 +53,7 @@ class Photo(ImageFile):
 
         return InMemoryUploadedFile(content, None, self.name, 'image/jpeg', content.tell, None)
 
-    def resize(self, max_width=2000):
+    def resize(self, max_width=2048):
         """
         Resize an image
 
@@ -61,9 +62,7 @@ class Photo(ImageFile):
         """
         # Resize if larger than max
         if self.pillow_image.size[0] > max_width:
-            img_ratio = self.pillow_image.size[0] / float(self.pillow_image.size[1])
-            new_height = int(max_width / img_ratio)
-            self.pillow_image = self.pillow_image.resize((max_width, new_height), PillowImage.ANTIALIAS)
+            return WidthResize(max_width).process(self.pillow_image)
 
         return self.pillow_image
 
@@ -93,3 +92,39 @@ class Photo(ImageFile):
             self.pillow_image.save(full_filename, format='JPEG', quality=quality)
 
             return full_filename
+
+
+class WidthResize(object):
+    """
+    Resize an image by setting the width and then calculating the height needed to maintain proportions
+    """
+    def __init__(self, width, upscale=False):
+        self.width = width
+        self.upscale = upscale
+
+    def process(self, img):
+        """
+        Resize an image
+
+        :param img: instance of Image to resize
+        :return: resized Image
+        """
+        # Resize if larger than max
+        if img.size[0] > self.width or self.upscale:
+            img_ratio = img.size[0] / float(img.size[1])
+            new_height = int(self.width / img_ratio)
+            img = img.resize((self.width, new_height), PillowImage.ANTIALIAS)
+
+        return img
+
+
+class BlurResize(WidthResize):
+    """
+    Blur and resize an image
+    """
+    def __init__(self, width=300, upscale=False):
+        super(BlurResize, self).__init__(width, upscale)
+
+    def process(self, img):
+        img = super(BlurResize, self).process(img)
+        return img.filter(ImageFilter.GaussianBlur(radius=5))

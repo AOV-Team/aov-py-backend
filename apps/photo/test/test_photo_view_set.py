@@ -338,6 +338,9 @@ class TestPhotoViewSetPOST(TestCase):
     """
     Test POST api/photos
     """
+    def tearDown(self):
+        test_helpers.clear_directory('backend/media/', '*.jpg')
+
     @override_settings(REMOTE_IMAGE_STORAGE=False,
                        DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_view_set_post_successful(self):
@@ -486,6 +489,9 @@ class TestPhotoViewSetPOST(TestCase):
         self.assertEquals(result['category'][0], category.id)
         self.assertEquals(len(result['gear']), 0)
         self.assertEquals(result['user'], user.id)
+        self.assertIn('image_blurred', result)
+        self.assertIn('image_medium', result)
+        self.assertIn('image_small', result)
         self.assertNotIn('original_image_url', result)
 
         # Query for entry
@@ -493,6 +499,7 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(len(photos), 1)
         self.assertTrue(photos[0].public)
+        self.assertIsNotNone(photos[0].original_image_url)
 
     @override_settings(REMOTE_IMAGE_STORAGE=False,
                        DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')

@@ -1,5 +1,4 @@
 from apps.account import models as account_models
-from apps.account import serializers as account_serializers
 from apps.photo import models
 from rest_framework import serializers
 import re
@@ -21,6 +20,9 @@ class PhotoSerializer(serializers.ModelSerializer):
     dimensions = serializers.SerializerMethodField()
     gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
+    image_blurred = serializers.ImageField(required=False)
+    image_medium = serializers.ImageField(required=False)
+    image_small = serializers.ImageField(required=False)
 
     def get_dimensions(self, obj):
         """
@@ -42,9 +44,10 @@ class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Photo
         fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
-                  'latitude', 'location', 'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed')
+                  'image_blurred', 'image_medium', 'image_small', 'latitude', 'location', 'longitude',
+                  'original_image_url', 'photo_data', 'public', 'photo_feed')
         extra_kwargs = {'original_image_url':  {'write_only': True},
                         'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
-        read_only_fields = ('photo_data',)
+        read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'photo_data',)

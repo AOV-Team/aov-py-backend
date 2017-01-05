@@ -308,13 +308,13 @@ class TestPhotoSingleViewSetPATCH(TestCase):
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
         photo.category = [category]
-        photo.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
-                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
+        photo.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II Test'),
+                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II Test')]
         photo.save()
 
         # Create some gear
-        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 10D')
-        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='A99V')
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 10D Test')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='A99V Test')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -339,7 +339,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         # Query for gear
         gear = account_models.Gear.objects.all()
 
-        self.assertEquals(len(gear), 4)
+        self.assertEquals(len(gear), 90)  # 86 created by fixture
 
         # Query for entry
         photos = photo_models.Photo.objects.filter(id=photo.id)

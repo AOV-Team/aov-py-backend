@@ -13,7 +13,7 @@ class TestGearSingleViewSetGET(TestCase):
         """
         # Create test data
         gear = account_models.Gear.objects\
-            .create_or_update(link='http://site.com/canon', item_make='Canon', item_model='EOS 5D Mark II')
+            .create_or_update(link='http://site.com/canon', item_make='Canon', item_model='EOS 5D Mark II Test')
 
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
@@ -36,9 +36,9 @@ class TestGearSingleViewSetGET(TestCase):
         # Query DB
         db_gear = account_models.Gear.objects.all()
 
-        self.assertEquals(len(db_gear), 1)
+        self.assertEquals(len(db_gear), 87)  # 86 created by fixture
 
-        db_gear = db_gear.first()
+        db_gear = db_gear.get(item_make='Canon', item_model='EOS 5D Mark II Test')
 
         self.assertEquals(db_gear.id, gear.id)
 
@@ -99,7 +99,7 @@ class TestGearSingleViewSetPATCH(TestCase):
         """
         # Create test data
         gear = account_models.Gear.objects \
-            .create_or_update(link='http://site.com/canon', item_make='Canon', item_model='EOS 5D Mark II')
+            .create_or_update(link='http://site.com/canon', item_make='Canon', item_model='EOS 5D Mark II Test')
 
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
         user.is_admin = True
@@ -129,9 +129,9 @@ class TestGearSingleViewSetPATCH(TestCase):
         # Query DB
         db_gear = account_models.Gear.objects.all()
 
-        self.assertEquals(len(db_gear), 1)
+        self.assertEquals(len(db_gear), 87)  # 86 created by fixture
 
-        db_gear = db_gear.first()
+        db_gear = db_gear.get(item_make='Canon', item_model='EOS 5D Mark II Test')
 
         self.assertEquals(db_gear.id, gear.id)
         self.assertEquals(db_gear.link, 'http://amazon.com/canon')
@@ -170,7 +170,7 @@ class TestGearSingleViewSetPATCH(TestCase):
         """
         # Create test data
         gear = account_models.Gear.objects \
-            .create_or_update(link='http://site.com/canon', item_make='Canon', item_model='EOS 5D Mark II')
+            .create_or_update(link='http://site.com/canon', item_make='Canon', item_model='EOS 5D Mark II Test')
 
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
         user.is_admin = True
@@ -196,14 +196,12 @@ class TestGearSingleViewSetPATCH(TestCase):
         # Query DB
         db_gear = account_models.Gear.objects.all()
 
-        self.assertEquals(len(db_gear), 1)
+        self.assertEquals(len(db_gear), 87)  # 86 created by fixture
 
-        db_gear = db_gear.first()
+        db_gear = db_gear.get(item_make='Canon', item_model='EOS 5D Mark II Test')
 
         self.assertEquals(db_gear.id, gear.id)
         self.assertEquals(db_gear.link, 'http://site.com/canon')
-        self.assertEquals(db_gear.item_make, 'Canon')
-        self.assertEquals(db_gear.item_model, 'EOS 5D Mark II')
         self.assertTrue(db_gear.public)
         self.assertFalse(db_gear.reviewed)
 
@@ -215,7 +213,7 @@ class TestGearSingleViewSetPATCH(TestCase):
         """
         # Create test data
         gear = account_models.Gear.objects \
-            .create_or_update(link='http://site.com/canon', item_make='Canon', item_model='EOS 5D Mark II')
+            .create_or_update(link='http://site.com/canon', item_make='Canon', item_model='EOS 5D Mark II Test')
 
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
@@ -238,9 +236,9 @@ class TestGearSingleViewSetPATCH(TestCase):
         # Query DB
         db_gear = account_models.Gear.objects.all()
 
-        self.assertEquals(len(db_gear), 1)
+        self.assertEquals(len(db_gear), 87)  # 86 created by fixture
 
-        db_gear = db_gear.first()
+        db_gear = db_gear.get(item_make='Canon', item_model='EOS 5D Mark II Test')
 
         self.assertEquals(db_gear.id, gear.id)
         self.assertEquals(db_gear.link, gear.link)
