@@ -41,21 +41,15 @@ class StarredUserAdmin(admin.ModelAdmin):
     search_fields = ('age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name',)
 
     def get_queryset(self, request):
-        queryset = super(StarredUserAdmin, self).get_queryset(request).annotate(Count('photo'))
-        starred_users = list()
-        user_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+        queryset = models.User.objects.none()
 
-        if user_type:
-            for q in queryset:
-                interest = models.UserInterest.objects \
-                    .filter(user=request.user, interest_type='star', content_type__pk=user_type.id, object_id=q.id)
+        user_type = ContentType.objects.get_for_model(models.User)
+        interests = models.UserInterest.objects.filter(user=request.user, interest_type='star', content_type=user_type)
 
-                if len(interest) > 0:
-                    starred_users.append(q.id)
+        for i in interests:
+            queryset = queryset | models.User.objects.filter(id=i.object_id)
 
-            return queryset.filter(id__in=starred_users)
-        else:
-            return queryset
+        return queryset.annotate(Count('photo'))
 
     def has_add_permission(self, request):
         return False
@@ -101,35 +95,25 @@ class StarUserFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'yes':
-            starred_users = list()
-            user_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+            q = models.User.objects.none()
+            user_type = ContentType.objects.get_for_model(models.User)
+            interests = models.UserInterest.objects.filter(user=request.user, interest_type='star',
+                                                           content_type=user_type)
 
-            if user_type:
-                for q in queryset:
-                    interest = models.UserInterest.objects\
-                        .filter(user=request.user, interest_type='star', content_type__pk=user_type.id, object_id=q.id)
+            for i in interests:
+                q = q | queryset.filter(id=i.object_id)
 
-                    if len(interest) > 0:
-                        starred_users.append(q.id)
-
-                return queryset.filter(id__in=starred_users)
-            else:
-                return queryset
+            return q.annotate(Count('photo'))
         elif self.value() == 'no':
             unstarred_users = list()
-            user_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
+            user_type = ContentType.objects.get_for_model(models.User)
+            interests = models.UserInterest.objects.filter(user=request.user, interest_type='star',
+                                                           content_type=user_type)
 
-            if user_type:
-                for q in queryset:
-                    interest = models.UserInterest.objects \
-                        .filter(user=request.user, interest_type='star', content_type__pk=user_type.id, object_id=q.id)
+            for i in interests:
+                unstarred_users.append(i.object_id)
 
-                    if len(interest) == 0:
-                        unstarred_users.append(q.id)
-
-                return queryset.filter(id__in=unstarred_users)
-            else:
-                return queryset
+            return queryset.exclude(id__in=unstarred_users).annotate(Count('photo'))
 
 
 class UserAdmin(BaseUserAdmin):

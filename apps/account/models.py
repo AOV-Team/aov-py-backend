@@ -1,5 +1,4 @@
 from apps.common import models as common_models
-from apps.common.exceptions import OverLimitException
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType

@@ -90,35 +90,9 @@ class StarPhotoFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'yes':
-            starred_photos = list()
-            photo_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
-
-            if photo_type:
-                for q in queryset:
-                    interest = account_models.UserInterest.objects\
-                        .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=q.id)
-
-                    if len(interest) > 0:
-                        starred_photos.append(q.id)
-
-                return queryset.filter(id__in=starred_photos)
-            else:
-                return queryset
+            return queryset.filter(user_interest__user=request.user, user_interest__interest_type='star')
         elif self.value() == 'no':
-            unstarred_photos = list()
-            photo_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
-
-            if photo_type:
-                for q in queryset:
-                    interest = account_models.UserInterest.objects \
-                        .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=q.id)
-
-                    if len(interest) == 0:
-                        unstarred_photos.append(q.id)
-
-                return queryset.filter(id__in=unstarred_photos)
-            else:
-                return queryset
+            return queryset.exclude(user_interest__user=request.user, user_interest__interest_type='star')
 
 
 class PhotoAdmin(GuardedModelAdmin):
@@ -289,20 +263,8 @@ class StarredPhotoAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super(StarredPhotoAdmin, self).get_queryset(request)
-        starred_photos = list()
-        photo_type = ContentType.objects.get_for_model(queryset[0]) if len(queryset) > 0 else None
 
-        if photo_type:
-            for q in queryset:
-                interest = account_models.UserInterest.objects \
-                    .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=q.id)
-
-                if len(interest) > 0:
-                    starred_photos.append(q.id)
-
-            return queryset.filter(id__in=starred_photos)
-        else:
-            return queryset
+        return queryset.filter(user_interest__user=request.user, user_interest__interest_type='star')
 
     def has_add_permission(self, request):
         return False

@@ -97,6 +97,7 @@ class Photo(geo_models.Model):
     tag = models.ManyToManyField(PhotoClassification, blank=True, related_name='tag')
     user = models.ForeignKey(account_models.User, blank=True, null=True)
     user_action = GenericRelation(utils_models.UserAction)
+    user_interest = GenericRelation(account_models.UserInterest)
 
     attribution_name = models.CharField(max_length=255, blank=True, null=True)
     coordinates = geo_models.PointField(srid=4326, blank=True, null=True)  # Lat/long
