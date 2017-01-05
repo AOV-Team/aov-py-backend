@@ -62,10 +62,10 @@ def photo_admin(request):
 
     if g:
         # Search gear
-        gear = account_models.Gear.objects.search(g)
+        gear = account_models.Gear.objects.filter(Q(item_make__icontains=g) | Q(item_model__icontains=g))
 
         for g in gear:
-            photos = photos | photo_models.Photo.objects.filter(user=g['user'])
+            photos = photos | photo_models.Photo.objects.filter(gear=g)
 
     if q or u:
         # Search for a tag

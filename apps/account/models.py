@@ -27,8 +27,8 @@ class GearManager(models.Manager):
 
 
 class Gear(models.Model):
-    item_make = models.TextField(max_length=128)
-    item_model = models.TextField(max_length=128)
+    item_make = models.CharField(max_length=128)
+    item_model = models.CharField(max_length=128)
     link = models.URLField(blank=True, null=True)
     public = models.BooleanField(default=True)
     reviewed = models.BooleanField(default=False)  # Set to true if added/approved by AOV
@@ -45,6 +45,7 @@ class Gear(models.Model):
 
         :return: String
         """
+        return '{}\t{}'.format(self.name, self.id)
 
     class Meta:
         default_permissions = ('add', 'change', 'delete', 'view')

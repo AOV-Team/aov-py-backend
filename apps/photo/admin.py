@@ -123,7 +123,7 @@ class StarPhotoFilter(admin.SimpleListFilter):
 
 class PhotoAdmin(GuardedModelAdmin):
     fieldsets = (
-        ('Image', {'fields': ('image', 'original_image_url', 'user', 'coordinates', 'location', 'public',)}),
+        ('Image', {'fields': ('image', 'original_image_url', 'user', 'coordinates', 'location', 'gear', 'public',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
         ('Misc', {'fields': ('attribution_name', 'photo_data', 'created_at',)}),
     )
@@ -134,7 +134,7 @@ class PhotoAdmin(GuardedModelAdmin):
     list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id')
     list_filter = (StarPhotoFilter,)
     ordering = ('-id',)
-    readonly_fields = ('coordinates', 'created_at', 'location', 'original_image_url', 'photo_clicks', 'user',)
+    readonly_fields = ('coordinates', 'created_at', 'gear', 'location', 'original_image_url', 'photo_clicks', 'user',)
     search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
 
     # Override get_changelist so we can get logged-in user

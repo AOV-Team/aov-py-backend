@@ -8,6 +8,22 @@ from guardian import models as guardian
 from guardian.admin import GuardedModelAdmin
 
 
+class GearAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Gear', {'fields': ('item_make', 'item_model', 'link', 'id',)}),
+        ('Misc', {'fields': ('public', 'reviewed',)}),
+    )
+
+    list_display = ('name', 'link', 'public', 'reviewed',)
+    list_filter = ('public', 'reviewed',)
+    ordering = ('item_make', 'item_model',)
+    readonly_fields = ('id',)
+    search_fields = ('item_make', 'item_model', 'link', 'name')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class StarredUser(models.User):
     class Meta:
         proxy = True
@@ -127,7 +143,8 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         ('User', {'fields': ('email', 'username', 'social_name', 'password', )}),
         ('User Details',
-            {'fields': ('id', 'first_name', 'last_name', 'age', 'location', 'avatar', 'created_at', 'last_login', )}),
+            {'fields': ('id', 'first_name', 'last_name', 'age', 'location', 'avatar', 'created_at', 'last_login',
+                        'gear',)}),
         ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 
@@ -137,7 +154,7 @@ class UserAdmin(BaseUserAdmin):
     list_per_page = 100
     ordering = ('-photo__count', '-id', 'username',)
 
-    readonly_fields = ('created_at', 'id', 'last_login', 'photo_count',)
+    readonly_fields = ('created_at', 'gear', 'id', 'last_login', 'photo_count',)
 
     search_fields = ('age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name',)
 
@@ -222,6 +239,7 @@ class UserObjectPermissionAdmin(GuardedModelAdmin):
         return False
 
 
+admin.site.register(models.Gear, GearAdmin)
 admin.site.register(StarredUser, StarredUserAdmin)
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Profile, ProfileAdmin)

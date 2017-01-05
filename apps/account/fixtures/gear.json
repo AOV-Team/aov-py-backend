@@ -1,0 +1,776 @@
+[
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 5D Mark II",
+      "reviewed": true
+    },
+    "pk": 1,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 5D Mark III",
+      "reviewed": true
+    },
+    "pk": 2,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 5D Mark IV",
+      "reviewed": true
+    },
+    "pk": 3,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS Rebel T5",
+      "reviewed": true
+    },
+    "pk": 4,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS Rebel SL1",
+      "reviewed": true
+    },
+    "pk": 5,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS Rebel T6",
+      "reviewed": true
+    },
+    "pk": 6,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS Rebel T5i",
+      "reviewed": true
+    },
+    "pk": 7,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS Rebel T6i",
+      "reviewed": true
+    },
+    "pk": 8,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 10D",
+      "reviewed": true
+    },
+    "pk": 9,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 20D",
+      "reviewed": true
+    },
+    "pk": 10,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 30D",
+      "reviewed": true
+    },
+    "pk": 11,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 40D",
+      "reviewed": true
+    },
+    "pk": 12,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 50D",
+      "reviewed": true
+    },
+    "pk": 13,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 60D",
+      "reviewed": true
+    },
+    "pk": 14,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 70D",
+      "reviewed": true
+    },
+    "pk": 15,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 80D",
+      "reviewed": true
+    },
+    "pk": 16,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 6D",
+      "reviewed": true
+    },
+    "pk": 17,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 7D",
+      "reviewed": true
+    },
+    "pk": 18,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 7D Mark II",
+      "reviewed": true
+    },
+    "pk": 19,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 5DS",
+      "reviewed": true
+    },
+    "pk": 20,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS 5DR",
+      "reviewed": true
+    },
+    "pk": 21,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS-1D X",
+      "reviewed": true
+    },
+    "pk": 22,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS-1D X Mark II",
+      "reviewed": true
+    },
+    "pk": 23,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS-1D C",
+      "reviewed": true
+    },
+    "pk": 24,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS M3",
+      "reviewed": true
+    },
+    "pk": 25,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS M5",
+      "reviewed": true
+    },
+    "pk": 26,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "EOS M10",
+      "reviewed": true
+    },
+    "pk": 27,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "PowerShot G7 X Mark II",
+      "reviewed": true
+    },
+    "pk": 28,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "PowerShot G5 X",
+      "reviewed": true
+    },
+    "pk": 29,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "PowerShot G9 X Silver",
+      "reviewed": true
+    },
+    "pk": 30,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "PowerShot G3 X",
+      "reviewed": true
+    },
+    "pk": 31,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Canon",
+      "item_model": "PowerShot G1 X Mark II",
+      "reviewed": true
+    },
+    "pk": 32,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 4",
+      "reviewed": true
+    },
+    "pk": 33,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 4S",
+      "reviewed": true
+    },
+    "pk": 34,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 5",
+      "reviewed": true
+    },
+    "pk": 35,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 5C",
+      "reviewed": true
+    },
+    "pk": 36,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 5S",
+      "reviewed": true
+    },
+    "pk": 37,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 6",
+      "reviewed": true
+    },
+    "pk": 38,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 6S",
+      "reviewed": true
+    },
+    "pk": 39,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 6 Plus",
+      "reviewed": true
+    },
+    "pk": 40,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 6S Plus",
+      "reviewed": true
+    },
+    "pk": 41,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone 7",
+      "reviewed": true
+    },
+    "pk": 42,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Apple",
+      "item_model": "iPhone Plus",
+      "reviewed": true
+    },
+    "pk": 43,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D5",
+      "reviewed": true
+    },
+    "pk": 44,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D4S",
+      "reviewed": true
+    },
+    "pk": 45,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "Df",
+      "reviewed": true
+    },
+    "pk": 46,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D810",
+      "reviewed": true
+    },
+    "pk": 47,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D810A",
+      "reviewed": true
+    },
+    "pk": 48,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D750",
+      "reviewed": true
+    },
+    "pk": 49,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D610",
+      "reviewed": true
+    },
+    "pk": 50,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D500",
+      "reviewed": true
+    },
+    "pk": 51,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D7200",
+      "reviewed": true
+    },
+    "pk": 52,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D7100",
+      "reviewed": true
+    },
+    "pk": 53,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D5600",
+      "reviewed": true
+    },
+    "pk": 54,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D5500",
+      "reviewed": true
+    },
+    "pk": 55,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D5300",
+      "reviewed": true
+    },
+    "pk": 56,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D3400",
+      "reviewed": true
+    },
+    "pk": 57,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "D3300",
+      "reviewed": true
+    },
+    "pk": 58,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX A",
+      "reviewed": true
+    },
+    "pk": 59,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX P900",
+      "reviewed": true
+    },
+    "pk": 60,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX P900S",
+      "reviewed": true
+    },
+    "pk": 61,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX B700",
+      "reviewed": true
+    },
+    "pk": 62,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX P610",
+      "reviewed": true
+    },
+    "pk": 63,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX P610S",
+      "reviewed": true
+    },
+    "pk": 64,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX A900",
+      "reviewed": true
+    },
+    "pk": 65,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX S9900",
+      "reviewed": true
+    },
+    "pk": 66,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX S9900S",
+      "reviewed": true
+    },
+    "pk": 67,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX S7000",
+      "reviewed": true
+    },
+    "pk": 68,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX A300",
+      "reviewed": true
+    },
+    "pk": 69,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX S3700",
+      "reviewed": true
+    },
+    "pk": 70,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX A100",
+      "reviewed": true
+    },
+    "pk": 71,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX S2900",
+      "reviewed": true
+    },
+    "pk": 72,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX W100",
+      "reviewed": true
+    },
+    "pk": 73,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX S33",
+      "reviewed": true
+    },
+    "pk": 74,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX L340",
+      "reviewed": true
+    },
+    "pk": 75,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX A10",
+      "reviewed": true
+    },
+    "pk": 76,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX L32",
+      "reviewed": true
+    },
+    "pk": 77,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Nikon",
+      "item_model": "COOLPIX L31",
+      "reviewed": true
+    },
+    "pk": 78,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Sony",
+      "item_model": "a99 II",
+      "reviewed": true
+    },
+    "pk": 79,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Sony",
+      "item_model": "A7R II",
+      "reviewed": true
+    },
+    "pk": 80,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Sony",
+      "item_model": "A7S II",
+      "reviewed": true
+    },
+    "pk": 81,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Sony",
+      "item_model": "A7 II",
+      "reviewed": true
+    },
+    "pk": 82,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Sony",
+      "item_model": "A7R",
+      "reviewed": true
+    },
+    "pk": 83,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Sony",
+      "item_model": "A7S",
+      "reviewed": true
+    },
+    "pk": 84,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Sony",
+      "item_model": "A7",
+      "reviewed": true
+    },
+    "pk": 85,
+    "model": "account.gear"
+  },
+  {
+    "fields": {
+      "item_make": "Sony",
+      "item_model": "A99V",
+      "reviewed": true
+    },
+    "pk": 86,
+    "model": "account.gear"
+  }
+]
