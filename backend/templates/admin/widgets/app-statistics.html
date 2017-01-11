@@ -1,0 +1,29 @@
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>App Statistics</th>
+                <th>All-Time</th>
+                <th>This Month</th>
+                <th>This Week</th>
+                <th>Today</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Photos</strong></td>
+                <td>{{ module.data.total_photos }}</td>
+                <td>{{ module.data.photos_this_month }}</td>
+                <td>{{ module.data.photos_this_week }}</td>
+                <td>{{ module.data.photos_today }}</td>
+            </tr>
+            <tr>
+                <td><strong>Users</strong></td>
+                <td>{{ module.data.total_users }}</td>
+                <td>{{ module.data.users_this_month }}</td>
+                <td>{{ module.data.users_this_week }}</td>
+                <td>{{ module.data.users_today }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
