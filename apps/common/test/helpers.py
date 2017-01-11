@@ -2,17 +2,22 @@ from rest_framework.authtoken.models import Token
 import fnmatch
 import glob
 import os
+import shutil
 
 
 def clear_directory(path, pattern='*'):
     """
-    Delete files in a directory based on a pattern
+    Delete files in a directory or directories based on a pattern
+
     :param path: path to dir
     :param pattern: pattern to glob with
     :return: None
     """
     for f in glob.glob(os.path.join(path, pattern)):
-        os.remove(f)
+        if os.path.isdir(f):
+            shutil.rmtree(f)
+        else:
+            os.remove(f)
 
 
 def find_file_by_pattern(path, pattern):

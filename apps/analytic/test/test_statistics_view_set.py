@@ -17,7 +17,11 @@ class TestStatisticsViewSetGET(TestCase):
         photo_signals.post_save.disconnect(photo_signals.save_photo_image_caches, sender=photo_models.Photo)
 
     def tearDown(self):
+        # Reconnect cache generation so other unit tests don't fail
+        photo_signals.post_save.connect(photo_signals.save_photo_image_caches, sender=photo_models.Photo)
+
         test_helpers.clear_directory('backend/media/', '*.jpg')
+        test_helpers.clear_directory('backend/media/', '20*_apps')
 
     @freeze_time('2017-03-21', tz_offset=-7)
     def test_statistics_view_set_photo_get_successful(self):
