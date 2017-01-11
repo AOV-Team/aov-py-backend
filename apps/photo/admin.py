@@ -1,6 +1,7 @@
 from apps.account import models as account_models
 # from apps.common import forms
 from apps.photo import models as photo_models
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import urlresolvers
@@ -118,6 +119,9 @@ class PhotoAdmin(GuardedModelAdmin):
         return qs
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
     def action_buttons(self, obj):
@@ -218,9 +222,15 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
     search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
 
     def has_add_permission(self, request):
+        if settings.DEBUG:
+            return True
+
         return False
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
     def photo_clicks(self, obj):
@@ -267,9 +277,15 @@ class StarredPhotoAdmin(admin.ModelAdmin):
         return queryset.filter(user_interest__user=request.user, user_interest__interest_type='star')
 
     def has_add_permission(self, request):
+        if settings.DEBUG:
+            return True
+
         return False
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
     def action_buttons(self, obj):

@@ -1,4 +1,5 @@
 from apps.account import models
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.contenttypes.models import ContentType
@@ -21,6 +22,9 @@ class GearAdmin(admin.ModelAdmin):
     search_fields = ('item_make', 'item_model', 'link', 'name')
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
 
@@ -52,9 +56,15 @@ class StarredUserAdmin(admin.ModelAdmin):
         return queryset.annotate(Count('photo'))
 
     def has_add_permission(self, request):
+        if settings.DEBUG:
+            return True
+
         return False
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
     def action_buttons(self, obj):
@@ -152,6 +162,9 @@ class UserAdmin(BaseUserAdmin):
         return super(UserAdmin, self).get_queryset(request).annotate(Count('photo'))
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
     def action_buttons(self, obj):
@@ -195,6 +208,9 @@ class ProfileAdmin(GuardedModelAdmin):
     search_fields = ('id', 'user', 'bio',)
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
     # Not needed if user is readonly
@@ -212,6 +228,9 @@ class UserInterestAdmin(GuardedModelAdmin):
     search_fields = ('id', 'user',)
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
 
@@ -220,6 +239,9 @@ class UserObjectPermissionAdmin(GuardedModelAdmin):
     search_fields = ('id', 'user', 'permission',)
 
     def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
         return False
 
 

@@ -19,6 +19,7 @@ djangorestframework==3.5.3
 docutils==0.12
 Flask==0.11.1
 flower==0.9.1
+freezegun==0.3.8
 gevent==1.1.2
 greenlet==0.4.10
 itsdangerous==0.24

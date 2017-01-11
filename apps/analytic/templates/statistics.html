@@ -1,0 +1,65 @@
+{% extends "admin/base_site.html" %}
+{% block title %}App Statistics{% endblock %}
+
+{% block extrahead %}
+{% load static %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-responsive-min.css">
+<link rel="stylesheet" href="{% static "css/statistics.css" %}">
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.1/d3.min.js"></script>
+<script src="{% static "js/statistics.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="pure-g">
+    <div class="pure-u-1">
+        <h2>User Statistics</h2>
+    </div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+        <table class="pure-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Youngest</th>
+                    <th>Average</th>
+                    <th>Oldest</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Age</td>
+                    <td>{{ age_low }}</td>
+                    <td>{{ age_avg }}</td>
+                    <td>{{ age_high }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pure-u-1 pure-u-sm-1-2">
+        <table class="pure-table">
+            <thead>
+                <tr>
+                    <th>Average Photo per User</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ avg_photos }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="pure-g">
+    <div class="pure-u-1">
+        <h2>Photo Statistics</h2>
+    </div>
+    <div class="pure-u-1">
+        <div id="photo-stats-container"></div>
+    </div>
+</div>
+{% endblock %}
