@@ -106,6 +106,7 @@ class Photo(geo_models.Model):
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path)
     image_blurred = ImageSpecField(source='image', processors=[BlurResize()], format='JPEG', options={'quality': 80})
     image_small = ImageSpecField(source='image', processors=[WidthResize(640)], format='JPEG')
+    image_small_2 = ImageSpecField(source='image', processors=[WidthResize(750)], format='JPEG')
     image_medium = ImageSpecField(source='image', processors=[WidthResize(1242)], format='JPEG')
 
     location = models.CharField(max_length=255, blank=True, null=True)
