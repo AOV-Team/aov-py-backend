@@ -2,7 +2,7 @@ from apps.account import models as account_models
 from apps.analytic import dates
 from apps.common.views import get_default_response
 from apps.photo import models as photo_models
-from datetime import date, datetime
+from datetime import datetime
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
 from django.shortcuts import render
