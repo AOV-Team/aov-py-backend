@@ -40,7 +40,7 @@ urlpatterns = [
     url(r'api/users/(?P<pk>[0-9^/]+)/stars$', account_views.UserSingleStarsViewSet.as_view()),
 
     # Analytic
-    # url(r'api/statistics$', analytic_views.StatisticsViewSet.as_view()),
+    url(r'api/statistics/(?P<resource>[a-z^/]+)$', analytic_views.StatisticsViewSet.as_view()),
 
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
@@ -63,7 +63,8 @@ urlpatterns = [
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     url(r'^admin/', admin.site.urls),
     url(r'^admin/photos/$', photo_views.photo_admin),
-    url(r'^admin/photos/map/$', photo_views.photo_map_admin)
+    url(r'^admin/photos/map/$', photo_views.photo_map_admin),
+    url(r'^admin/statistics/$', analytic_views.statistics_admin),
 ]
 
 # Enable images for runserver
