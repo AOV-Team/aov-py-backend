@@ -133,6 +133,29 @@ class TestAuthViewSetPOST(TestCase):
 
         self.assertEquals(me_result['id'], user.id)
 
+    def test_authenticate_view_set_post_different_case(self):
+        """
+        /api/auth POST - test that email is case insensitive - for emails that got transferred from old backend
+
+        :return: None
+        """
+        # Create user
+        account_models.User.objects\
+            .create_user(email='Spencer.a.marsh@gmail.com', password='WhoWantsToBeAMillionaire?', username='aov1')
+
+        # Log user in
+        client = APIClient()
+
+        payload = {
+            'email': 'spencer.a.marsh@gmail.com',
+            'password': 'WhoWantsToBeAMillionaire?'
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+        response = request.data
+
+        self.assertIsNotNone(response['token'])
+
     def test_authenticate_view_set_post_bad_request(self):
         """
         Test that we get a HTTP 400 code if email and/or password missing in payload

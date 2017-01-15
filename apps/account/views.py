@@ -10,7 +10,7 @@ from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
 from django.conf import settings
-from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
@@ -81,10 +81,15 @@ class AuthenticateViewSet(APIView):
                 return response
             # END TODO
 
-            user = authenticate(email=email.lower(), password=password)
+            try:
+                # Have to do this manually since authenticate does not support case insensitive email
+                user_model = get_user_model()
+                user = user_model.objects.filter(email__iexact=email).first()
 
-            if user:
-                # User exists and is active, get/create token and return
+                if not user or not user.check_password(password):
+                    # This is not the actual exception but we want it handled the same as if the user was not found
+                    raise ObjectDoesNotExist
+
                 if user.is_active:
                     token = Token.objects.get_or_create(user=user)
                     response = get_default_response('201')
@@ -93,10 +98,25 @@ class AuthenticateViewSet(APIView):
                     response = get_default_response('403')
                     response.data['message'] = 'User inactive'
                     response.data['userMessage'] = 'Cannot log you in because your user is inactive'
-            else:
+            except ObjectDoesNotExist:
                 response = get_default_response('401')
                 response.data['message'] = 'Authentication failed'
                 response.data['userMessage'] = 'Email or password incorrect. Please try again.'
+
+            # if user:
+            #     # User exists and is active, get/create token and return
+            #     if user.is_active:
+            #         token = Token.objects.get_or_create(user=user)
+            #         response = get_default_response('201')
+            #         response.data['token'] = token[0].key
+            #     else:
+            #         response = get_default_response('403')
+            #         response.data['message'] = 'User inactive'
+            #         response.data['userMessage'] = 'Cannot log you in because your user is inactive'
+            # else:
+            #     response = get_default_response('401')
+            #     response.data['message'] = 'Authentication failed'
+            #     response.data['userMessage'] = 'Email or password incorrect. Please try again.'
 
         return response
 
@@ -120,7 +140,7 @@ class AuthenticateResetViewSet(APIView):
                 saved_email = password.get_password_reset_email(payload['code'])
 
                 if saved_email:
-                    user = account_models.User.objects.get(email=saved_email, is_active=True)
+                    user = account_models.User.objects.get(email__iexact=saved_email, is_active=True)
                     user.set_password(payload['password'])
                     user.save()
 
@@ -154,7 +174,7 @@ class AuthenticateResetViewSet(APIView):
 
             try:
                 # Create code in Redis
-                user = account_models.User.objects.get(email=payload['email'])
+                user = account_models.User.objects.get(email__iexact=payload['email'])
                 code = password.create_password_reset_code(user)
 
                 # Send email to user
@@ -348,7 +368,14 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         # Password
         if 'password' in payload:
             if 'existing_password' in payload:
-                existing = authenticate(email=authenticated_user.email, password=payload['existing_password'])
+                # We have to do this manually due to case insensitive email
+                existing = False
+                user_model = get_user_model()
+                user = user_model.objects\
+                    .filter(email__iexact=authenticated_user.email).first()
+
+                if user and user.check_password(payload['existing_password']):
+                    existing = True
 
                 if existing:
                     updated_user.set_password(payload['password'])

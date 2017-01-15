@@ -10,7 +10,6 @@ import redis
 class TestAuthenticateResetViewSetPATCH(TestCase):
     """
     Test that we can reset password
-
     """
 
     def setUp(self):
@@ -71,6 +70,34 @@ class TestAuthenticateResetViewSetPATCH(TestCase):
         login_request = client.post('/api/auth', data={'email': 'test@test.com', 'password': 'aaa'}, format='json')
 
         self.assertEquals(login_request.status_code, 401)
+
+    def test_authenticate_reset_view_set_patch_different_case(self):
+        """
+        Test that we can successfully reset user's password even if provided case is different than what's saved
+
+        :return: None
+        """
+        # Create test data
+        user = account_models.User.objects.create_user(email='Spencer.a.marsh@gmail.com', username='aov1')
+        code = password.create_password_reset_code(user)
+
+        client = APIClient()
+
+        payload = {
+            'code': code,
+            'password': 'aaa'
+        }
+
+        request = client.patch('/api/auth/reset', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 200)
+
+        # Check that we can authenticate w/ new password
+        login_request = client.post('/api/auth', data={'email': 'spencer.a.marsh@gmail.com', 'password': 'aaa'},
+                                    format='json')
+
+        self.assertEquals(login_request.status_code, 201)
+        self.assertIn('token', login_request.data)
 
     def test_authenticate_reset_view_set_patch_no_code(self):
         """
@@ -176,6 +203,29 @@ class TestAuthenticateResetViewSetPOST(TestCase):
 
         payload = {
             'email': user.email
+        }
+
+        request = client.post('/api/auth/reset', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 201)
+
+        # Check that an email was sent
+        self.assertEquals(len(mail.outbox), 1)
+
+    def test_authenticate_reset_view_set_post_different_case(self):
+        """
+        Test that we can successfully request code for resetting user's password even if they request it with an email
+        that has different case than what's saved in the db
+
+        :return: None
+        """
+        # Create test data
+        user = account_models.User.objects.create_user(email='Spencer.a.marsh@gmail.com', username='aov1')
+
+        client = APIClient()
+
+        payload = {
+            'email': user.email.lower()
         }
 
         request = client.post('/api/auth/reset', data=payload, format='json')

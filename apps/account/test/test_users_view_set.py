@@ -237,3 +237,31 @@ class TestUsersViewSetPOST(TestCase):
         request = client.post('/api/users', data=payload, format='json')
 
         self.assertEquals(request.status_code, 409)
+
+    def test_users_view_set_post_case_insensitive_2(self):
+        """
+        Test that user emails are case insensitive
+
+        :return: None
+        """
+        client = APIClient()
+
+        payload = {
+            'email': 'Spencer.a.marsh@gmail.com',
+            'password': 'WhoWantsToBeAMillionaire?',
+            'username': 'aov_hov'
+        }
+
+        request = client.post('/api/users', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 201)
+
+        payload = {
+            'email': 'spencer.a.marsh@gmail.com',
+            'password': 'Millionaire',
+            'username': 'aov'
+        }
+
+        request = client.post('/api/users', data=payload, format='json')
+
+        self.assertEquals(request.status_code, 409)
