@@ -57,6 +57,12 @@ class TestPhotoViewSetGET(TestCase):
         self.assertEquals(results[1]['gear'][0], gear_1.id)
         self.assertEquals(results[1]['latitude'], 43.0)
         self.assertEquals(results[1]['longitude'], -116.0)
+        self.assertIsNotNone(results[0]['image_blurred'])
+        self.assertIsNotNone(results[0]['image_medium'])
+        self.assertIsNotNone(results[0]['image_small'])
+        self.assertIsNotNone(results[0]['image_small_2'])
+        self.assertIsNotNone(results[0]['image_tiny_246'])
+        self.assertIsNotNone(results[0]['image_tiny_272'])
 
     def test_photo_view_set_get_public(self):
         """

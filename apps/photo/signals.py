@@ -15,7 +15,7 @@ def save_photo_image_caches(sender, instance, **kwargs):
     :param kwargs:
     :return: None
     """
-    image_sizes = ('image_blurred', 'image_medium', 'image_small', 'image_small_2')
+    image_sizes = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246', 'image_tiny_272',)
 
     for image in image_sizes:
         try:
