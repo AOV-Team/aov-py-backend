@@ -104,6 +104,8 @@ class Photo(geo_models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path)
+    image_tiny_246 = ImageSpecField(source='image', processors=[WidthResize(246)], format='JPEG')
+    image_tiny_272 = ImageSpecField(source='image', processors=[WidthResize(272)], format='JPEG')
     image_blurred = ImageSpecField(source='image', processors=[BlurResize()], format='JPEG', options={'quality': 80})
     image_small = ImageSpecField(source='image', processors=[WidthResize(640)], format='JPEG')
     image_small_2 = ImageSpecField(source='image', processors=[WidthResize(750)], format='JPEG')

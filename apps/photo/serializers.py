@@ -24,6 +24,8 @@ class PhotoSerializer(serializers.ModelSerializer):
     image_medium = serializers.ImageField(required=False)
     image_small = serializers.ImageField(required=False)
     image_small_2 = serializers.ImageField(required=False)
+    image_tiny_246 = serializers.ImageField(required=False)
+    image_tiny_272 = serializers.ImageField(required=False)
 
     def get_dimensions(self, obj):
         """
@@ -45,10 +47,11 @@ class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Photo
         fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
-                  'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'latitude', 'location', 'longitude',
-                  'original_image_url', 'photo_data', 'public', 'photo_feed')
+                  'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246', 'image_tiny_272',
+                  'latitude', 'location', 'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed')
         extra_kwargs = {'original_image_url':  {'write_only': True},
                         'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
-        read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'photo_data',)
+        read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
+                            'image_tiny_272', 'photo_data',)
