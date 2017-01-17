@@ -69,7 +69,7 @@ DATABASES = {
     }
 }
 
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = bool(os.environ.get('DEBUG', False))
 
 EMAIL = dict()
 
