@@ -214,12 +214,15 @@ class PhotoFeedPhotoFilter(admin.SimpleListFilter):
 class PhotoFeedPhotoAdmin(admin.ModelAdmin):
     filter_horizontal = ('category', 'tag', 'photo_feed')
 
-    list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'id',)
+    list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id',)
     list_filter = (PhotoFeedPhotoFilter,)
     readonly_fields = ('coordinates', 'created_at', 'location', 'original_image_url', 'photo_clicks', 'user',)
     search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
 
     def get_queryset(self, request):
+        # Hackish but we need to know current photo feed ID
+        self.current_feed = request.GET.get('feed')
+
         return super(PhotoFeedPhotoAdmin, self).get_queryset(request)\
             .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
             .order_by('-creation_seq')
@@ -235,6 +238,25 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
             return True
 
         return False
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of PhotoFeedPhoto (Photo)
+        :return: String w/ HTML
+        """
+        photo_feeds = ''
+
+        for photo_feed in obj.photo_feed.all():
+            photo_feeds += str(photo_feed.id) + ','
+
+        return u'<span data-content-type="photos" data-id="{}" data-feeds="{}" data-current-feed="{}"' \
+               u'class="eye-button fa fa-eye" title="Toggle photo in this feed"></span>' \
+            .format(obj.id, str(photo_feeds), self.current_feed)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
 
     def photo_clicks(self, obj):
         """

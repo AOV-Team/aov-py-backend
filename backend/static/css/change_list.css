@@ -6,9 +6,18 @@ a.action {
     cursor: pointer;
 }
 
+.eye-button {
+    color: #0fc30f;
+    cursor: pointer;
+}
+
 .star-button {
     color: #999;
     cursor: pointer;
+}
+
+.eye-button.removed {
+    color: #999;
 }
 
 .star-button.starred {
