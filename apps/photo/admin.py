@@ -53,8 +53,7 @@ class PhotoFeedAdmin(GuardedModelAdmin):
     search_fields = ('name', 'id',)
 
     def get_queryset(self, request):
-        return super(PhotoFeedAdmin, self).get_queryset(request) \
-            .annotate(Count('photo'))
+        return super(PhotoFeedAdmin, self).get_queryset(request).annotate(Count('photo'))
 
     def action_buttons(self, obj):
         """
@@ -217,9 +216,13 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
 
     list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'id',)
     list_filter = (PhotoFeedPhotoFilter,)
-    ordering = ('-id',)
     readonly_fields = ('coordinates', 'created_at', 'location', 'original_image_url', 'photo_clicks', 'user',)
     search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
+
+    def get_queryset(self, request):
+        return super(PhotoFeedPhotoAdmin, self).get_queryset(request)\
+            .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
+            .order_by('-creation_seq')
 
     def has_add_permission(self, request):
         if settings.DEBUG:
