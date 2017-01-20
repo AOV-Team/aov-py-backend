@@ -27,6 +27,7 @@ source ~vagrant/.bash_profile > /dev/null 2>&1
 printf "\n# Useful Aliases:\n" >> ~vagrant/.bash_profile
 printf "alias runserver='python manage.py runserver 0.0.0.0:8000'\n" >> ~vagrant/.bash_profile
 printf "alias test='python manage.py test -v2'\n" >> ~vagrant/.bash_profile
+printf "alias coveragetest='coverage run --source='apps' manage.py test'\n" >> ~vagrant/.bash_profile
 mkvirtualenv --python=python3.5 backend > /dev/null 2>&1
 
 # Set up db
@@ -42,6 +43,7 @@ workon backend
 pip install -r requirements.txt > /dev/null 2>&1
 ./scripts/setup.sh dev > /dev/null
 ./manage.py migrate
+pip install coverage
 
 # Redis
 echo "Installing Redis"
