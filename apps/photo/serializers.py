@@ -36,6 +36,16 @@ class PhotoSerializer(serializers.ModelSerializer):
         """
         return {'width': obj.image.width, 'height': obj.image.height}
 
+    @staticmethod
+    def setup_eager_loading(queryset):
+        queryset = queryset\
+            .select_related('user')\
+            .prefetch_related('category')\
+            .prefetch_related('gear')\
+            .prefetch_related('tag')
+
+        return queryset
+
     def validate_geo_location(self, value):
         """
         Check that coordinates are valid

@@ -5,6 +5,7 @@ from apps.account import tasks as account_tasks
 from apps.common import models as common_models
 from apps.common.mailer import send_transactional_email
 from apps.common.exceptions import ForbiddenValue, OverLimitException
+from apps.common.serializers import setup_eager_loading
 from apps.common.views import get_default_response, MediumResultsSetPagination, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
@@ -723,8 +724,11 @@ class UserPhotosViewSet(generics.ListAPIView):
     """
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = photo_models.Photo.objects.all()
     serializer_class = photo_serializers.PhotoSerializer
+
+    @setup_eager_loading
+    def get_queryset(self):
+        return photo_models.Photo.objects.all()
 
     def get(self, request, **kwargs):
         """

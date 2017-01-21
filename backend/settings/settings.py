@@ -26,7 +26,7 @@ SECRET_KEY = '&ovy=!!3@8s@68950+td&##!n!=(&vh_at@j71kti&pu^@2k%_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = DEBUG
 
-INTERNAL_IPS = ('127.0.0.1', )
+INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
 
 ALLOWED_HOSTS = ['*']
 
@@ -59,9 +59,17 @@ INSTALLED_APPS = [
     'social.apps.django_app.default',
 ]
 
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+
 SITE_ID = 1
 
-MIDDLEWARE = [
+MIDDLEWARE = list()
+
+if DEBUG:
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
+MIDDLEWARE += [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

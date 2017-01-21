@@ -53,8 +53,7 @@ class PhotoFeedAdmin(GuardedModelAdmin):
     search_fields = ('name', 'id',)
 
     def get_queryset(self, request):
-        return super(PhotoFeedAdmin, self).get_queryset(request) \
-            .annotate(Count('photo'))
+        return super(PhotoFeedAdmin, self).get_queryset(request).annotate(Count('photo'))
 
     def action_buttons(self, obj):
         """
@@ -215,11 +214,19 @@ class PhotoFeedPhotoFilter(admin.SimpleListFilter):
 class PhotoFeedPhotoAdmin(admin.ModelAdmin):
     filter_horizontal = ('category', 'tag', 'photo_feed')
 
-    list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'id',)
+    list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id',)
+    list_display_links = None
     list_filter = (PhotoFeedPhotoFilter,)
-    ordering = ('-id',)
     readonly_fields = ('coordinates', 'created_at', 'location', 'original_image_url', 'photo_clicks', 'user',)
     search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
+
+    def get_queryset(self, request):
+        # Hackish but we need to know current photo feed ID
+        self.current_feed = request.GET.get('feed')
+
+        return super(PhotoFeedPhotoAdmin, self).get_queryset(request)\
+            .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
+            .order_by('-creation_seq')
 
     def has_add_permission(self, request):
         if settings.DEBUG:
@@ -232,6 +239,29 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
             return True
 
         return False
+
+    def action_buttons(self, obj):
+        """
+        Show action buttons
+
+        :param obj: instance of PhotoFeedPhoto (Photo)
+        :return: String w/ HTML
+        """
+        photo_feeds = ''
+
+        for photo_feed in obj.photo_feed.all():
+            photo_feeds += str(photo_feed.id) + ','
+
+        # Since we had to disable link on image, this is the work-around
+        link = urlresolvers.reverse("admin:photo_photo_change", args=[obj.id])
+        edit_link = u'<a class="action" href="{}"><span class="fa fa-pencil-square"></span></a>'.format(link)
+
+        return u'<span data-content-type="photos" data-id="{}" data-feeds="{}" data-current-feed="{}"' \
+               u'class="eye-button fa fa-eye action" title="Toggle photo in this feed"></span>{}' \
+            .format(obj.id, str(photo_feeds), self.current_feed, edit_link)
+
+    action_buttons.allow_tags = True
+    action_buttons.short_description = 'Actions'
 
     def photo_clicks(self, obj):
         """
