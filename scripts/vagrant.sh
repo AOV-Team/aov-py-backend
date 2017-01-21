@@ -44,6 +44,7 @@ pip install -r requirements.txt > /dev/null 2>&1
 ./scripts/setup.sh dev > /dev/null
 ./manage.py migrate
 pip install coverage
+pip install django-debug-toolbar
 
 # Redis
 echo "Installing Redis"
