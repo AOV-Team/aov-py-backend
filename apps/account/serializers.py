@@ -9,6 +9,13 @@ class GearSerializer(serializers.ModelSerializer):
         extra_kwargs = {'public': {'default': True, 'write_only': True}}
 
 
+class UserBasicSerializer(serializers.ModelSerializer):
+    """ Use this serializer to add additional user info to photos """
+    class Meta:
+        model = models.User
+        fields = ('id', 'age', 'email', 'first_name', 'last_name', 'location', 'social_name', 'username')
+
+
 class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
@@ -20,9 +27,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.User
-        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'gear', 'is_active', 'last_login', 'last_name',
-                  'location', 'password', 'social_name', 'username')
-        read_only_fields = ('last_login',)
+        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'gear', 'is_active', 'is_admin', 'last_login',
+                  'last_name', 'location', 'password', 'social_name', 'username')
+        read_only_fields = ('is_admin', 'last_login',)
         extra_kwargs = {'is_active': {'default': True, 'write_only': True}, 'password': {'write_only': True}}
 
 

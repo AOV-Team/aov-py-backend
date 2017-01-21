@@ -24,6 +24,9 @@ class TestPhotoViewSetGET(TestCase):
         """
         # Test data
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user.location = 'Boise'
+        user.social_name = '@theaov'
+        user.save()
 
         # Create some gear
         gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
@@ -63,6 +66,9 @@ class TestPhotoViewSetGET(TestCase):
         self.assertIsNotNone(results[0]['image_small_2'])
         self.assertIsNotNone(results[0]['image_tiny_246'])
         self.assertIsNotNone(results[0]['image_tiny_272'])
+        self.assertEquals(results[0]['user_details']['location'], user.location)
+        self.assertEquals(results[0]['user_details']['social_name'], user.social_name)
+        self.assertEquals(results[0]['user_details']['username'], user.username)
 
     def test_photo_view_set_get_public(self):
         """

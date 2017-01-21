@@ -83,6 +83,9 @@ class TestPhotoSingleViewSetGET(TestCase):
         """
         # Test data
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user.location = 'Boise'
+        user.social_name = '@theaov'
+        user.save()
 
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
@@ -106,6 +109,9 @@ class TestPhotoSingleViewSetGET(TestCase):
         self.assertEquals(len(result['gear']), 2)
         self.assertIsInstance(result['gear'][0], int)
         self.assertEquals(result['user'], user.id)
+        self.assertEquals(result['user_details']['location'], user.location)
+        self.assertEquals(result['user_details']['social_name'], user.social_name)
+        self.assertEquals(result['user_details']['username'], user.username)
 
     def test_photo_single_view_set_get_deleted(self):
         """
