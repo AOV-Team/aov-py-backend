@@ -1,6 +1,7 @@
 from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.common import models as common_models
+from apps.common.serializers import setup_eager_loading
 from apps.common.views import get_default_response, handle_jquery_empty_array, LargeResultsSetPagination, \
     MediumResultsSetPagination, remove_pks_from_payload
 from apps.photo import models as photo_models
@@ -390,6 +391,7 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 
+    @setup_eager_loading
     def get_queryset(self):
         """
         Return list of photos for requested photo feed
@@ -400,7 +402,8 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
             photo_feed_id = self.kwargs['photo_feed_id']
             photo_feed = photo_models.PhotoFeed.objects.get(id=photo_feed_id)
 
-            return photo_models.Photo.objects.filter(photo_feed=photo_feed, public=True)\
+            return photo_models.Photo.objects\
+                .filter(photo_feed=photo_feed, public=True)\
                 .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
                 .order_by('-creation_seq')
         except ObjectDoesNotExist:
@@ -410,8 +413,11 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
 class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = photo_models.Photo.objects.all()
     serializer_class = photo_serializers.PhotoSerializer
+
+    @setup_eager_loading
+    def get_queryset(self):
+        return photo_models.Photo.objects.all()
 
     def delete(self, request, *args, **kwargs):
         """
