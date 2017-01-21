@@ -215,6 +215,7 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
     filter_horizontal = ('category', 'tag', 'photo_feed')
 
     list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id',)
+    list_display_links = None
     list_filter = (PhotoFeedPhotoFilter,)
     readonly_fields = ('coordinates', 'created_at', 'location', 'original_image_url', 'photo_clicks', 'user',)
     search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
@@ -251,9 +252,13 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
         for photo_feed in obj.photo_feed.all():
             photo_feeds += str(photo_feed.id) + ','
 
+        # Since we had to disable link on image, this is the work-around
+        link = urlresolvers.reverse("admin:photo_photo_change", args=[obj.id])
+        edit_link = u'<a class="action" href="{}"><span class="fa fa-pencil-square"></span></a>'.format(link)
+
         return u'<span data-content-type="photos" data-id="{}" data-feeds="{}" data-current-feed="{}"' \
-               u'class="eye-button fa fa-eye" title="Toggle photo in this feed"></span>' \
-            .format(obj.id, str(photo_feeds), self.current_feed)
+               u'class="eye-button fa fa-eye action" title="Toggle photo in this feed"></span>{}' \
+            .format(obj.id, str(photo_feeds), self.current_feed, edit_link)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
