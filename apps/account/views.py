@@ -19,7 +19,7 @@ from json.decoder import JSONDecodeError
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.views import APIView
 from social.apps.django_app.utils import load_strategy
 from social.apps.django_app.utils import load_backend
@@ -103,21 +103,6 @@ class AuthenticateViewSet(APIView):
                 response = get_default_response('401')
                 response.data['message'] = 'Authentication failed'
                 response.data['userMessage'] = 'Email or password incorrect. Please try again.'
-
-            # if user:
-            #     # User exists and is active, get/create token and return
-            #     if user.is_active:
-            #         token = Token.objects.get_or_create(user=user)
-            #         response = get_default_response('201')
-            #         response.data['token'] = token[0].key
-            #     else:
-            #         response = get_default_response('403')
-            #         response.data['message'] = 'User inactive'
-            #         response.data['userMessage'] = 'Cannot log you in because your user is inactive'
-            # else:
-            #     response = get_default_response('401')
-            #     response.data['message'] = 'Authentication failed'
-            #     response.data['userMessage'] = 'Email or password incorrect. Please try again.'
 
         return response
 
@@ -738,10 +723,12 @@ class UserPhotosViewSet(generics.ListAPIView):
         :param kwargs:
         :return: Response object
         """
-        authentication = TokenAuthentication().authenticate(request)
-        authenticated_user = authentication[0] if authentication else request.user
+        try:
+            user = account_models.User.objects.get(id=kwargs.get('user_id'))
+        except ObjectDoesNotExist:
+            raise NotFound('User does not exist')
 
-        photos = photo_models.Photo.objects.filter(user=authenticated_user, public=True).order_by('-id')
+        photos = photo_models.Photo.objects.filter(user=user, public=True).order_by('-id')
         paginated_photos = self.paginate_queryset(photos)
 
         serialized_items = list()
@@ -752,6 +739,32 @@ class UserPhotosViewSet(generics.ListAPIView):
         response = self.get_paginated_response(serialized_items)
 
         return response
+
+
+class UserProfileViewSet(generics.RetrieveAPIView):
+    """ /api/users/{}/profile """
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = account_models.Profile.objects.all()
+    serializer_class = account_serializers.ProfileSerializer
+
+    def get(self, request, **kwargs):
+        """
+        Get a user's profile
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        try:
+            user = account_models.User.objects.get(id=kwargs.get('pk'))
+            profile = account_models.Profile.objects.get(user=user)
+
+            response = get_default_response('200')
+            response.data = account_serializers.ProfileSerializer(profile).data
+            return response
+        except ObjectDoesNotExist:
+            raise NotFound('User does not exist')
 
 
 class UserSingleViewSet(generics.RetrieveAPIView):
