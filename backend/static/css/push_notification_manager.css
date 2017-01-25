@@ -1,5 +1,35 @@
+/*
+General
+*/
+
+button[type="submit"] {
+    background-color: #ff3333;
+    color: #fff;
+    padding: 10px;
+    float: right;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.fa {
+    cursor: pointer;
+}
+
+/*
+Push message area
+*/
+
 #message {
     margin-bottom: 20px;
+}
+
+#message #characters {
+    display: block;
+    width: 100%;
+    height: 25px;
+    line-height: 25px;
+    text-align: right;
 }
 
 #message #push-message {
@@ -9,10 +39,16 @@
     resize: none;
 }
 
-#message #characters {
-    display: block;
+/*
+Recipient list
+*/
+
+.recipient {
     width: 100%;
     height: 25px;
     line-height: 25px;
-    text-align: right;
+}
+
+.recipient .fa {
+    float: right;
 }

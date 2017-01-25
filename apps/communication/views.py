@@ -2,6 +2,7 @@ from apps.communication.serializers import AOVAPNSDeviceSerializer
 from apps.communication.tasks import send_push_notification
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from push_notifications.models import APNSDevice
 from rest_framework import generics
@@ -25,7 +26,7 @@ class DevicesViewSet(generics.ListCreateAPIView):
 
         # If searching by user
         if query:
-            queryset = queryset.select_related('user')\
+            queryset = queryset\
                 .filter(Q(user__email__icontains=query) | Q(user__first_name__icontains=query) |
                         Q(user__last_name__icontains=query) | Q(user__social_name__icontains=query) |
                         Q(user__username__icontains=query))
@@ -44,13 +45,17 @@ def push_notification_manager(request):
     post = request.POST
 
     if len(post) > 0:
-        print(post)
         # Set up message
         message = post['message']
-        recipients = post['recipients']
+        recipients = post.getlist('recipient-list[]')
 
-        if recipients == 'all':
-            send_push_notification.delay(message, 'all')
+        if len(message) > 0:
+            if len(recipients) > 0:
+                send_push_notification.delay(message, recipients)
+            else:
+                send_push_notification.delay(message, 'all')
+
+        return HttpResponseRedirect('/admin/push/')
     else:
         pass
 

@@ -1,4 +1,3 @@
-from apps.utils.commands import TermColor
 from django.core.management import BaseCommand
 from push_notifications.models import APNSDevice
 
