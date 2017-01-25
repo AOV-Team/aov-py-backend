@@ -1,6 +1,7 @@
 from apps.communication.serializers import AOVAPNSDeviceSerializer
 from apps.communication.tasks import send_push_notification
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Q
 from django.shortcuts import render
 from push_notifications.models import APNSDevice
 from rest_framework import generics
@@ -19,7 +20,17 @@ class DevicesViewSet(generics.ListCreateAPIView):
 
         :return: Queryset
         """
-        return APNSDevice.objects.all().order_by('-date_created')
+        query = self.request.query_params.get('q')
+        queryset = APNSDevice.objects.all()
+
+        # If searching by user
+        if query:
+            queryset = queryset.select_related('user')\
+                .filter(Q(user__email__icontains=query) | Q(user__first_name__icontains=query) |
+                        Q(user__last_name__icontains=query) | Q(user__social_name__icontains=query) |
+                        Q(user__username__icontains=query))
+
+        return queryset.order_by('-date_created')
 
 
 @staff_member_required
