@@ -1,4 +1,15 @@
 $( document ).ready(function() {
+    // Schedule text box
+    $('#schedule').dateRangePicker({
+        format: 'YYYY-MM-DD HH:mm',
+        singleDate: true,
+        singleMonth: true,
+        startDate: moment().format("YYYY-MM-DD"),
+        time: {
+            enabled: true
+        }
+    });
+
     // Push message textarea
     $('#push-message').keyup(updateCount);
     $('#push-message').keydown(updateCount);
