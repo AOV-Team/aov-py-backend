@@ -1,3 +1,4 @@
+from apps.communication.tasks import send_push_notification
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
@@ -14,9 +15,13 @@ def push_notification_manager(request):
     post = request.POST
 
     if len(post) > 0:
+        print(post)
         # Set up message
         message = post['message']
-        recipient = post['recipient']
+        recipients = post['recipients']
+
+        if recipients == 'all':
+            send_push_notification.delay(message, 'all')
     else:
         pass
 

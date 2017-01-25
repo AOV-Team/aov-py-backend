@@ -5,6 +5,6 @@ echo "FOR TESTING ONLY"
 echo
 ../../redis-3.0.7/src/redis-server &
 echo
-flower -A backend.settings -p 5555 &
+flower -A backend.settings -p 5555 -conf=flowerconfig.py &
 echo
 celery -A backend.settings worker -l info &
