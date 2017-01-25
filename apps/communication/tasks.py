@@ -20,5 +20,4 @@ def send_push_notification(message, recipients, **kwargs):
     elif type(recipients) is list:
         devices = APNSDevice.objects.filter(id__in=recipients)
 
-    print(devices)
     devices.send_message(message, **kwargs)

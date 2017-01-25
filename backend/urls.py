@@ -44,6 +44,9 @@ urlpatterns = [
     # Analytic
     url(r'api/statistics/(?P<resource>[a-z^/]+)$', analytic_views.StatisticsViewSet.as_view()),
 
+    # communication
+    url(r'api/devices$', communication_views.DevicesViewSet.as_view()),
+
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
     url(r'api/photo_classifications/(?P<photo_classification_id>[0-9^/]+)/photos$',

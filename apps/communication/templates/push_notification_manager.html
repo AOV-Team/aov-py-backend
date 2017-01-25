@@ -3,8 +3,12 @@
 
 {% block extrahead %}
 {% load static %}
-<link rel="stylesheet" href="{% static "css/push_notification_manager.css" %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-responsive-min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/daterangepicker.min.css">
+<link rel="stylesheet" href="{% static "css/push_notification_manager.css" %}">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -22,11 +26,18 @@
     <div id="message">
         <h1>Push Notifications</h1>
         <textarea id="push-message" name="message" maxlength="235"></textarea>
-        <span id="characters">
-        </span>
+        <span id="characters"></span>
         <label for="recipients">Message recipients</label><br>
         <input type="radio" name="recipients" value="all" checked> All<br>
         <button type="submit">Send</button>
+    </div>
+</form>
+<div>
+    <div id="toolbar" class="initialized">
+        <form id="device-search">
+            <input type="text" size="15" value="" id="searchbar" placeholder="Search by user">
+            <input type="submit" value="Search">
+        </form>
     </div>
     <div class="results">
         <table id="result_list">
@@ -37,21 +48,5 @@
             </thead>
         </table>
     </div>
-</form>
-<!-- pagination -->
-<div class="pagination">
-    <span class="step-links">
-        {% if photos.has_previous %}
-            <a href="?page={{ photos.previous_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-left"></span></a>
-        {% endif %}
-
-        <span class="current">
-            Page <strong>{{ photos.number }}</strong> of {{ photos.paginator.num_pages }}
-        </span>
-
-        {% if photos.has_next %}
-            <a href="?page={{ photos.next_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-right"></span></a>
-        {% endif %}
-    </span>
 </div>
 {% endblock %}
