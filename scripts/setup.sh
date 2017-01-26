@@ -20,7 +20,7 @@ DEBUG = True
 EMAIL = dict()
 
 EMAIL['EMAIL_BACKEND'] = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL['EMAIL_USE_TLS'] = True
+EMAIL['EMAIL_USE_TLS'] = False
 EMAIL['EMAIL_HOST'] = 'smtp-relay.sendinblue.com'
 EMAIL['EMAIL_PORT'] = 587
 EMAIL['EMAIL_HOST_PASSWORD'] = 'TzNv13Ohx0tSUwnL'
@@ -74,7 +74,7 @@ DEBUG = bool(os.environ.get('DEBUG', False))
 EMAIL = dict()
 
 EMAIL['EMAIL_BACKEND'] = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL['EMAIL_USE_TLS'] = True
+EMAIL['EMAIL_USE_TLS'] = False
 EMAIL['EMAIL_HOST'] = os.environ['EMAIL_HOST']
 EMAIL['EMAIL_PORT'] = os.environ.get('EMAIL_PORT', 587)
 EMAIL['EMAIL_HOST_PASSWORD'] = os.environ['EMAIL_HOST_PASSWORD']
