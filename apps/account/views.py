@@ -24,6 +24,7 @@ from rest_framework.views import APIView
 from social.apps.django_app.utils import load_strategy
 from social.apps.django_app.utils import load_backend
 from social.exceptions import AuthAlreadyAssociated
+import json
 
 
 class AuthenticateViewSet(APIView):
@@ -59,10 +60,18 @@ class AuthenticateViewSet(APIView):
         :param request: Request object
         :return: Response object
         """
+        raw_payload = request.body
         payload = request.data
         email = payload.get('email')
         password = payload.get('password')
         response = get_default_response('400')
+        content_type = request.META['CONTENT_TYPE']
+
+        # This is to handle app versions that don't use application/json
+        if content_type == 'application/x-www-form-urlencoded' and email is None and password is None:
+            new_payload = json.loads(raw_payload.decode('utf-8'))
+            email = new_payload['email']
+            password = new_payload['password']
 
         if email and password:
             # TODO remove this a few weeks after transition to Django backend
