@@ -96,6 +96,7 @@ JET_SIDE_MENU_CUSTOM_APPS = [
     ('utils', ['__all__']),
     ('authtoken', ['__all__']),
     ('auth', ['__all__']),
+    ('communication', ['__all__']),
     ('dbmail', ['MailTemplate']),
     ('push_notifications', ['__all__']),
 ]

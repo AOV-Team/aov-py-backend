@@ -6,6 +6,10 @@ General
     cursor: pointer;
 }
 
+label {
+    font-weight: 700;
+}
+
 #send-button {
     background-color: #ff3333;
     color: #fff;
@@ -25,6 +29,7 @@ Push message area
 */
 
 #message {
+    margin-top: 20px;
     margin-bottom: 20px;
 }
 

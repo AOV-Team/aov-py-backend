@@ -1,5 +1,7 @@
 from apps.communication.serializers import AOVAPNSDeviceSerializer
+from apps.communication.models import PushMessage
 from apps.communication.tasks import send_push_notification
+from datetime import datetime, timedelta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -48,12 +50,26 @@ def push_notification_manager(request):
         # Set up message
         message = post['message']
         recipients = post.getlist('recipient-list[]')
+        schedule = post['schedule']
 
         if len(message) > 0:
-            if len(recipients) > 0:
-                send_push_notification.delay(message, recipients)
+            if schedule:
+                push_message = PushMessage(message=message, send_at=datetime.strptime(schedule, '%Y-%m-%d %H:%M'))
+                push_message.save()
+
+                if len(recipients) > 0:
+                    devices = list()
+
+                    for r in recipients:
+                        devices.append(APNSDevice.objects.get(id=r))
+
+                    push_message.device = devices
+                    push_message.save()
             else:
-                send_push_notification.delay(message, 'all')
+                if len(recipients) > 0:
+                    send_push_notification.delay(message, recipients)
+                else:
+                    send_push_notification.delay(message, 'all')
 
         return HttpResponseRedirect('/admin/push/')
     else:
