@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 from backend.settings.project_config import *
+from celery.schedules import crontab
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -163,6 +164,13 @@ BROKER_URL = BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json']
 
 CELERY_RESULT_BACKEND = CELERY_RESULT_BACKEND
+
+CELERYBEAT_SCHEDULE = {
+    'send-push-messages': {
+        'task': 'send_scheduled_push_notifications',
+        'schedule': crontab()  # Executes every minute
+    },
+}
 
 # Communication
 

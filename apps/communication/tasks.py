@@ -1,4 +1,7 @@
+from apps.communication import models as communication_models
 from celery import task
+from datetime import timedelta
+from django.utils import timezone
 from push_notifications.models import APNSDevice
 
 
@@ -21,3 +24,23 @@ def send_push_notification(message, recipients, **kwargs):
         devices = APNSDevice.objects.filter(id__in=recipients)
 
     devices.send_message(message, **kwargs)
+
+    return devices
+
+
+@task(name='send_scheduled_push_notifications')
+def send_scheduled_push_notifications():
+    """
+    Check for push notifications to be sent out.
+
+    :return: None
+    """
+    now = timezone.now().replace(second=0, microsecond=0)
+
+    # Query for messages to be sent out now
+    messages = communication_models.PushMessage.objects.filter(send_at=now)
+
+    for message in messages:
+        send_push_notification.delay(message.message, list(message.device.all().values_list('id', flat=True)))
+
+    return messages
