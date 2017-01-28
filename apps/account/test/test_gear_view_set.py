@@ -80,6 +80,85 @@ class TestGearViewSetGET(TestCase):
 
         self.assertEquals(len(gear), 89)
 
+    def test_gear_view_set_get_search_make(self):
+        """
+        Test that we can search gear by make
+
+        :return: None
+        """
+        # Create test data
+        account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II Test')
+        account_models.Gear.objects.create_or_update(item_make='Random Brand', item_model='a99 II Test')
+        account_models.Gear.objects.create_or_update(item_make='Random Brand', item_model='A7 Test')
+
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/gear?item_make=ran')
+        results = request.data['results']
+
+        self.assertIsNone(request.data['next'])
+        self.assertEquals(len(results), 2)
+
+    def test_gear_view_set_get_search_make_model(self):
+        """
+        Test that we can search gear by make and model
+
+        :return: None
+        """
+        # Create test data
+        account_models.Gear.objects.create_or_update(item_make='Units', item_model='EOS 5D Test')
+        account_models.Gear.objects.create_or_update(item_make='Units', item_model='EOS 5D Mark II Test')
+        account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II Test')
+
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/gear?item_make=unit&item_model=mark')
+        results = request.data['results']
+
+        self.assertIsNone(request.data['next'])
+        self.assertEquals(len(results), 1)
+        self.assertEquals(results[0]['item_model'], 'EOS 5D Mark II Test')
+
+    def test_gear_view_set_get_search_model(self):
+        """
+        Test that we can search gear by make
+
+        :return: None
+        """
+        # Create test data
+        account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Test Model')
+        account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II Test Model')
+        account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II Test')
+
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/gear?item_model=model')
+        results = request.data['results']
+
+        self.assertIsNone(request.data['next'])
+        self.assertEquals(len(results), 2)
+
 
 class TestGearViewSetPOST(TestCase):
     """
