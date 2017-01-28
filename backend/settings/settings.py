@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 from backend.settings.project_config import *
+from celery.schedules import crontab
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -50,10 +51,12 @@ INSTALLED_APPS = [
     'storages',
     'apps.account',
     'apps.analytic',
+    'apps.communication',
     'apps.photo.apps.PhotoConfig',
     'apps.utils',
     'dbmail',
     'guardian',
+    'push_notifications',
     'rest_framework',
     'rest_framework.authtoken',
     'social.apps.django_app.default',
@@ -94,7 +97,9 @@ JET_SIDE_MENU_CUSTOM_APPS = [
     ('utils', ['__all__']),
     ('authtoken', ['__all__']),
     ('auth', ['__all__']),
+    ('communication', ['__all__']),
     ('dbmail', ['MailTemplate']),
+    ('push_notifications', ['__all__']),
 ]
 
 
@@ -154,13 +159,18 @@ SOCIAL_AUTH_FACEBOOK_SECRET = SOCIAL_AUTH_FACEBOOK_SECRET
 
 # Celery settings
 
-BROKER_URL = 'redis://localhost:6379/0'
+BROKER_URL = BROKER_URL
 
-CELERY_ACCEPT_CONTENT = ['json', 'pickle']
+CELERY_ACCEPT_CONTENT = ['json']
 
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERY_RESULT_BACKEND = CELERY_RESULT_BACKEND
 
-CELERY_TIMEZONE = 'America/Boise'
+CELERYBEAT_SCHEDULE = {
+    'send-push-messages': {
+        'task': 'send_scheduled_push_notifications',
+        'schedule': crontab()  # Executes every minute
+    },
+}
 
 # Communication
 
@@ -172,6 +182,10 @@ EMAIL_HOST_PASSWORD = EMAIL['EMAIL_HOST_PASSWORD']
 EMAIL_HOST_USER = EMAIL['EMAIL_HOST_USER']
 DEFAULT_FROM_EMAIL = EMAIL['DEFAULT_FROM_EMAIL']
 SERVER_EMAIL = EMAIL['SERVER_EMAIL']
+
+PUSH_NOTIFICATIONS_SETTINGS = {
+        'APNS_CERTIFICATE': 'aov_dev.pem',
+}
 
 
 # Database

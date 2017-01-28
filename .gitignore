@@ -48,6 +48,7 @@ coverage.xml
 *.log
 *.pdf
 *.csv
+*.pem
 *.txt
 project_config.py
 !requirements.txt

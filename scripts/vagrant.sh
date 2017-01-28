@@ -50,6 +50,8 @@ pip install django-debug-toolbar
 echo "Installing Redis"
 ./scripts/install_redis.sh > /dev/null 2>&1
 redis-server --daemonize yes
+sudo printf "\nbind 0.0.0.0" >> /etc/redis/6379.conf
+sudo /etc/init.d/redis_6379 restart
 
 # Set virtualenvs owner
 sudo chown -R vagrant:vagrant ~vagrant/virtualenvs

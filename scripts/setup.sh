@@ -3,6 +3,11 @@ echo "Setting up '$1'"
 
 if [ "$1" == "dev" ]; then
     cat > backend/settings/project_config.py <<'EOF'
+import os
+
+BROKER_URL = 'redis://{}:{}/2'.format(os.environ.get('REDIS_HOST', '0.0.0.0'), os.environ.get('REDIS_PORT', 6379))
+CELERY_RESULT_BACKEND = 'redis://{}:{}/3'.format(os.environ.get('REDIS_HOST', '0.0.0.0'), os.environ.get('REDIS_PORT', 6379))
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -56,6 +61,9 @@ EOF
 elif [ "$1" == "production" ]; then
     cat > backend/settings/project_config.py <<'EOF'
 import os
+
+BROKER_URL = 'redis://{}:{}/2'.format(os.environ.get('REDIS_HOST', '0.0.0.0'), os.environ.get('REDIS_PORT', 6379))
+CELERY_RESULT_BACKEND = 'redis://{}:{}/3'.format(os.environ.get('REDIS_HOST', '0.0.0.0'), os.environ.get('REDIS_PORT', 6379))
 
 DATABASES = {
     'default': {

@@ -15,6 +15,7 @@ Including another URLconf
 """
 from apps.account import views as account_views
 from apps.analytic import views as analytic_views
+from apps.communication import views as communication_views
 from apps.photo import views as photo_views
 from apps.utils import views as utils_views
 from django.conf import settings
@@ -43,6 +44,9 @@ urlpatterns = [
     # Analytic
     url(r'api/statistics/(?P<resource>[a-z^/]+)$', analytic_views.StatisticsViewSet.as_view()),
 
+    # communication
+    url(r'api/devices$', communication_views.DevicesViewSet.as_view()),
+
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
     url(r'api/photo_classifications/(?P<photo_classification_id>[0-9^/]+)/photos$',
@@ -65,6 +69,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^admin/photos/$', photo_views.photo_admin),
     url(r'^admin/photos/map/$', photo_views.photo_map_admin),
+    url(r'^admin/push/$', communication_views.push_notification_manager),
     url(r'^admin/statistics/$', analytic_views.statistics_admin),
 ]
 

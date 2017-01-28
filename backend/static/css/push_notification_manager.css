@@ -1,0 +1,63 @@
+/*
+General
+*/
+
+.fa {
+    cursor: pointer;
+}
+
+label {
+    font-weight: 700;
+}
+
+#send-button {
+    background-color: #ff3333;
+    color: #fff;
+    padding: 10px;
+    float: right;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#send-button[disabled="disabled"] {
+    background-color: #aaa;
+}
+
+/*
+Push message area
+*/
+
+#message {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#message #characters {
+    display: block;
+    width: 100%;
+    height: 25px;
+    line-height: 25px;
+    text-align: right;
+}
+
+#message #push-message {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100px;
+    resize: none;
+}
+
+/*
+Recipient list
+*/
+
+.recipient {
+    width: 100%;
+    height: 25px;
+    line-height: 25px;
+}
+
+.recipient .fa {
+    float: right;
+}
