@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ObjectDoesNotExist
 from json.decoder import JSONDecodeError
 from rest_framework import generics, permissions
@@ -244,7 +245,17 @@ class GearViewSet(generics.ListCreateAPIView):
 
         :return: QuerySet
         """
-        return account_models.Gear.objects.filter(public=True)
+        make = self.request.GET.get('item_make')
+        model = self.request.GET.get('item_model')
+        queryset = account_models.Gear.objects.filter(public=True)
+
+        if make:
+            queryset = queryset.filter(item_make__icontains=make)
+
+        if model:
+            queryset = queryset.filter(item_model__icontains=model)
+
+        return queryset
 
     def post(self, request):
         """
