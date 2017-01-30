@@ -64,7 +64,7 @@ elif [ "$1" == "production" ]; then
     cat > backend/settings/project_config.py <<'EOF'
 import os
 
-APNS_CERTIFICATE = os.environ.get('apns_cert')
+APNS_CERTIFICATE = os.environ.get('APNS_CERT')
 
 BROKER_URL = 'redis://:{}@{}:{}/2'.format(os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
 CELERY_RESULT_BACKEND = 'redis://:{}@{}:{}/3'.format(os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
