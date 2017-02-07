@@ -44,7 +44,7 @@ def get_month_date_ranges(date1, date2):
 
         days_in_month = calendar.monthrange(step_year, step_month)[1]
         first_day = datetime(step_year, step_month, 1)
-        last_day = datetime(step_year, step_month, days_in_month, 23, 59)
+        last_day = datetime(step_year, step_month, days_in_month, 23, 59, 59)
 
         date_ranges.append((first_day, last_day,))
         counter += 1

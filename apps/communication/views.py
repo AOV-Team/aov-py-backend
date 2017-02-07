@@ -53,23 +53,29 @@ def push_notification_manager(request):
         schedule = post['schedule']
 
         if len(message) > 0:
-            if schedule:
-                push_message = PushMessage(message=message, send_at=datetime.strptime(schedule, '%Y-%m-%d %H:%M'))
-                push_message.save()
-
-                if len(recipients) > 0:
-                    devices = list()
-
-                    for r in recipients:
-                        devices.append(APNSDevice.objects.get(id=r))
-
-                    push_message.device = devices
-                    push_message.save()
+            if len(recipients) > 0:
+                send_push_notification.delay(message, recipients)
             else:
-                if len(recipients) > 0:
-                    send_push_notification.delay(message, recipients)
-                else:
-                    send_push_notification.delay(message, 'all')
+                send_push_notification.delay(message, 'all')
+
+            # Scheduling is disabled for now
+            # if schedule:
+            #     push_message = PushMessage(message=message, send_at=datetime.strptime(schedule, '%Y-%m-%d %H:%M'))
+            #     push_message.save()
+            #
+            #     if len(recipients) > 0:
+            #         devices = list()
+            #
+            #         for r in recipients:
+            #             devices.append(APNSDevice.objects.get(id=r))
+            #
+            #         push_message.device = devices
+            #         push_message.save()
+            # else:
+            #     if len(recipients) > 0:
+            #         send_push_notification.delay(message, recipients)
+            #     else:
+            #         send_push_notification.delay(message, 'all')
 
         return HttpResponseRedirect('/admin/push/')
     else:

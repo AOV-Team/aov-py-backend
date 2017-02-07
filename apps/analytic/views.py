@@ -78,9 +78,9 @@ class StatisticsViewSet(APIView):
                 date_ranges = dates.get_month_date_ranges(datetime(2016, 12, 1), datetime.now())
 
                 for d in date_ranges:
-                    photos = photo_models.Photo.objects.filter(created_at__gte=d[0], created_at__lte=d[1], public=True)
-                    users = account_models.User.objects\
-                        .filter(created_at__gte=d[0], created_at__lte=d[1], is_active=True)
+                    photos = photo_models.Photo.objects.filter(created_at__lte=d[1], public=True)
+                    users = account_models.User.objects.filter(created_at__lte=d[1], is_active=True)\
+                        .exclude(email='AnonymousUser')
 
                     data_points.append({
                         'date': '{}-{}-{}'.format(d[0].year, d[0].month, d[0].day),

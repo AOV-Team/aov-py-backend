@@ -25,8 +25,6 @@ def send_push_notification(message, recipients, **kwargs):
 
     devices.send_message(message, **kwargs)
 
-    return devices
-
 
 @task(name='send_scheduled_push_notifications')
 def send_scheduled_push_notifications():
