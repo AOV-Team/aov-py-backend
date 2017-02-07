@@ -3,7 +3,8 @@ from redis import StrictRedis
 import random
 import string
 
-r = StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'])
+r = StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB['PASSWORD_CODES'],
+                password=settings.REDIS_PASSWORD)
 
 
 def create_password_reset_code(user):

@@ -45,6 +45,7 @@ REDIS_DB = dict()
 
 REDIS_DB['PASSWORD_CODES'] = 1
 REDIS_HOST = 'localhost'
+REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
@@ -100,6 +101,7 @@ REDIS_DB = dict()
 
 REDIS_DB['PASSWORD_CODES'] = 1
 REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', None)
 REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
 
 SOCIAL_AUTH_FACEBOOK_SECRET = ''
