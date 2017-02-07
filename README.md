@@ -10,6 +10,10 @@ ensure a consistent dev environment that more closely mimics the production envi
 5. In SSH, `workon backend` to enable the virtual environment and go to project root
 6. Run `runserver` alias to start Django dev server and map to `http://localhost:8000`
 
+## Additional files
+Make sure the following files are in the project directory before running the project:
+* ./aov_dev.pem (for APNS)
+
 ## Endpoints
 ### `/api/auth`
 * DELETE

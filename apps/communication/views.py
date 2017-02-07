@@ -54,9 +54,11 @@ def push_notification_manager(request):
 
         if len(message) > 0:
             if len(recipients) > 0:
-                send_push_notification.delay(message, recipients)
+                # send_push_notification.delay(message, recipients)
+                send_push_notification(message, recipients)
             else:
-                send_push_notification.delay(message, 'all')
+                # send_push_notification.delay(message, 'all')
+                send_push_notification(message, 'all')
 
             # Scheduling is disabled for now
             # if schedule:
