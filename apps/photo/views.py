@@ -376,7 +376,9 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
             photo_classification_id = self.kwargs.get('photo_classification_id')
             classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
 
-            return photo_models.Photo.objects.filter(Q(category=classification) | Q(tag=classification), public=True)
+            return photo_models.Photo.objects\
+                .filter(Q(category=classification) | Q(tag=classification), public=True)\
+                .order_by('-id')
         except ObjectDoesNotExist:
             raise NotFound
 
