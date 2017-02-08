@@ -50,7 +50,7 @@ def push_notification_manager(request):
         # Set up message
         message = post['message']
         recipients = post.getlist('recipient-list[]')
-        schedule = post['schedule']
+        # schedule = post['schedule']
 
         if len(message) > 0:
             if len(recipients) > 0:
