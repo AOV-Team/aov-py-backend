@@ -7,6 +7,8 @@ from apps.common.views import get_default_response, handle_jquery_empty_array, L
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
+from apps.utils.models import UserAction
+from apps.utils.serializers import UserActionSerializer
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -500,6 +502,39 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
                 raise NotFound
         else:
             raise PermissionDenied
+
+
+class PhotoSingleFlagsViewSet(generics.CreateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = account_models.UserInterest.objects.all()
+    serializer_class = UserActionSerializer
+
+    def post(self, request, **kwargs):
+        """
+        Create a flag entry
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        authentication = TokenAuthentication().authenticate(request)
+        authenticated_user = authentication[0] if authentication else request.user
+
+        try:
+            photo = photo_models.Photo.objects.get(id=kwargs.get('pk'))
+            photo_content_type = ContentType.objects.get_for_model(photo)
+            user_action = UserAction.objects.filter(user=authenticated_user, action='photo_flag',
+                                                    content_type__pk=photo_content_type.id, object_id=photo.id).first()
+
+            if user_action:
+                return get_default_response('200')
+            else:
+                UserAction.objects.create(user=authenticated_user, action='photo_flag', content_object=photo)
+
+                return get_default_response('201')
+        except ObjectDoesNotExist:
+            raise NotFound('Photo does not exist')
 
 
 class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):

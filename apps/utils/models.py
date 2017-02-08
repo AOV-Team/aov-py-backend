@@ -7,6 +7,7 @@ from django.db import models
 class UserAction(models.Model):
     ACTION_CHOICES = (
         ('photo_click', 'Photo Click'),
+        ('photo_flag', 'Photo Flag'),
         ('photo_imp', 'Photo Impression'),
     )
 
