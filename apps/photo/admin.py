@@ -1,6 +1,7 @@
 from apps.account import models as account_models
 # from apps.common import forms
 from apps.photo import models as photo_models
+from apps.utils.models import UserAction
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
@@ -8,6 +9,65 @@ from django.core import urlresolvers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from guardian.admin import GuardedModelAdmin
+
+
+class FlaggedPhoto(photo_models.Photo):
+    class Meta:
+        proxy = True
+        verbose_name = 'flagged photo'
+        verbose_name_plural = 'flagged photos'
+
+
+class FlaggedPhotoAdmin(admin.ModelAdmin):
+    filter_horizontal = ('category', 'tag', 'photo_feed')
+
+    list_display = ('photo_tag', 'user_info', 'public', 'location', 'photo_clicks', 'id',)
+    ordering = ('-id',)
+    readonly_fields = ('coordinates', 'created_at', 'location', 'original_image_url', 'photo_clicks', 'user',)
+    search_fields = ('id', 'image', 'user__email', 'user__social_name', 'user__username',)
+
+    def get_queryset(self, request):
+        queryset = super(FlaggedPhotoAdmin, self).get_queryset(request)
+
+        flag_actions = UserAction.objects.filter(action='photo_flag')
+
+        return queryset.filter(id__in=[f.object_id for f in flag_actions])
+
+    def has_add_permission(self, request):
+        if settings.DEBUG:
+            return True
+
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG:
+            return True
+
+        return False
+
+    def photo_clicks(self, obj):
+        """
+        Show number of photo views (clicks)
+
+        :param obj: instance of Photo
+        :return: String w/ photo view count
+        """
+        view_count = obj.user_action.filter(action='photo_click')
+
+        return u'{}'.format(len(view_count))
+
+    photo_clicks.allow_tags = True
+    photo_clicks.short_description = 'Clicks'
+
+    def user_info(self, obj):
+        if obj.user:
+            link = urlresolvers.reverse("admin:account_user_change", args=[obj.user.id])
+            return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
+        else:
+            return '--empty--'
+
+    user_info.allow_tags = True
+    user_info.short_description = 'Username / Social Name'
 
 
 class PhotoClassificationAdmin(GuardedModelAdmin):
@@ -356,6 +416,7 @@ class StarredPhotoAdmin(admin.ModelAdmin):
     user_info.short_description = 'Username / Social Name'
 
 
+admin.site.register(FlaggedPhoto, FlaggedPhotoAdmin)
 admin.site.register(photo_models.PhotoClassification, PhotoClassificationAdmin)
 admin.site.register(photo_models.PhotoFeed, PhotoFeedAdmin)
 admin.site.register(photo_models.Photo, PhotoAdmin)
