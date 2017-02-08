@@ -250,10 +250,10 @@ class GearViewSet(generics.ListCreateAPIView):
         queryset = account_models.Gear.objects.filter(public=True)
 
         if make:
-            queryset = queryset.filter(item_make__icontains=make)
+            return queryset.filter(item_make__icontains=make).order_by('item_make', 'item_model')
 
         if model:
-            queryset = queryset.filter(item_model__icontains=model)
+            return queryset.filter(item_model__icontains=model).order_by('item_model', 'item_make')
 
         return queryset
 

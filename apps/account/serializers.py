@@ -13,13 +13,14 @@ class UserBasicSerializer(serializers.ModelSerializer):
     """ Use this serializer to add additional user info to photos """
     class Meta:
         model = models.User
-        fields = ('id', 'age', 'email', 'first_name', 'last_name', 'location', 'social_name', 'username')
+        fields = ('id', 'age', 'email', 'first_name', 'last_name', 'location', 'social_name', 'username',)
 
 
 class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'last_name', 'location', 'social_name', 'username')
+        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'gear', 'last_name', 'location', 'social_name',
+                  'username',)
 
 
 class UserSerializer(serializers.ModelSerializer):
