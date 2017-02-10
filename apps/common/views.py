@@ -111,6 +111,12 @@ def get_default_response(status_code):
         raise NameError('The status code {} not supported.'.format(status_code))
 
 
+class DefaultResultsSetPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 90
+
+
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 30
     page_size_query_param = 'page_size'

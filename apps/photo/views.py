@@ -2,8 +2,8 @@ from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.common import models as common_models
 from apps.common.serializers import setup_eager_loading
-from apps.common.views import get_default_response, handle_jquery_empty_array, LargeResultsSetPagination, \
-    MediumResultsSetPagination, remove_pks_from_payload
+from apps.common.views import DefaultResultsSetPagination, get_default_response, handle_jquery_empty_array, \
+    LargeResultsSetPagination, MediumResultsSetPagination, remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -392,6 +392,7 @@ class PhotoFeedViewSet(generics.ListAPIView):
 
 class PhotoFeedPhotosViewSet(generics.ListAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 

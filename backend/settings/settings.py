@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.postgres',
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'imagekit',

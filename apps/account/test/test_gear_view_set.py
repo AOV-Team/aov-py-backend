@@ -113,8 +113,8 @@ class TestGearViewSetGET(TestCase):
         :return: None
         """
         # Create test data
-        account_models.Gear.objects.create_or_update(item_make='Units', item_model='EOS 5D Test')
-        account_models.Gear.objects.create_or_update(item_make='Units', item_model='EOS 5D Mark II Test')
+        account_models.Gear.objects.create_or_update(item_make='Units', item_model='eZee 500')
+        account_models.Gear.objects.create_or_update(item_make='Units', item_model='ezee 700a II Test')
         account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II Test')
 
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
@@ -126,12 +126,12 @@ class TestGearViewSetGET(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        request = client.get('/api/gear?item_make=unit&item_model=mark')
+        request = client.get('/api/gear?item_make=unit&item_model=ezee')
         results = request.data['results']
 
         self.assertIsNone(request.data['next'])
-        self.assertEquals(len(results), 1)
-        self.assertEquals(results[0]['item_model'], 'EOS 5D Mark II Test')
+        self.assertEquals(len(results), 2)
+        self.assertEquals(results[0]['item_model'], 'eZee 500')
 
     def test_gear_view_set_get_search_model(self):
         """

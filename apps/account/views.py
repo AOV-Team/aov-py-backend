@@ -250,10 +250,12 @@ class GearViewSet(generics.ListCreateAPIView):
         queryset = account_models.Gear.objects.filter(public=True)
 
         if make:
-            return queryset.filter(item_make__icontains=make).order_by('item_make', 'item_model')
+            queryset = queryset.annotate(make_similarity=TrigramSimilarity('item_make', make))\
+                .filter(make_similarity__gt=0.2).order_by('-make_similarity')
 
         if model:
-            return queryset.filter(item_model__icontains=model).order_by('item_model', 'item_make')
+            queryset = account_models.Gear.objects.annotate(model_similarity=TrigramSimilarity('item_model', model))\
+                .filter(model_similarity__gt=0.2).order_by('-model_similarity')
 
         return queryset
 
