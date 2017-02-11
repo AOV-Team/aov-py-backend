@@ -5,6 +5,22 @@ from django.test import TestCase
 import re
 
 
+class TestGetRandomQuerysetElements(TestCase):
+    """
+    Test that we can get random model elements
+    """
+    def test_get_random_queryset_elements(self):
+        """
+        Successfully get random elements
+
+        :return: None
+        """
+        random_categories = list(common_models
+                                 .get_random_queryset_elements(photo_models.PhotoClassification.objects.all(), 3))
+
+        self.assertEquals(len(random_categories), 3)
+
+
 class TestGetUploadedFilePath(TestCase):
     """
     Test file naming
