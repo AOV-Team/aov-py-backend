@@ -394,6 +394,7 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.IsAuthenticated,)
+    photo_feed = None
     serializer_class = photo_serializers.PhotoSerializer
 
     @setup_eager_loading
@@ -405,12 +406,26 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
         """
         try:
             photo_feed_id = self.kwargs['photo_feed_id']
-            photo_feed = photo_models.PhotoFeed.objects.get(id=photo_feed_id)
+            self.photo_feed = photo_models.PhotoFeed.objects.get(id=photo_feed_id)
+            queryset = photo_models.Photo.objects.filter(public=True)
 
-            return photo_models.Photo.objects\
-                .filter(photo_feed=photo_feed, public=True)\
-                .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
-                .order_by('-creation_seq')
+            if self.photo_feed.randomize:
+                q_count = queryset.count()
+                page_size = self.paginator.get_page_size(self.request)
+                count = page_size if page_size < q_count else q_count
+
+                queryset = queryset\
+                    .filter(id__in=list(common_models.get_random_queryset_elements(queryset, count, False)),
+                            photo_feed=self.photo_feed)
+            else:
+                queryset = queryset.filter(photo_feed=self.photo_feed)\
+                    .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
+                    .order_by('-creation_seq')
+
+            if self.photo_feed.photo_limit:
+                return queryset[:self.photo_feed.photo_limit]
+
+            return queryset
         except ObjectDoesNotExist:
             raise NotFound
 

@@ -77,7 +77,10 @@ class PhotoFeedManager(models.Manager):
 
 class PhotoFeed(models.Model):
     name = models.CharField(max_length=64)
+    photo_limit = models.IntegerField(blank=True, null=True, verbose_name='max photos to display',
+                                      help_text='Leave blank for unlimited')
     public = models.BooleanField(default=True)
+    randomize = models.BooleanField(default=False)
 
     objects = PhotoFeedManager()
 
