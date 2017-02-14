@@ -37,7 +37,7 @@ $( document ).ready(function() {
             .range([height, 0]);
 
         var line = d3.line()
-            .curve(d3.curveBasis)
+            .curve(d3.curveMonotoneX)
             .x(function(d) { console.log('xxxxx', x(d.date)); return x(d.date); })
             .y(function(d) { return y(d.average_photos_per_user); });
 
@@ -99,6 +99,7 @@ $( document ).ready(function() {
 
         svg
             .append('path')
+            .attr('fill', 'none')
             .attr('class', 'line')
             .attr('d', line(data))
             .style("stroke", '#6f7e95');

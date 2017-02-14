@@ -56,6 +56,29 @@
 </div>
 <div class="pure-g">
     <div class="pure-u-1">
+        <h2>Feed Statistics</h2>
+    </div>
+    <div class="pure-u-1">
+        <table class="pure-table">
+            <thead>
+                <tr>
+                    <th>Feed</th>
+                    <th>Total Photo Clicks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feed in feeds %}
+                <tr>
+                    <th>{{ feed.name }}</th>
+                    <th>{{ feed.total_clicks }}</th>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="pure-g">
+    <div class="pure-u-1">
         <h2>Photo Statistics</h2>
     </div>
     <div class="pure-u-1">

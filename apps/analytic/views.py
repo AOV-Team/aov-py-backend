@@ -4,7 +4,7 @@ from apps.common.views import get_default_response
 from apps.photo import models as photo_models
 from datetime import datetime
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.shortcuts import render
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
@@ -32,11 +32,25 @@ def statistics_admin(request):
         # Photos per user
         photos.append(u.photo__count)
 
+    # Feed stats
+    feeds = photo_models.PhotoFeed.objects.filter(public=True)
+
+    for feed in feeds:
+        photo_counts = 0
+
+        feed_photos = photo_models.Photo.objects.filter(photo_feed__id=feed.id)
+
+        for photo in feed_photos:
+            photo_counts += photo.user_action.filter(action='photo_click').count()
+
+        feed.total_clicks = photo_counts
+
     context = {
         'age_avg': round(statistics.mean(ages), 2),
         'age_high': max(int(age) for age in ages),
         'age_low': min(int(age) for age in ages),
-        'avg_photos': round(statistics.mean(photos), 2)
+        'avg_photos': round(statistics.mean(photos), 2),
+        'feeds': feeds
     }
 
     return render(request, 'statistics.html', context)
