@@ -20,7 +20,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDenied, ValidationError
 
 
 @staff_member_required
@@ -290,8 +290,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
 
 
 class PhotoClassificationViewSet(generics.ListCreateAPIView):
-    authentication_classes = (SessionAuthentication, TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
     pagination_class = MediumResultsSetPagination
     serializer_class = photo_serializers.PhotoClassificationSerializer
 
@@ -329,6 +328,10 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
         payload = request.data
         payload = remove_pks_from_payload('photo_classification', payload)
 
+        # Have to be authenticated to POST
+        if not TokenAuthentication().authenticate(request):
+            return get_default_response('401')
+
         # Only tags are allowed
         if 'classification_type' in payload:
             if payload['classification_type'] == 'category':
@@ -362,8 +365,7 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
 
 
 class PhotoClassificationPhotosViewSet(generics.ListAPIView):
-    authentication_classes = (SessionAuthentication, TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
     serializer_class = photo_serializers.PhotoSerializer
 
     def get_queryset(self):
@@ -384,16 +386,14 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
 
 
 class PhotoFeedViewSet(generics.ListAPIView):
-    authentication_classes = (SessionAuthentication, TokenAuthentication)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
     queryset = photo_models.PhotoFeed.objects.filter(public=True)
     serializer_class = photo_serializers.PhotoFeedSerializer
 
 
 class PhotoFeedPhotosViewSet(generics.ListAPIView):
-    authentication_classes = (SessionAuthentication, TokenAuthentication,)
     pagination_class = DefaultResultsSetPagination
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
     photo_feed = None
     serializer_class = photo_serializers.PhotoSerializer
 
@@ -431,8 +431,7 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
 
 
 class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView):
-    authentication_classes = (SessionAuthentication, TokenAuthentication)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
     serializer_class = photo_serializers.PhotoSerializer
 
     @setup_eager_loading
@@ -448,8 +447,14 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
         :param kwargs:
         :return: Response object
         """
-        authenticated_user = TokenAuthentication().authenticate(request)[0]
         photo_id = kwargs.get('pk')
+        authenticate = TokenAuthentication().authenticate(request)
+
+        # User needs to be authenticated
+        if authenticate:
+            authenticated_user = authenticate[0]
+        else:
+            return get_default_response('401')
 
         try:
             photo = photo_models.Photo.objects.get(id=photo_id, public=True)
@@ -488,12 +493,21 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
 
     def patch(self, request, *args, **kwargs):
         """
+        Edit photo
 
-        :param request:
-        :return:
+        :param request: Request object
+        :return: Response object
         """
+        authenticate = TokenAuthentication().authenticate(request)
+
+        # Check that user is authenticated
+        if authenticate:
+            user = authenticate[0]
+        else:
+            return get_default_response('401')
+
         # Needs to be superuser
-        if request.user.is_superuser:
+        if user.is_superuser:
             photo_id = kwargs.get('pk')
             payload = request.data
             payload = remove_pks_from_payload('photo', payload)

@@ -108,3 +108,35 @@ class TestPhotoClassificationPhotosViewSetGET(TestCase):
         request = client.get('/api/photo_classifications/{}/photos'.format(55555))
 
         self.assertEquals(request.status_code, 404)
+
+    def test_photo_classification_photos_view_set_get_unauthenticated(self):
+        """
+        Test that any user can get photos
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        classification = photo_models.PhotoClassification.objects\
+            .create_or_update(name='night', classification_type='category')
+
+        photo1 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo1.save()
+        photo1.category = [classification]
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.save()
+        photo2.category = [classification]
+        photo2.save()
+
+        # Get data from endpoint
+        client = APIClient()
+
+        request = client.get('/api/photo_classifications/{}/photos'.format(classification.id))
+        results = request.data['results']
+
+        self.assertEquals(len(results), 2)

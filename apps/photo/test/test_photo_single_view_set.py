@@ -70,6 +70,31 @@ class TestPhotoSingleViewSetDELETE(TestCase):
 
         self.assertEquals(updated_photo.public, True)
 
+    def test_photo_single_view_set_delete_unauthenticated(self):
+        """
+        Test that unauthenticated user cannot delete photo
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        photo = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo.save()
+
+        # Get data from endpoint
+        client = APIClient()
+
+        request = client.delete('/api/photos/{}'.format(photo.id))
+
+        self.assertEquals(request.status_code, 401)
+
+        # Query for entry
+        updated_photo = photo_models.Photo.objects.get(id=photo.id)
+
+        self.assertEquals(updated_photo.public, True)
+
 
 class TestPhotoSingleViewSetGET(TestCase):
     """
@@ -156,6 +181,40 @@ class TestPhotoSingleViewSetGET(TestCase):
         request = client.get('/api/photos/{}'.format(5555))
 
         self.assertEquals(request.status_code, 404)
+
+    def test_photo_single_view_set_get_unauthenticated(self):
+        """
+        Test that we get photo if user not logged in
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user.location = 'Boise'
+        user.social_name = '@theaov'
+        user.save()
+
+        photo = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo.save()
+        photo.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
+                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
+        photo.save()
+
+        # Get data from endpoint
+        client = APIClient()
+
+        request = client.get('/api/photos/{}'.format(photo.id))
+        result = request.data
+
+        self.assertIn('dimensions', result)
+        self.assertIn('image', result)
+        self.assertEquals(len(result['gear']), 2)
+        self.assertIsInstance(result['gear'][0], int)
+        self.assertEquals(result['user'], user.id)
+        self.assertEquals(result['user_details']['location'], user.location)
+        self.assertEquals(result['user_details']['social_name'], user.social_name)
+        self.assertEquals(result['user_details']['username'], user.username)
 
 
 class TestPhotoSingleViewSetPATCH(TestCase):
@@ -393,3 +452,45 @@ class TestPhotoSingleViewSetPATCH(TestCase):
 
         self.assertEquals(len(photos), 1)
         self.assertEquals(len(photos[0].photo_feed.all()), 0)
+
+    def test_photo_single_view_set_patch_unauthenticated(self):
+        """
+        Test that user that is not logged in cannot edit photo
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_superuser(email='mrtest@mypapaya.io', password='WhoAmI')
+
+        category = photo_models.PhotoClassification.objects\
+            .create_or_update(name='Landscape', classification_type='category')
+        feed = photo_models.PhotoFeed.objects.create_or_update(name='Night')
+
+        photo = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo.save()
+        photo.category = [category]
+        photo.save()
+
+        # Create some gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'gear': [gear_1.id, gear_2.id],
+            'photo_feed': [feed.id],
+        }
+
+        request = client.patch('/api/photos/{}'.format(photo.id), data=payload, format='json')
+
+        self.assertEquals(request.status_code, 401)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.filter(id=photo.id)
+
+        self.assertEquals(len(photos), 1)
+        self.assertEquals(len(photos[0].gear.all()), 0)
+        self.assertEquals(photos[0].photo_feed.all().count(), 0)

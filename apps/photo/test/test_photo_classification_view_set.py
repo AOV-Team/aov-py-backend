@@ -85,6 +85,27 @@ class TestPhotoClassificationViewSetGET(TestCase):
 
         self.assertEquals(request.status_code, 400)
 
+    def test_photo_classification_view_set_get_not_authenticated(self):
+        """
+        Test that we can successfully get all classifications even if not authenticated
+
+        :return: None
+        """
+        # Test data
+        photo_models.PhotoClassification.objects.create_or_update(name='City')
+        photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
+        photo_models.PhotoClassification.objects.create_or_update(name='Rural', classification_type='category')
+
+        # Get data from endpoint
+        client = APIClient()
+
+        request = client.get('/api/photo_classifications')
+        results = request.data['results']
+
+        # 11 classifications are created by fixture
+        self.assertEquals(len(results), 14)
+        self.assertEquals(results[2]['classification_type'], 'category')
+
     def test_photo_classification_view_set_get_public(self):
         """
         Test that we can successfully get all public classifications
@@ -243,6 +264,28 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         classifications = photo_models.PhotoClassification.objects.all()
 
         self.assertEquals(len(classifications), 13)
+
+    def test_photo_classification_view_set_post_category_not_authenticated(self):
+        """
+        Test that unauthenticated users cannot create a tag
+
+        :return: None
+        """
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            'name': 'Night',
+            'classification_type': 'tag'
+        }
+
+        request = client.post('/api/photo_classifications', data=payload, format='json')
+        self.assertEquals(request.status_code, 401)
+
+        # Query for entry as well
+        classifications = photo_models.PhotoClassification.objects.all()
+
+        self.assertEquals(len(classifications), 11)
 
     def test_photo_classification_view_set_post_not_public(self):
         """

@@ -38,7 +38,7 @@ urlpatterns = [
     url(r'api/users$', account_views.UserViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)$', account_views.UserSingleViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/photos$', account_views.UserPhotosViewSet.as_view()),
-    url(r'api/users/(?P<pk>[0-9^/]+)/profile', account_views.UserProfileViewSet.as_view()),
+    url(r'api/users/(?P<pk>[0-9^/]+)/profile$', account_views.UserProfileViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)/stars$', account_views.UserSingleStarsViewSet.as_view()),
 
     # Analytic
@@ -56,7 +56,8 @@ urlpatterns = [
     url(r'api/photos$', photo_views.PhotoViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)$', photo_views.PhotoSingleViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/flags', photo_views.PhotoSingleFlagsViewSet.as_view()),
-    url(r'api/photos/(?P<pk>[0-9^/]+)/(?P<user_interest>stars|likes)$', photo_views.PhotoSingleInterestsViewSet.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/(?P<user_interest>stars|likes)$',
+        photo_views.PhotoSingleInterestsViewSet.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
