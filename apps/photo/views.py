@@ -555,9 +555,10 @@ class PhotoSingleFlagsViewSet(generics.CreateAPIView):
             raise NotFound('Photo does not exist')
 
 
-class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
+class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
     """
-    /api/photos/{}/interests
+    /api/photos/{}/likes
+    /api/photos/{}/stars
     """
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
@@ -576,6 +577,12 @@ class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
         authenticated_user = authentication[0] if authentication else request.user
         response = get_default_response('200')
         starred_photo_id = kwargs.get('pk')
+        user_interest = kwargs.get('user_interest')
+
+        if user_interest == 'stars' or user_interest == 'likes':
+            user_interest = user_interest[:-1]
+        else:
+            raise NotFound('Invalid user interest')
 
         try:
             try:
@@ -586,13 +593,13 @@ class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
                 return response
 
             photo_type = ContentType.objects.get_for_model(photo)
-            interest = account_models.UserInterest.objects.filter(user=authenticated_user, interest_type='star',
+            interest = account_models.UserInterest.objects.filter(user=authenticated_user, interest_type=user_interest,
                                                                   content_type__pk=photo_type.id,
                                                                   object_id=photo.id)
 
             interest.delete()
         except ObjectDoesNotExist:
-            # Return 200 even if user wasn't starred
+            # Return 200 even if photo wasn't acted upon
             pass
 
         return response
@@ -609,6 +616,12 @@ class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
         authenticated_user = authentication[0] if authentication else request.user
         response = get_default_response('400')
         photo_id = kwargs.get('pk')
+        user_interest = kwargs.get('user_interest')
+
+        if user_interest == 'stars' or user_interest == 'likes':
+            user_interest = user_interest[:-1]
+        else:
+            raise NotFound('Invalid user interest')
 
         try:
             photo = photo_models.Photo.objects.get(id=photo_id)
@@ -616,13 +629,13 @@ class PhotoSingleStarsViewSet(generics.DestroyAPIView, generics.CreateAPIView):
             # Make sure there is no existing entry
             photo_type = ContentType.objects.get_for_model(photo)
             interest = account_models.UserInterest.objects \
-                .filter(user=authenticated_user, interest_type='star', content_type__pk=photo_type.id,
+                .filter(user=authenticated_user, interest_type=user_interest, content_type__pk=photo_type.id,
                         object_id=photo.id) \
                 .first()
 
             if not interest:
                 account_models.UserInterest.objects.create(content_object=photo,
-                                                           user=authenticated_user, interest_type='star')
+                                                           user=authenticated_user, interest_type=user_interest)
                 response = get_default_response('201')
             else:
                 response = get_default_response('409')
