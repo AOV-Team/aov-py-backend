@@ -49,7 +49,7 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
-### `/api/gear`
+### `/api/gear`, `/api/gear?item_make=`, `/api/gear?item_model=`, `/api/gear?item_make=&item_model=`
 * GET
 * POST
 ```javascript
@@ -133,16 +133,31 @@ Make sure the following files are in the project directory before running the pr
 ### `/api/users/{}/photos`
 * GET
 
+### `/api/users/{}/profile`
+* GET
+
 ### `/api/users/{}/stars`
 * DELETE
 * POST
+
+### `/api/statistics/{resource:photos|users}`
+* GET
+
+### `/api/devices`, `/api/devices?q=`
+* GET (only admins can access this endpoint)
+* POST
+```javascript
+{
+    "registration_id": ""
+}
+```
 
 ### `/api/photo_classifications`
 * GET
 * POST
 ```javascript
 {
-    "classification_type": "category|tag",
+    "classification_type": "tag",
     "name": ""
 }
 ```
@@ -186,6 +201,26 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
+### `/api/photos/{}/flags`
+* POST
+
+### `/api/photos/{}/likes`
+* DELETE
+* POST
+
 ### `/api/photos/{}/stars`
 * DELETE
 * POST
+
+### `/api/me/actions`
+* POST
+```javascript
+{
+    "id": _  // photo id
+    "action": "photo_click|photo_imp"
+}
+```
+
+## Troubleshooting
+If certain unit tests are failing due to authentication/timestamp errors (usually Boto/AWS-dependant tests), run 
+`sudo ntpdate pool.ntp.org` in your vagrant machine to sync the VM's time.
