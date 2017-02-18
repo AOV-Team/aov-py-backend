@@ -404,26 +404,34 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
 
         :return: Queryset
         """
+        # TODO figure out why randomness isn't functioning properly
+        # try:
+        #     photo_feed_id = self.kwargs['photo_feed_id']
+        #     self.photo_feed = photo_models.PhotoFeed.objects.get(id=photo_feed_id)
+        #     queryset = photo_models.Photo.objects.filter(public=True, photo_feed=self.photo_feed)
+        #
+        #     if self.photo_feed.randomize:
+        #         count = self.photo_feed.photo_limit if self.photo_feed.photo_limit else self.paginator.get_page_size(self.request)
+        #         r = list(common_models.get_random_queryset_elements(queryset, count, False))
+        #
+        #         queryset = queryset.filter(id__in=r)
+        #     else:
+        #         queryset = queryset.extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
+        #             .order_by('-creation_seq')
+        #
+        #     if self.photo_feed.photo_limit:
+        #         return queryset[:self.photo_feed.photo_limit]
+        #
+        #     return queryset
+        # except ObjectDoesNotExist:
+        #     raise NotFound
         try:
             photo_feed_id = self.kwargs['photo_feed_id']
             self.photo_feed = photo_models.PhotoFeed.objects.get(id=photo_feed_id)
-            queryset = photo_models.Photo.objects.filter(public=True)
-
-            if self.photo_feed.randomize:
-                q_count = queryset.count()
-                page_size = self.paginator.get_page_size(self.request)
-                count = page_size if page_size < q_count else q_count
-
-                queryset = queryset\
-                    .filter(id__in=list(common_models.get_random_queryset_elements(queryset, count, False)),
-                            photo_feed=self.photo_feed)
-            else:
-                queryset = queryset.filter(photo_feed=self.photo_feed)\
-                    .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
-                    .order_by('-creation_seq')
-
-            if self.photo_feed.photo_limit:
-                return queryset[:self.photo_feed.photo_limit]
+            queryset = photo_models.Photo.objects\
+                .filter(public=True, photo_feed=self.photo_feed)\
+                .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
+                .order_by('-creation_seq')
 
             return queryset
         except ObjectDoesNotExist:

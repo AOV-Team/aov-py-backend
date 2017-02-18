@@ -108,6 +108,10 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
 
 
 class PhotoFeedAdmin(GuardedModelAdmin):
+    fieldsets = (
+        ('Photo Feed', {'fields': ('name', 'public',)}),
+    )
+
     list_display = ('name', 'public', 'photo_count', 'id', 'action_buttons',)
     ordering = ('name',)
     search_fields = ('name', 'id',)
@@ -272,7 +276,7 @@ class PhotoFeedPhotoFilter(admin.SimpleListFilter):
 
 
 class PhotoFeedPhotoAdmin(admin.ModelAdmin):
-    filter_horizontal = ('category', 'tag', 'photo_feed')
+    filter_horizontal = ('category', 'tag', 'photo_feed',)
 
     list_display = ('photo_tag', 'user_info', 'location', 'public', 'photo_clicks', 'action_buttons', 'id',)
     list_display_links = None

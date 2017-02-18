@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.geos import GEOSGeometry
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils.safestring import mark_safe
 from imagekit.models import ImageSpecField
@@ -78,7 +79,8 @@ class PhotoFeedManager(models.Manager):
 class PhotoFeed(models.Model):
     name = models.CharField(max_length=64)
     photo_limit = models.IntegerField(blank=True, null=True, verbose_name='max photos to display',
-                                      help_text='Leave blank for unlimited')
+                                      help_text='Leave blank for unlimited.',
+                                      validators=[MaxValueValidator(9999)])
     public = models.BooleanField(default=True)
     randomize = models.BooleanField(default=False)
 

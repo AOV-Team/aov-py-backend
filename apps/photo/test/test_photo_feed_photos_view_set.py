@@ -4,6 +4,7 @@ from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from django.test import TestCase
 from rest_framework.test import APIClient
+from unittest import skip
 
 
 class TestPhotoFeedPhotosViewSetGET(TestCase):
@@ -54,6 +55,7 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
         self.assertEquals(len(results), 2)
         self.assertGreater(results[0]['id'], results[1]['id'])
 
+    @skip('disabled')
     def test_photo_feed_photos_view_set_get_limited(self):
         """
         Test that we can limit number of results returned
@@ -118,6 +120,7 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
         self.assertIn('next', request.data)
         self.assertEquals(len(results), 4)
 
+    @skip('disabled')
     def test_photo_feed_photos_view_set_get_random_limited(self):
         """
         Test that we can get a random list of photos for a feed
