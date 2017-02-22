@@ -100,7 +100,7 @@ JET_SIDE_MENU_CUSTOM_APPS = [
     ('auth', ['__all__']),
     ('communication', ['__all__']),
     ('dbmail', ['MailTemplate']),
-    ('push_notifications', ['__all__']),
+    ('push_notifications', ['APNSDevice']),
 ]
 
 

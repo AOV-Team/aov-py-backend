@@ -71,7 +71,9 @@ $( document ).ready(function() {
             (function(device) {
                 $.when(getUser(device['user'])).then(function(data) {
                     var html = '<tr class="device" data-id="' + device['id'] + '" data-email="' + data.email + '">'
-                        + '<td>' + data.email + '</td><td><span id="add-device" class="fa fa-plus"></span></td></tr>'
+                        + '<td>' + data.email + '</td>'
+                        + '<td>' + device['active'] + '</td>'
+                        + '<td><span id="add-device" class="fa fa-plus"></span></td></tr>'
 
                     table.append(html);
                 });

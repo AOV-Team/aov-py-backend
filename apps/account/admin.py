@@ -7,6 +7,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from guardian import models as guardian
 from guardian.admin import GuardedModelAdmin
+from push_notifications.admin import DeviceAdmin
+from push_notifications.models import APNSDevice
+
+
+class APNSDeviceAdmin(DeviceAdmin):
+    readonly_fields = ('user',)
 
 
 class GearAdmin(admin.ModelAdmin):
@@ -252,3 +258,5 @@ admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Profile, ProfileAdmin)
 admin.site.register(models.UserInterest, UserInterestAdmin)
 admin.site.register(guardian.UserObjectPermission, UserObjectPermissionAdmin)
+admin.site.unregister(APNSDevice)
+admin.site.register(APNSDevice, APNSDeviceAdmin)
