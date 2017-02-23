@@ -62,7 +62,7 @@ class Photo(ImageFile):
         """
         # Resize if larger than max
         if self.pillow_image.size[0] > max_width:
-            return WidthResize(max_width).process(self.pillow_image)
+            self.pillow_image =  WidthResize(max_width).process(self.pillow_image)
 
         return self.pillow_image
 

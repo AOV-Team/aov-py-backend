@@ -413,6 +413,45 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         self.assertEquals(len(photos[0].gear.all()), 2)
         self.assertEquals(photos[0].photo_feed.all()[0].id, feed.id)
 
+    def test_photo_single_view_set_patch_gear_session_auth(self):
+        """
+        Test that we can update a photo's gear
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_superuser(email='mrtest@mypapaya.io', password='WhoAmI')
+
+        category = photo_models.PhotoClassification.objects\
+            .create_or_update(name='Landscape', classification_type='category')
+        feed = photo_models.PhotoFeed.objects.create_or_update(name='Night')
+
+        photo = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo.save()
+        photo.category = [category]
+        photo.save()
+
+        # Get data from endpoint
+        client = APIClient()
+        client.login(username=user.email, password='WhoAmI')
+
+        payload = {
+            'photo_feed': [feed.id],
+        }
+
+        request = client.patch('/api/photos/{}'.format(photo.id), data=payload, format='json')
+        result = request.data
+
+        self.assertEquals(len(result['photo_feed']), 1)
+        self.assertEquals(result['photo_feed'], [feed.id])
+
+        # Query for entry
+        photos = photo_models.Photo.objects.filter(id=photo.id)
+
+        self.assertEquals(len(photos), 1)
+        self.assertEquals(photos[0].photo_feed.all()[0].id, feed.id)
+
     def test_photo_single_view_set_patch_not_superuser(self):
         """
         Test that regular user cannot update photo

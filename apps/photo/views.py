@@ -511,6 +511,8 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
         # Check that user is authenticated
         if authenticate:
             user = authenticate[0]
+        elif request.user.is_superuser:
+            user = request.user
         else:
             return get_default_response('401')
 

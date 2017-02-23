@@ -467,6 +467,7 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(len(photos), 1)
         self.assertTrue(photos[0].public)
+        self.assertEquals(photos[0].image.width, 2048)
 
     def test_photo_view_set_post_remote_no_gear_successful(self):
         """

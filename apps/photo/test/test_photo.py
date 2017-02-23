@@ -34,12 +34,15 @@ class TestPhoto(TestCase):
 
         :return: None
         """
-        file = 'apps/common/test/data/photos/photo1-min.jpg'
+        file = 'apps/common/test/data/photos/md-portrait.jpg'
 
         photo = Photo(open(file, 'rb'))
         image = photo.compress()
 
+        pil_image = Image.open(image)
+
         self.assertIsInstance(image, InMemoryUploadedFile)
+        self.assertEquals(pil_image.size[0], 2048)
 
     @override_settings(REMOTE_IMAGE_STORAGE=False,
                        DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
