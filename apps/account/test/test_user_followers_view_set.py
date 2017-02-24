@@ -20,8 +20,8 @@ class TestUserFollowersViewSetGET(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_1, interest_type='follow')
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_2, interest_type='follow')
+        target_user.follower = [user_1, user_2]
+        target_user.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(access_user)
@@ -41,11 +41,6 @@ class TestUserFollowersViewSetGET(TestCase):
         for result in results:
             if result['username'] != user_1.username and result['username'] != user_2.username:
                 self.fail('Unidentified follower')
-
-        # Check for entry
-        interests = account_models.UserInterest.objects.all()
-
-        self.assertEquals(len(interests), 2)
 
     def test_user_followers_view_set_get_does_not_exist(self):
         """
@@ -80,8 +75,8 @@ class TestUserFollowersViewSetGET(TestCase):
         user_2 = account_models.User.objects.create_user(email='prince@aov.com', social_name='@wbp', username='wbp')
 
         # Follow target user
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_1, interest_type='follow')
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_2, interest_type='follow')
+        target_user.follower = [user_1, user_2]
+        target_user.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(target_user)
@@ -102,11 +97,6 @@ class TestUserFollowersViewSetGET(TestCase):
             if result['username'] != user_1.username and result['username'] != user_2.username:
                 self.fail('Unidentified follower')
 
-        # Check for entry
-        interests = account_models.UserInterest.objects.all()
-
-        self.assertEquals(len(interests), 2)
-
     def test_user_followers_view_set_get_unauthenticated(self):
         """
         Test that an unauthenticated user can retrieve followers
@@ -120,8 +110,8 @@ class TestUserFollowersViewSetGET(TestCase):
         user_2 = account_models.User.objects.create_user(email='prince@aov.com', social_name='@wbp', username='wbp')
 
         # Follow target user
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_1, interest_type='follow')
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_2, interest_type='follow')
+        target_user.follower = [user_1, user_2]
+        target_user.save()
 
         # Get data from endpoint
         client = APIClient()
@@ -137,11 +127,6 @@ class TestUserFollowersViewSetGET(TestCase):
         for result in results:
             if result['username'] != user_1.username and result['username'] != user_2.username:
                 self.fail('Unidentified follower')
-
-        # Check for entry
-        interests = account_models.UserInterest.objects.all()
-
-        self.assertEquals(len(interests), 2)
 
 
 class TestUserFollowersViewSetPOST(TestCase):
@@ -159,7 +144,8 @@ class TestUserFollowersViewSetPOST(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_1, interest_type='follow')
+        target_user.follower = [user_1]
+        target_user.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(access_user)
@@ -173,12 +159,12 @@ class TestUserFollowersViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 201)
 
         # Check for entry
-        interests = account_models.UserInterest.objects.all()
+        followers = target_user.follower.all()
 
-        self.assertEquals(len(interests), 2)
+        self.assertEquals(len(followers), 2)
 
-        for interest in interests:
-            if interest.user.id != access_user.id and interest.user.id != user_1.id:
+        for follower in followers:
+            if follower.id != access_user.id and follower.id != user_1.id:
                 self.fail('Unidentified follower')
 
     def test_user_followers_view_set_post_already_following(self):
@@ -194,7 +180,8 @@ class TestUserFollowersViewSetPOST(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        account_models.UserInterest.objects.create(content_object=target_user, user=access_user, interest_type='follow')
+        target_user.follower = [access_user]
+        target_user.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(access_user)
@@ -208,13 +195,13 @@ class TestUserFollowersViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 409)
 
         # Check for entry
-        interests = account_models.UserInterest.objects.all()
+        followers = target_user.follower.all()
 
-        self.assertEquals(len(interests), 1)
+        self.assertEquals(followers.count(), 1)
 
-        interest = interests.first()
+        follower = followers.first()
 
-        self.assertEquals(interest.user.id, access_user.id)
+        self.assertEquals(follower.id, access_user.id)
 
     def test_user_followers_view_set_post_does_not_exist(self):
         """
@@ -254,6 +241,6 @@ class TestUserFollowersViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 401)
 
         # Check for entry
-        interests = account_models.UserInterest.objects.all()
+        followers = target_user.follower.all()
 
-        self.assertEquals(len(interests), 0)
+        self.assertEquals(followers.count(), 0)

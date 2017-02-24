@@ -81,6 +81,7 @@ class UserCustomManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
+    follower = models.ManyToManyField('User', related_name='followers')
     gear = models.ManyToManyField(Gear, blank=True)
 
     age = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -99,7 +100,20 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     objects = UserCustomManager()
 
     class Meta:
-        verbose_name_plural = "Users"
+        default_permissions = ('add', 'change', 'delete', 'view')
+        verbose_name_plural = 'Users'
+
+    @property
+    def followers_count(self):
+        """
+        Return number of followers
+
+        :return: int
+        """
+        user_type = ContentType.objects.get_for_model(self)
+        return UserInterest.objects\
+            .filter(interest_type='follow', content_type__pk=user_type.id, object_id=self.id)\
+            .count()
 
     def get_short_name(self):
         return self.email
@@ -110,9 +124,6 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
 
     def __str__(self):
         return '{},\t{},\tID{}'.format(self.username, self.email, self.id)
-
-    class Meta:
-        default_permissions = ('add', 'change', 'delete', 'view')
 
 
 class ProfileManager(models.Manager):
@@ -159,7 +170,6 @@ class UserInterest(models.Model):
     https://makina-corpus.com/blog/metier/2015/how-to-improve-prefetch_related-performance-with-the-prefetch-object
     """
     INTEREST_TYPE_CHOICES = (
-        ('follow', 'Follow'),
         ('like', 'Like'),
         ('star', 'Star'),
     )

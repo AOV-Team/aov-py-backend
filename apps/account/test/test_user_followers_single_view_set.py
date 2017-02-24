@@ -19,8 +19,8 @@ class TestUserFollowersViewSetDELETE(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        account_models.UserInterest.objects.create(content_object=target_user, user=access_user, interest_type='follow')
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_1, interest_type='follow')
+        target_user.follower = [access_user, user_1]
+        target_user.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(access_user)
@@ -34,13 +34,13 @@ class TestUserFollowersViewSetDELETE(TestCase):
         self.assertEquals(request.status_code, 200)
 
         # Check for entry
-        interests = account_models.UserInterest.objects.all()
+        followers = target_user.follower.all()
 
-        self.assertEquals(len(interests), 1)
+        self.assertEquals(followers.count(), 1)
 
-        interest = interests.first()
+        follower = followers.first()
 
-        self.assertEquals(interest.user.id, user_1.id)
+        self.assertEquals(follower.id, user_1.id)
 
     def test_user_followers_view_set_delete_not_following(self):
         """
@@ -56,7 +56,8 @@ class TestUserFollowersViewSetDELETE(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_1, interest_type='follow')
+        target_user.follower = [user_1]
+        target_user.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(access_user)
@@ -70,13 +71,13 @@ class TestUserFollowersViewSetDELETE(TestCase):
         self.assertEquals(request.status_code, 200)
 
         # Check for entry
-        interests = account_models.UserInterest.objects.all()
+        followers = target_user.follower.all()
 
-        self.assertEquals(len(interests), 1)
+        self.assertEquals(followers.count(), 1)
 
-        interest = interests.first()
+        follower = followers.first()
 
-        self.assertEquals(interest.user.id, user_1.id)
+        self.assertEquals(follower.id, user_1.id)
 
     def test_user_followers_view_set_delete_not_found(self):
         """
@@ -110,7 +111,8 @@ class TestUserFollowersViewSetDELETE(TestCase):
         user_1 = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
 
         # Follow target user
-        account_models.UserInterest.objects.create(content_object=target_user, user=user_1, interest_type='follow')
+        target_user.follower = [user_1]
+        target_user.save()
 
         # Get data from endpoint
         client = APIClient()
@@ -120,10 +122,10 @@ class TestUserFollowersViewSetDELETE(TestCase):
         self.assertEquals(request.status_code, 401)
 
         # Check for entry
-        interests = account_models.UserInterest.objects.all()
+        followers = target_user.follower.all()
 
-        self.assertEquals(len(interests), 1)
+        self.assertEquals(followers.count(), 1)
 
-        interest = interests.first()
+        follower = followers.first()
 
-        self.assertEquals(interest.user.id, user_1.id)
+        self.assertEquals(follower.id, user_1.id)

@@ -739,12 +739,7 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
         """
         try:
             user = account_models.User.objects.get(id=self.kwargs.get('user_id'))
-            user_type = ContentType.objects.get_for_model(user)
-            user_ids = account_models.UserInterest.objects\
-                .filter(interest_type='follow', content_type__pk=user_type.id, object_id=user.id).values('user_id')
-            users = [u['user_id'] for u in user_ids]
-
-            return account_models.User.objects.filter(id__in=users)
+            return user.follower.all()
 
         except ObjectDoesNotExist:
             raise NotFound('User does not exist')
@@ -764,15 +759,13 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
 
             try:
                 user = account_models.User.objects.get(id=kwargs.get('user_id'), is_active=True)
-                user_type = ContentType.objects.get_for_model(user)
-                follow = account_models.UserInterest.objects \
-                    .filter(interest_type='follow', content_type__pk=user_type.id, object_id=user.id, user=auth_user)
+                follow = user.follower.filter(id=auth_user.id).first()
 
                 # Create follow entry
                 # If user is already following this user, return HTTP 409 status code
                 if not follow:
-                    account_models.UserInterest.objects\
-                        .create(content_object=user, interest_type='follow', user=auth_user)
+                    user.follower.add(auth_user)
+                    user.save()
 
                     return get_default_response('201')
                 else:
@@ -800,10 +793,8 @@ class UserFollowerSingleViewSet(generics.DestroyAPIView):
 
         try:
             user = account_models.User.objects.get(id=kwargs.get('user_id'), is_active=True)
-            user_type = ContentType.objects.get_for_model(user)
-            interest = account_models.UserInterest.objects \
-                .filter(user=auth_user, interest_type='follow', content_type__pk=user_type.id, object_id=user.id)
-            interest.delete()
+            user.follower.remove(auth_user)
+            user.save()
 
             return get_default_response('200')
         except ObjectDoesNotExist:

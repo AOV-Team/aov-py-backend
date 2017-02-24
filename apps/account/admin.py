@@ -143,19 +143,18 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         ('User', {'fields': ('email', 'username', 'social_name', 'password', )}),
         ('User Details',
-            {'fields': ('id', 'first_name', 'last_name', 'age', 'location', 'avatar', 'created_at', 'last_login',
-                        'gear',)}),
+            {'fields': ('first_name', 'last_name', 'age', 'location', 'avatar', 'created_at', 'last_login',
+                        'gear', 'follower',)}),
         ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ('username', 'email', 'social_name', 'location', 'age', 'photo_count', 'id', 'created_at',
-                    'action_buttons',)
+    list_display = ('username', 'email', 'social_name', 'location', 'age', 'followers_count', 'photo_count', 'id',
+                    'created_at', 'action_buttons',)
     list_filter = (StarUserFilter, 'is_active', 'is_superuser',)
     list_per_page = 100
-    ordering = ('-photo__count', '-id', 'username',)
+    ordering = ('-photo__count', '-follower__count', '-id', 'username',)
 
-    readonly_fields = ('created_at', 'gear', 'id', 'last_login', 'photo_count',)
-
+    readonly_fields = ('created_at', 'gear', 'id', 'follower', 'last_login', 'photo_count',)
     search_fields = ('age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name',)
 
     # Override get_changelist so we can get logged-in user
@@ -165,7 +164,7 @@ class UserAdmin(BaseUserAdmin):
         return qs
 
     def get_queryset(self, request):
-        return super(UserAdmin, self).get_queryset(request).annotate(Count('photo'))
+        return super(UserAdmin, self).get_queryset(request).annotate(Count('photo')).annotate(Count('follower'))
 
     def has_delete_permission(self, request, obj=None):
         if settings.DEBUG or request.user.is_superuser:
@@ -201,6 +200,12 @@ class UserAdmin(BaseUserAdmin):
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
 
+    def followers_count(self, obj):
+        return obj.follower__count
+
+    followers_count.admin_order_field = 'follower__count'
+    followers_count.short_description = 'Followers'
+
     def photo_count(self, obj):
         return obj.photo__count
 
@@ -231,8 +236,15 @@ class ProfileAdmin(GuardedModelAdmin):
 
 class UserInterestAdmin(GuardedModelAdmin):
     list_display = ('content_type', 'id', 'content_object', 'interest_type', 'user',)
-    readonly_fields = ('user', 'interest_type', 'content_type', 'object_id',)
+    readonly_fields = ('user', 'interest_type', 'content_type', 'object_id',) if not settings.DEBUG else tuple()
     search_fields = ('id', 'user',)
+
+    def render_change_form(self, request, context, *args, **kwargs):
+        """
+        Fixes issue where form won't render due to annotation
+        """
+        context['adminform'].form.fields['user'].queryset = models.User.objects.all()
+        return super(UserInterestAdmin, self).render_change_form(request, context, args, kwargs)
 
     def has_delete_permission(self, request, obj=None):
         if settings.DEBUG:
