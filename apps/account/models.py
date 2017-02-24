@@ -94,7 +94,9 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     location = models.CharField(max_length=255, blank=True, null=True)
     social_name = models.CharField(max_length=64, blank=True,
                                    null=True)  # third party social platforms such as Instagram
+    social_url = models.URLField(max_length=2083, blank=True, null=True)
     username = models.CharField(max_length=255, unique=True)
+    website_url = models.URLField(max_length=2083, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     objects = UserCustomManager()
