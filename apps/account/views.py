@@ -6,7 +6,8 @@ from apps.common import models as common_models
 from apps.common.mailer import send_transactional_email
 from apps.common.exceptions import ForbiddenValue, OverLimitException
 from apps.common.serializers import setup_eager_loading
-from apps.common.views import get_default_response, MediumResultsSetPagination, remove_pks_from_payload
+from apps.common.views import get_default_response, LargeResultsSetPagination, MediumResultsSetPagination, \
+    remove_pks_from_payload
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -723,6 +724,90 @@ class SocialSignUpViewSet(generics.CreateAPIView):
                 response.data['userMessage'] = 'The specified user already exists. Please log in.'
 
         return response
+
+
+class UserFollowersViewSet(generics.ListCreateAPIView):
+    pagination_class = LargeResultsSetPagination
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = account_serializers.UserPublicSerializer
+
+    def get_queryset(self):
+        """
+        Get followers for a user
+
+        :return: Queryset
+        """
+        try:
+            user = account_models.User.objects.get(id=self.kwargs.get('user_id'))
+            user_type = ContentType.objects.get_for_model(user)
+            user_ids = account_models.UserInterest.objects\
+                .filter(interest_type='follow', content_type__pk=user_type.id, object_id=user.id).values('user_id')
+            users = [u['user_id'] for u in user_ids]
+
+            return account_models.User.objects.filter(id__in=users)
+
+        except ObjectDoesNotExist:
+            raise NotFound('User does not exist')
+
+    def post(self, request, **kwargs):
+        """
+        Follow a user
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        authentication = TokenAuthentication().authenticate(request)
+
+        if authentication:
+            auth_user = authentication[0]
+
+            try:
+                user = account_models.User.objects.get(id=kwargs.get('user_id'), is_active=True)
+                user_type = ContentType.objects.get_for_model(user)
+                follow = account_models.UserInterest.objects \
+                    .filter(interest_type='follow', content_type__pk=user_type.id, object_id=user.id, user=auth_user)
+
+                # Create follow entry
+                # If user is already following this user, return HTTP 409 status code
+                if not follow:
+                    account_models.UserInterest.objects\
+                        .create(content_object=user, interest_type='follow', user=auth_user)
+
+                    return get_default_response('201')
+                else:
+                    return get_default_response('409')
+            except ObjectDoesNotExist:
+                raise NotFound('User does not exist')
+        else:
+            return get_default_response('401')
+
+
+class UserFollowerSingleViewSet(generics.DestroyAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def delete(self, request, **kwargs):
+        """
+        Stop following a user
+
+        :param request: Request object
+        :param kwargs:
+        :return: Response object
+        """
+        authentication = TokenAuthentication().authenticate(request)
+        auth_user = authentication[0]
+
+        try:
+            user = account_models.User.objects.get(id=kwargs.get('user_id'), is_active=True)
+            user_type = ContentType.objects.get_for_model(user)
+            interest = account_models.UserInterest.objects \
+                .filter(user=auth_user, interest_type='follow', content_type__pk=user_type.id, object_id=user.id)
+            interest.delete()
+
+            return get_default_response('200')
+        except ObjectDoesNotExist:
+            raise NotFound('User does not exist')
 
 
 class UserPhotosViewSet(generics.ListAPIView):
