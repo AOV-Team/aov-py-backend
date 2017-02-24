@@ -89,7 +89,10 @@ class TestUsersViewSetPOST(TestCase):
                 'last_name': 'Ronquillo',
                 'location': 'Boise',
                 'password': 'WhoWantsToBeAMillionaire?',
-                'username': 'aov_hov'
+                'social_name': 'aov',
+                'social_url': 'http://instagram.com/aov',
+                'username': 'aov_hov',
+                'website_url': 'https://artofvisuals.com'
             }
 
             request = client.post('/api/users', data=payload, format='multipart')
@@ -99,7 +102,10 @@ class TestUsersViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 201)
         self.assertIn('avatar', result)
         self.assertIn('email', result)
+        self.assertIn('social_name', result)
+        self.assertIn('social_url', result)
         self.assertIn('username', result)
+        self.assertIn('website_url', result)
 
         user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
@@ -110,7 +116,10 @@ class TestUsersViewSetPOST(TestCase):
         self.assertTrue(user.is_active)
         self.assertEquals(user.last_name, 'Ronquillo')
         self.assertEquals(user.location, 'Boise')
+        self.assertEquals(user.social_name, 'aov')
+        self.assertEquals(user.social_url, 'http://instagram.com/aov')
         self.assertEquals(user.username, 'aov_hov')
+        self.assertEquals(user.website_url, 'https://artofvisuals.com')
         self.assertFalse(user.is_superuser)
 
     def test_users_view_set_post_app_data_successful(self):
