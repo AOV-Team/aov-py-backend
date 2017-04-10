@@ -148,8 +148,8 @@ class UserAdmin(BaseUserAdmin):
         ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ('username', 'email', 'social_name', 'location', 'age', 'followers_count', 'photo_count', 'id',
-                    'created_at', 'action_buttons',)
+    list_display = ('username', 'email', 'social_name', 'social_url', 'website_url', 'location', 'age',
+                    'followers_count', 'photo_count', 'id', 'created_at', 'action_buttons',)
     list_filter = (StarUserFilter, 'is_active', 'is_superuser',)
     list_per_page = 100
     ordering = ('-photo__count', '-follower__count', '-id', 'username',)
