@@ -19,7 +19,8 @@ class TestMeViewSetGET(TestCase):
         gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
         gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
-        user = account_models.User.objects.create_user(email='test@test.com', social_name='aeon', username='aov_hov')
+        user = account_models.User.objects.create_user(email='test@test.com', social_name='aeon', username='aov_hov',
+                                                       gender='Male')
         user.gear = [gear_1, gear_2]
 
         # Simulate auth
@@ -36,6 +37,7 @@ class TestMeViewSetGET(TestCase):
         self.assertEquals(len(result['gear']), 2)
         self.assertEquals(result['social_name'], user.social_name)
         self.assertEquals(result['username'], user.username)
+        self.assertEquals(result['gender'], user.gender)
 
 
 class TestMeViewSetPATCH(TestCase):
@@ -67,7 +69,8 @@ class TestMeViewSetPATCH(TestCase):
             'email': user.email,
             'age': 22,
             'gear': [gear_1.id, gear_2.id],
-            'username': user.username
+            'username': user.username,
+            'gender': 'Male'
         }
 
         request = client.patch('/api/me', data=payload, format='json')
@@ -75,12 +78,14 @@ class TestMeViewSetPATCH(TestCase):
 
         self.assertEquals(result['age'], 22)
         self.assertEquals(len(result['gear']), 2)
+        self.assertEquals(result['gender'], 'Male')
 
         # Also check entry
         updated_user = account_models.User.objects.get(id=user.id)
 
         self.assertEquals(updated_user.age, 22)
         self.assertEquals(len(updated_user.gear.all()), 2)
+        self.assertEquals(updated_user.gender, 'Male')
 
     def test_me_view_set_patch_avatar(self):
         """
@@ -405,3 +410,41 @@ class TestMeViewSetPATCH(TestCase):
 
         self.assertEquals(updated_user.age, 23)
         self.assertEquals(updated_user.username, 'aov_hov')
+
+    def test_me_view_set_patch_gender(self):
+        """
+        Test that we can update the users gender
+
+        :return: None
+        """
+        # Create data
+        user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
+                                                       username='aov_hov')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        self.assertEquals(user.gender, 'None')
+
+        payload = {
+            'email': user.email,
+            'age': 22,
+            'username': user.username,
+            'gender': 'Male'
+        }
+
+        request = client.patch('/api/me', data=payload, format='json')
+        result = request.data
+
+        self.assertEquals(result['age'], 22)
+        self.assertEquals(result['gender'], 'Male')
+
+        # Also check entry
+        updated_user = account_models.User.objects.get(id=user.id)
+
+        self.assertEquals(updated_user.age, 22)
+        self.assertEquals(updated_user.gender, 'Male')
