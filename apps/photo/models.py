@@ -117,6 +117,7 @@ class Photo(geo_models.Model):
     image_medium = ImageSpecField(source='image', processors=[WidthResize(1242)], format='JPEG')
 
     location = models.CharField(max_length=255, blank=True, null=True)
+    magazine_authorized = models.BooleanField(default=True)
     original_image_url = models.URLField(blank=True, null=True)
     photo_data = models.TextField(blank=True, null=True)
     public = models.BooleanField(default=True)

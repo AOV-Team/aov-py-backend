@@ -36,6 +36,7 @@ def photo_admin(request):
     feed = request.GET.get('feed')
     g = request.GET.get('g')
     i = request.GET.get('i')
+    magazine = request.GET.get('magazine')
     q = request.GET.get('q')
     u = request.GET.get('u')
 
@@ -75,6 +76,9 @@ def photo_admin(request):
         # ID
         photos = photo_models.Photo.objects.filter(pk=i)
 
+    if magazine:
+        photos = photo_models.Photo.objects.filter(magazine_authorized=magazine)
+
     if q or u:
         # Search for a tag
         if q:
@@ -101,7 +105,7 @@ def photo_admin(request):
                 photos = photos | photo_models.Photo.objects.filter(user=user)
 
     # Default query
-    if not category and not date and not feed and not g and not i and not q and not u:
+    if not category and not date and not feed and not g and not i and not q and not u and not magazine:
         # Build search attributes for photo
         search = {
             'public': True
@@ -527,6 +531,9 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
             # Cannot change image
             if 'image' in payload:
                 del payload['image']
+
+            if 'magazine_authorized' in payload:
+                payload['magazine_authorized'] = payload['magazine_authorized'][0] == 'true'
 
             try:
                 photo = photo_models.Photo.objects.get(id=photo_id)

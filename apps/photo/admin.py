@@ -161,7 +161,7 @@ class StarPhotoFilter(admin.SimpleListFilter):
 
 class PhotoAdmin(GuardedModelAdmin):
     fieldsets = (
-        ('Image', {'fields': ('image', 'original_image_url', 'user', 'coordinates', 'location', 'gear', 'public',)}),
+        ('Image', {'fields': ('image', 'original_image_url', 'user', 'coordinates', 'location', 'gear', 'public', 'magazine_authorized',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
         ('Misc', {'fields': ('attribution_name', 'photo_data', 'created_at',)}),
     )
