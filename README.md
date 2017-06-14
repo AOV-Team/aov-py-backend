@@ -158,7 +158,9 @@ Make sure the following files are in the project directory before running the pr
 ```javascript
 {
     "classification_type": "tag",
-    "name": ""
+    "name": "",
+    "icon": [file],
+    "category_image": [file]
 }
 ```
 

@@ -19,5 +19,3 @@ def get_image_preview_form(dynamic_model, image_attribute_name='image'):
             model = dynamic_model
 
     return ImagePreviewForm
-
-

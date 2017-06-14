@@ -69,7 +69,7 @@ def get_random_queryset_elements(queryset, number, yield_object=True):
             pass
 
 
-def get_uploaded_file_path(instance, filename):
+def get_uploaded_file_path(instance, filename, purpose=None):
     """
     Function that determines file path for specified file
 
@@ -91,3 +91,39 @@ def get_uploaded_file_path(instance, filename):
 
     # 2016-11-30_135957_{filename|username}.{ext}
     return build_file_name(current_time, filename)
+
+def get_classification_background_file_path(instance, filename):
+    """
+        Function that determines file path for specified file
+
+    :param instance: instance of db object for which file is being saved
+    :param filename: name of file
+    :return: path to file
+    """
+
+    filename = "{}_background".format(instance.name)
+
+    # Date stamp
+    current_time = get_date_stamp_str()
+
+    # 2016-11-30_135957_{filename|username}.{ext}
+    filepath = build_file_name(current_time, filename)
+    return filepath
+
+def get_classification_icon_file_path(instance, filename):
+    """
+        Function that determines file path for specified file
+
+    :param instance: instance of db object for which file is being saved
+    :param filename: name of file
+    :return: path to file
+    """
+
+    filename = "{}_icon".format(instance.name)
+
+    # Date stamp
+    current_time = get_date_stamp_str()
+
+    # 2016-11-30_135957_{filename|username}.{ext}
+    filepath = build_file_name(current_time, filename)
+    return filepath

@@ -1,6 +1,7 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
+from apps.photo.photo import Photo
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -18,7 +19,13 @@ class TestPhotoClassificationViewSetGET(TestCase):
         # Test data
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
 
-        photo_models.PhotoClassification.objects.create_or_update(name='City')
+        photo_models.PhotoClassification.objects.create_or_update(name='City',
+                                                                  category_image=Photo(
+                                                                      open('apps/common/test/data/photos/small.jpg',
+                                                                           'rb')),
+                                                                  icon=Photo(
+                                                                      open('apps/common/test/data/photos/small.jpg',
+                                                                           'rb')))
         photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
         photo_models.PhotoClassification.objects.create_or_update(name='Rural', classification_type='category')
 
@@ -35,6 +42,8 @@ class TestPhotoClassificationViewSetGET(TestCase):
         # 11 classifications are created by fixture
         self.assertEquals(len(results), 14)
         self.assertEquals(results[2]['classification_type'], 'category')
+        self.assertIn('icon', results[0])
+        self.assertIn('category_image', results[0])
 
     def test_photo_classification_view_set_get_filtered_successful(self):
         """

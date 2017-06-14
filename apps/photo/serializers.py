@@ -8,7 +8,7 @@ import re
 class PhotoClassificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PhotoClassification
-        fields = ('id', 'name', 'classification_type')
+        fields = ('id', 'name', 'classification_type', 'icon', 'category_image')
 
 
 class PhotoFeedSerializer(serializers.ModelSerializer):

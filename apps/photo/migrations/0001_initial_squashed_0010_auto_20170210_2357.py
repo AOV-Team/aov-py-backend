@@ -165,5 +165,5 @@ class Migration(migrations.Migration):
             name='randomize',
             field=models.BooleanField(default=False),
         ),
-        migrations.RunPython(load_fixture),
+        # migrations.RunPython(load_fixture),
     ]

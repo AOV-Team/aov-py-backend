@@ -3,11 +3,13 @@ from apps.common import models as common_models
 from apps.photo.photo import BlurResize, WidthResize
 from apps.utils import models as utils_models
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.forms import ValidationError
 from django.utils.safestring import mark_safe
 from imagekit.models import ImageSpecField
 
@@ -43,7 +45,10 @@ class PhotoClassification(models.Model):
         ('tag', 'Tag')
     )
 
+    category_image = models.ImageField(
+        upload_to=common_models.get_classification_background_file_path, blank=True, null=True)
     classification_type = models.CharField(max_length=32, choices=CLASSIFICATION_TYPE_CHOICES, default='tag')
+    icon = models.ImageField(upload_to=common_models.get_classification_icon_file_path, blank=True, null=True)
     name = models.CharField(max_length=64)
     public = models.BooleanField(default=True)
 
