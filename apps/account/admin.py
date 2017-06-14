@@ -143,12 +143,12 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         ('User', {'fields': ('email', 'username', 'social_name', 'password', )}),
         ('User Details',
-            {'fields': ('first_name', 'last_name', 'age', 'location', 'avatar', 'created_at', 'last_login',
+            {'fields': ('first_name', 'last_name', 'age', 'gender', 'location', 'avatar', 'created_at', 'last_login',
                         'gear', 'follower', 'social_url', 'website_url',)}),
         ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 
-    list_display = ('username', 'email', 'social_name', 'location', 'age', 'followers_count', 'photo_count', 'id',
+    list_display = ('username', 'email', 'social_name', 'location', 'age', 'gender', 'followers_count', 'photo_count', 'id',
                     'created_at', 'action_buttons',)
     list_filter = (StarUserFilter, 'is_active', 'is_superuser',)
     list_per_page = 100

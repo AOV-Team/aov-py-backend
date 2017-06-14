@@ -81,6 +81,12 @@ class UserCustomManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
+    GENDER_CHOICES = (
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('None', 'None')
+    )
+
     follower = models.ManyToManyField('User', related_name='followers')
     gear = models.ManyToManyField(Gear, blank=True)
 
@@ -88,6 +94,7 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     avatar = models.ImageField(upload_to=common_models.get_uploaded_file_path, blank=True, null=True)
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=64, blank=True, null=True)
+    gender = models.CharField(max_length=8, choices=GENDER_CHOICES, default="None", null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False, verbose_name='staff account')
     last_name = models.CharField(max_length=64, blank=True, null=True)

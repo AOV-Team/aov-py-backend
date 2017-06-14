@@ -45,10 +45,17 @@ $( document ).ready(function() {
             csrfToken = $(this).parent().find('input[type="hidden"]').attr('value'),
             thisCheckboxFeedId = $(this).attr('data-feed-id'),
             thisCheckboxChecked = $(this).attr('checked');
+            thisMagazineAuthorization = $(this)[0].checked;
+        if(photoId === undefined) {
+            photoId = $('[id="photo-info"]').attr('data-photo-id');
+        }
 
         // Append all feeds that were already checked
         $(this).parent().children('input[checked]').each(function(index) {
-            var id = $(this).attr('class').replace('feed-', '')
+            var id = $(this).attr('class');
+            if (id !== undefined) {
+                id = id.replace('feed-', '');
+            }
 
             // Append feeds already checked
             // Otherwise uncheck
@@ -59,14 +66,16 @@ $( document ).ready(function() {
         });
 
         // Append feed just checked if unchecked
-        if (thisCheckboxChecked == undefined) {
+        if (thisCheckboxChecked === undefined) {
             $(this).attr('checked', true);
             photoFeeds.push(thisCheckboxFeedId);
         }
 
         data = {
-            photo_feed: photoFeeds
-        }
+            photo_feed: photoFeeds,
+            magazine_authorized: thisMagazineAuthorization
+        };
+        console.log($(this)[0].checked, thisMagazineAuthorization, data.magazine_authorized);
 
         if(photoFeeds.length == 0)
             data.photo_feed = null;
@@ -129,6 +138,12 @@ $( document ).ready(function() {
                 <option value="?feed={{ feed.name }}">{{ feed.name }}</option>
             {% endfor %}
         </select>
+        <select class="photo-mgmt-select" tabindex="-1" aria-hidden="true" onchange="javascript:location.search = this.value;">
+            <option value="?" selected="selected">By magazine</option>
+            <option disabled="disabled">---</option>
+            <option value="?magazine=True">Yes</option>
+            <option value="?magazine=False">No</option>
+        </select>
         <input type="submit" value="Search">
     </form>
 </div>
@@ -158,7 +173,7 @@ $( document ).ready(function() {
                             {% endfor %}
                             {% csrf_token %}
                         {% endif %}
-                        <div class="info">
+                        <div id="photo-info" class="info" data-photo-id="{{ photo.id }}">
                             <h2>Photo info</h2>
                             <p>
                                 {% if photo.starred %}
@@ -173,6 +188,14 @@ $( document ).ready(function() {
                                 <strong>User age:</strong> {{ photo.user.age }}<br>
                                 <strong>Photo location:</strong> {{ photo.location }}<br>
                                 <strong>Uploaded:</strong> {{ photo.created_at }}<br>
+                                <strong>AOV magazine authorization:</strong>
+                                <input name="authorized" title="authorized" value="{{ photo.magazine_authorized }}" type="checkbox">
+                                <!--{% if photo.magazine_authorized %}-->
+                                    <!--<input name="authorized" type="checkbox" value="{{ photo.magazine_authorized }}" checked>-->
+                                <!--{% else %}-->
+                                    <!--<input name="authorized" value="{{ photo.magazine_authorized }}" type="checkbox">-->
+                                <!--{% endif %}-->
+                                {% csrf_token %}
                             </p>
                         </div>
                         <p>

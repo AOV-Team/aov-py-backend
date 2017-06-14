@@ -1,6 +1,8 @@
 from apps.account import models as account_models
 # from apps.common import forms
+from apps.photo import forms as photo_forms
 from apps.photo import models as photo_models
+from apps.photo.photo import Photo
 from apps.utils.models import UserAction
 from django.conf import settings
 from django.contrib import admin
@@ -74,6 +76,7 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
     """
     Categories and tags
     """
+    form = photo_forms.PhotoClassificationAdminForm
     list_display = ('name', 'classification_type', 'photo_count', 'public', 'id', 'action_buttons',)
     ordering = ('classification_type', 'name',)
     search_fields = ('name', 'classification_type', 'id',)
@@ -102,6 +105,11 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
 
     def photo_count(self, obj):
         return obj.photos_in_category + obj.photos_in_tag
+
+    def save_model(self, request, obj, form, change):
+        if obj.category_image and obj.icon:
+            obj.category_image = Photo(obj.category_image).save("{}_background".format(obj.name))
+            obj.icon = Photo(obj.icon).save("{}_icon".format(obj.name))
 
     photo_count.admin_order_field = 'photos'
     photo_count.short_description = 'Photos'
@@ -161,7 +169,7 @@ class StarPhotoFilter(admin.SimpleListFilter):
 
 class PhotoAdmin(GuardedModelAdmin):
     fieldsets = (
-        ('Image', {'fields': ('image', 'original_image_url', 'user', 'coordinates', 'location', 'gear', 'public',)}),
+        ('Image', {'fields': ('image', 'original_image_url', 'user', 'coordinates', 'location', 'gear', 'public', 'magazine_authorized',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
         ('Misc', {'fields': ('attribution_name', 'photo_data', 'created_at',)}),
     )
