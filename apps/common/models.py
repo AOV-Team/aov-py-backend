@@ -101,7 +101,7 @@ def get_classification_background_file_path(instance, filename):
     :return: path to file
     """
 
-    filename = "{}_background".format(instance.name)
+    filename = "{}_background.{}".format(instance.name, filename.split('.')[-1])
 
     # Date stamp
     current_time = get_date_stamp_str()
@@ -119,7 +119,7 @@ def get_classification_icon_file_path(instance, filename):
     :return: path to file
     """
 
-    filename = "{}_icon".format(instance.name)
+    filename = "{}_icon.{}".format(instance.name, filename.split('.')[-1])
 
     # Date stamp
     current_time = get_date_stamp_str()
