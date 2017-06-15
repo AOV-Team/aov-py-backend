@@ -107,9 +107,18 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
         return obj.photos_in_category + obj.photos_in_tag
 
     def save_model(self, request, obj, form, change):
+        # Check for the 'Clear' selection
+        post_data = request.POST
+        if post_data.get('category_image-clear') == 'on':
+            obj.category_image = None
+
+        if post_data.get('icon-clear') == 'on':
+            obj.icon = None
+
         if obj.category_image and obj.icon:
             obj.category_image = Photo(obj.category_image).save("{}_background".format(obj.name))
             obj.icon = Photo(obj.icon).save("{}_icon".format(obj.name))
+        obj.save()
 
     photo_count.admin_order_field = 'photos'
     photo_count.short_description = 'Photos'
