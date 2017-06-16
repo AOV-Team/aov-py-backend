@@ -28,5 +28,5 @@ class Migration(migrations.Migration):
             name='icon',
             field=models.ImageField(blank=True, null=True, upload_to=apps.common.models.get_classification_icon_file_path),
         ),
-        migrations.RunPython(load_fixture),
+        # migrations.RunPython(load_fixture),
     ]

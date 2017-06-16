@@ -77,9 +77,13 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
     Categories and tags
     """
     form = photo_forms.PhotoClassificationAdminForm
-    list_display = ('name', 'classification_type', 'photo_count', 'public', 'id', 'action_buttons',)
-    ordering = ('classification_type', 'name',)
+    list_display = ('name', 'order_value', 'classification_type', 'photo_count', 'public', 'id', 'action_buttons',)
+    ordering = ('admin_order_value', 'classification_type', 'name',)
     search_fields = ('name', 'classification_type', 'id',)
+
+    def order_value(self, obj):
+        return obj.admin_order_value
+    order_value.short_description = 'Display Order'
 
     def get_queryset(self, request):
         return super(PhotoClassificationAdmin, self).get_queryset(request)\
@@ -107,15 +111,15 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
         return obj.photos_in_category + obj.photos_in_tag
 
     def save_model(self, request, obj, form, change):
-
-        # Check for the 'Clear' selection
         post_data = request.POST
+        # Check for the 'Clear' selection
         if post_data.get('category_image-clear') == 'on':
             obj.category_image = None
 
         if post_data.get('icon-clear') == 'on':
             obj.icon = None
 
+        # Deal with any images added
         if obj.category_image and obj.icon:
             obj.category_image = Photo(obj.category_image).save("{}_background.{}".format(obj.name, obj.category_image.name.split('.')[-1]))
             obj.icon = Photo(obj.icon).save("{}_icon.{}".format(obj.name, obj.icon.name.split('.')[-1]))
