@@ -389,6 +389,43 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
             raise NotFound
 
 
+class PhotoClassificationPhotoFeedPhotosViewSet(generics.ListAPIView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = photo_serializers.PhotoSerializer
+
+    @setup_eager_loading
+    def get_queryset(self):
+        """
+        Return photos for a classification
+
+        :return: Queryset
+        """
+        try:
+            photo_classification_id = self.kwargs.get('photo_classification_id')
+            classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
+            if classification.classification_type == 'tag':
+                queryset = Photo.objects.none()
+                return queryset
+
+            related_feed = classification.photo_feed
+
+            # return photo_models.Photo.objects \
+            #     .filter(Q(category=classification) | Q(tag=classification), public=True) \
+            #     .order_by('-id')
+            if related_feed:
+                queryset = photo_models.Photo.objects \
+                    .filter(public=True, photo_feed=classification.photo_feed) \
+                    .extra(select={'creation_seq': 'photo_photo_photo_feed.id'}) \
+                    .order_by('-creation_seq')
+
+                return queryset
+            else:
+                raise ObjectDoesNotExist
+
+        except ObjectDoesNotExist:
+            raise NotFound
+
+
 class PhotoFeedViewSet(generics.ListAPIView):
     permission_classes = (permissions.AllowAny,)
     queryset = photo_models.PhotoFeed.objects.filter(public=True)

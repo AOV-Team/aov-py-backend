@@ -27,6 +27,7 @@ class PhotoClassificationManager(models.Manager):
                     classification_type=new_photo_classification.classification_type).first()
 
         if existing:
+            new_photo_classification.photo_feed = existing.photo_feed
             new_photo_classification.category_image = existing.category_image
             new_photo_classification.icon = existing.icon
             new_photo_classification.pk = existing.pk
@@ -51,6 +52,7 @@ class PhotoClassification(models.Model):
     classification_type = models.CharField(max_length=32, choices=CLASSIFICATION_TYPE_CHOICES, default='tag')
     icon = models.ImageField(upload_to=common_models.get_classification_icon_file_path, blank=True, null=True)
     name = models.CharField(max_length=64)
+    photo_feed = models.ForeignKey('PhotoFeed', on_delete=models.SET_NULL, null=True, blank=True)
     public = models.BooleanField(default=True)
 
     objects = PhotoClassificationManager()

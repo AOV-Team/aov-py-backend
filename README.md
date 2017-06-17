@@ -167,6 +167,9 @@ Make sure the following files are in the project directory before running the pr
 ### `/api/photo_classifications/{}/photos`
 * GET
 
+### `/api/photo_classifications/{}/photo_feed`
+* GET
+
 ### `/api/photo_feeds`
 * GET
 
