@@ -52,8 +52,6 @@ urlpatterns = [
 
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
-    url(r'api/photo_classifications/(?P<photo_classification_id>[0-9^/]+)/photo_feed$',
-        photo_views.PhotoClassificationPhotoFeedPhotosViewSet.as_view()),
     url(r'api/photo_classifications/(?P<photo_classification_id>[0-9^/]+)/photos$',
         photo_views.PhotoClassificationPhotosViewSet.as_view()),
     url(r'api/photo_feeds$', photo_views.PhotoFeedViewSet.as_view()),

@@ -26,8 +26,12 @@ class TestPhotoClassificationViewSetGET(TestCase):
                                                                   icon=Photo(
                                                                       open('apps/common/test/data/photos/small.jpg',
                                                                            'rb')))
-        photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
+        abstract = photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
         photo_models.PhotoClassification.objects.create_or_update(name='Rural', classification_type='category')
+        photo_feed = photo_models.PhotoFeed.objects.create_or_update(name='Abstract')
+        abstract.photo_feed = photo_feed
+        abstract.save()
+
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -44,6 +48,7 @@ class TestPhotoClassificationViewSetGET(TestCase):
         self.assertEquals(results[2]['classification_type'], 'category')
         self.assertIn('icon', results[0])
         self.assertIn('category_image', results[0])
+        self.assertEqual(results[len(results) - 1]['feed_id'], photo_feed.id)
 
     def test_photo_classification_view_set_get_filtered_successful(self):
         """
