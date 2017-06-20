@@ -98,7 +98,7 @@ class StatisticsViewSet(APIView):
 
                     data_points.append({
                         'date': '{}-{}-{}'.format(d[0].year, d[0].month, d[0].day),
-                        'average_photos_per_user': round(len(photos) / len(users), 2)
+                        'average_photos_per_user': round(photos.count() / users.count(), 2)
                     })
 
                 response = get_default_response('200')

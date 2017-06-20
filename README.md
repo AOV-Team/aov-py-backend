@@ -160,14 +160,12 @@ Make sure the following files are in the project directory before running the pr
     "classification_type": "tag",
     "name": "",
     "icon": [file],
-    "category_image": [file]
+    "category_image": [file],
+    "feed_id": _ // PhotoFeed id
 }
 ```
 
 ### `/api/photo_classifications/{}/photos`
-* GET
-
-### `/api/photo_classifications/{}/photo_feed`
 * GET
 
 ### `/api/photo_feeds`

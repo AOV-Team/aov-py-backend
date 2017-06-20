@@ -6,9 +6,16 @@ import re
 
 
 class PhotoClassificationSerializer(serializers.ModelSerializer):
+    feed_id = serializers.SerializerMethodField()
+
+    def get_feed_id(self, obj):
+        if obj.photo_feed:
+            return obj.photo_feed.id
+        return None
+
     class Meta:
         model = models.PhotoClassification
-        fields = ('id', 'name', 'classification_type', 'icon', 'category_image')
+        fields = ('id', 'name', 'classification_type', 'icon', 'category_image', 'feed_id')
 
 
 class PhotoFeedSerializer(serializers.ModelSerializer):
