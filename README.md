@@ -130,6 +130,15 @@ Make sure the following files are in the project directory before running the pr
 ### `/api/users/{}`
 * GET
 
+### `/api/users/{}/location`
+* POST
+```javascript
+{
+    "location": "",
+    "geo_location": "POINT (long lat)"
+}
+```
+
 ### `/api/users/{}/photos`
 * GET
 

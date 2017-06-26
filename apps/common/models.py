@@ -1,3 +1,4 @@
+from django.contrib.gis.db import models as geo_models
 from django.db import models
 import datetime
 import random
@@ -6,6 +7,18 @@ import random
 class EditMixin(models.Model):
     """
     Abstract class for use in models
+
+    """
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class GeoEditMixin(geo_models.Model):
+    """
+        Abstract class for use in models that inherit from geo_models version of Model, avoids MRO TypeError
 
     """
     created_at = models.DateTimeField(auto_now_add=True)

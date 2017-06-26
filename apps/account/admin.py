@@ -194,8 +194,10 @@ class UserAdmin(BaseUserAdmin):
         photo_link = u'<a class="action" href="/admin/photos/?u={}"><span class="fa fa-picture-o"></span></a>'\
             .format(obj.username)
 
-        return u'<span data-content-type="users" data-id="{}" class="action star-button{}fa fa-star"></span>{}'\
-            .format(obj.id, starred, photo_link)
+        location_history_link = u'<a class="action" href="/admin/account/userlocation/?user_id={}"><span class="fa fa-map-marker"></span></a>'.format(obj.id)
+
+        return u'<span data-content-type="users" data-id="{}" class="action star-button{}fa fa-star"></span>{}{}'\
+            .format(obj.id, starred, photo_link, location_history_link)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -264,6 +266,18 @@ class UserObjectPermissionAdmin(GuardedModelAdmin):
         return False
 
 
+class UserLocationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'id', 'coordinates', 'location',)
+    search_fields = ('id', 'user', 'location')
+
+    def render_change_form(self, request, context, *args, **kwargs):
+        """
+        Fixes issue where form won't render due to annotation
+        """
+        context['adminform'].form.fields['user'].queryset = models.User.objects.all()
+        return super(UserLocationAdmin, self).render_change_form(request, context, args, kwargs)
+
+
 admin.site.register(models.Gear, GearAdmin)
 admin.site.register(StarredUser, StarredUserAdmin)
 admin.site.register(models.User, UserAdmin)
@@ -272,3 +286,4 @@ admin.site.register(models.UserInterest, UserInterestAdmin)
 admin.site.register(guardian.UserObjectPermission, UserObjectPermissionAdmin)
 admin.site.unregister(APNSDevice)
 admin.site.register(APNSDevice, APNSDeviceAdmin)
+admin.site.register(models.UserLocation, UserLocationAdmin)

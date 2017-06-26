@@ -1,5 +1,6 @@
 from apps.account import models
 from rest_framework import serializers
+import re
 
 
 class GearSerializer(serializers.ModelSerializer):
@@ -47,3 +48,22 @@ class UserInterestSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserInterest
         fields = ('id', 'interest_type')
+
+
+class UserLocationSerializer(serializers.ModelSerializer):
+    geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
+    user = serializers.PrimaryKeyRelatedField(queryset=models.User.objects.all(), required=True)
+
+    def validate_geo_location(self, value):
+        """
+        Check that coordinates are valid
+        """
+        if not re.match('^POINT\s\([\-\.\d]+\s[\-\.\d]+\)$', value):
+            raise serializers.ValidationError('Geo location coordinates are invalid - expecting "POINT (long lat)"')
+        return value
+
+    class Meta:
+        model = models.UserLocation
+        fields = ('id', 'geo_location', 'user', 'latitude', 'location', 'longitude', 'coordinates')
+        ordering_fields = ('id', 'location')
+        ordering = ('-id',)

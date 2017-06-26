@@ -2,6 +2,8 @@ from apps.common import models as common_models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.db import models as geo_models
+from django.contrib.gis.geos import GEOSGeometry
 from django.db import models
 from django.utils import timezone
 
@@ -195,3 +197,30 @@ class UserInterest(models.Model):
 
     class Meta:
         default_permissions = ('add', 'change', 'delete', 'view')
+
+
+class UserLocation(common_models.GeoEditMixin):
+    """
+        Model used to store the history of a users location data
+    """
+    user = models.ForeignKey(User)
+
+    coordinates = geo_models.PointField(srid=4326, null=True, blank=True)  # Lat/long
+    location = models.CharField(max_length=255, blank=True, null=True)
+
+
+    @property
+    def geo_location(self):
+        return None
+
+    @geo_location.setter
+    def geo_location(self, value):
+        self.coordinates = GEOSGeometry(value, srid=4326)
+
+    @property
+    def latitude(self):
+        return self.coordinates.y if self.coordinates else None
+
+    @property
+    def longitude(self):
+        return self.coordinates.x if self.coordinates else None

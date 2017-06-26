@@ -801,6 +801,43 @@ class UserFollowerSingleViewSet(generics.DestroyAPIView):
             raise NotFound('User does not exist')
 
 
+class UserLocationViewSet(generics.GenericAPIView):
+    """
+        /api/users/{}/location
+    """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, **kwargs):
+        """
+
+        :param request: HTTP Request object containing data necessary to create the database entry
+        :param kwargs: Additional keyword arguments passed via url. This endpoint expects a user id
+        :return: HTTP response object confirming or denying execution of the request
+        """
+
+        authentication = TokenAuthentication().authenticate(request)
+        auth_user = authentication[0]
+        payload = request.data
+        user_id = kwargs.get('user_id', None)
+
+        if auth_user.id != int(user_id):
+            return get_default_response('403')
+
+        payload['user'] = user_id
+        serializer = account_serializers.UserLocationSerializer(data=payload)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            response = get_default_response('200')
+            response.data = serializer.data
+        else:
+            raise ValidationError(serializer.errors)
+
+        return response
+
+
 class UserPhotosViewSet(generics.ListAPIView):
     """
     /api/users/{}/photos
