@@ -267,7 +267,7 @@ class UserObjectPermissionAdmin(GuardedModelAdmin):
 
 
 class UserLocationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'id', 'coordinates', 'location',)
+    list_display = ('user', 'id', 'coordinates', 'location', 'created_at')
     search_fields = ('id', 'user', 'location')
 
     def render_change_form(self, request, context, *args, **kwargs):
