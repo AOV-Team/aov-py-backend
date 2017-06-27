@@ -919,13 +919,26 @@ class UserSingleViewSet(generics.RetrieveAPIView):
         :param kwargs:
         :return: Response object
         """
+        user_id = kwargs.get('pk', None)
         response = get_default_response('200')
 
-        try:
-            user = account_models.User.objects.get(id=kwargs.get('pk'), is_active=True)
+        user = account_models.User.objects.filter(id=user_id, is_active=True)
+        # Check for query parameters
+        query_params = request.query_params
+        query_dict = {
+            'id': user_id,
+            'is_active': True,
+        }
+        if 'username' in query_params:
+            query_dict['username'] = query_params.get('username')
+
+        user = user.filter(**query_dict)
+
+        if user.exists():
+            user = user.first()
 
             response.data = account_serializers.UserPublicSerializer(user).data
-        except ObjectDoesNotExist:
+        else:
             response = get_default_response('404')
             response.data['message'] = 'User does not exist.'
             response.data['userMessage'] = 'User does not exist.'
