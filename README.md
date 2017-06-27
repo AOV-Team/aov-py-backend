@@ -127,7 +127,7 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
-### `/api/users/{}`
+### `/api/users/{}`, `/api/users/{}?username=`
 * GET
 
 ### `/api/users/{}/location`
