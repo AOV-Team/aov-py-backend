@@ -128,6 +128,7 @@ class Photo(geo_models.Model):
     magazine_authorized = models.BooleanField(default=True)
     original_image_url = models.URLField(blank=True, null=True)
     photo_data = models.TextField(blank=True, null=True)
+    caption = models.TextField(blank=True, null=True)
     public = models.BooleanField(default=True)
 
     @property

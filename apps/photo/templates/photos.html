@@ -75,7 +75,6 @@ $( document ).ready(function() {
             photo_feed: photoFeeds,
             magazine_authorized: thisMagazineAuthorization
         };
-        console.log($(this)[0].checked, thisMagazineAuthorization, data.magazine_authorized);
 
         if(photoFeeds.length == 0)
             data.photo_feed = null;
@@ -214,6 +213,12 @@ $( document ).ready(function() {
                         {% empty %}
                         <span>No tags...</span>
                         {% endfor %}
+                    </div>
+                    <div class="pure-u-1" style="margin-top: 10px;">
+                        <a target="_blank" href="">Caption </a><span class="fa fa-sticky-note-o"></span>
+                        <div class="caption">
+                            <span>{{ photo.caption }}</span>
+                        </div>
                     </div>
                 </div>
             </div><!-- .feeds-modal -->
