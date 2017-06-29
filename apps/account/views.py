@@ -726,6 +726,27 @@ class SocialSignUpViewSet(generics.CreateAPIView):
         return response
 
 
+class UserFollowingViewSet(generics.ListAPIView):
+    pagination_class = LargeResultsSetPagination
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = account_serializers.UserPublicSerializer
+
+    def get_queryset(self):
+        """
+        Get the users that a user is following
+
+        :return: Queryset
+        """
+        accessing_user = account_models.User.objects.filter(id=self.kwargs.get('user_id'))
+
+        if accessing_user.exists():
+            # Gather the users he is following
+            following = account_models.User.objects.filter(follower=accessing_user).order_by('-created_at')
+            return following
+
+        else:
+            raise NotFound('User does not exist')
+
 class UserFollowersViewSet(generics.ListCreateAPIView):
     pagination_class = LargeResultsSetPagination
     permission_classes = (permissions.AllowAny,)
