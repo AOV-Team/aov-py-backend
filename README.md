@@ -198,7 +198,8 @@ Make sure the following files are in the project directory before running the pr
     "gear": [##, ##],
     "geo_location": "POINT (long lat)",
     "image": [file],
-    "location": ""
+    "location": "",
+    "caption": ""
 }
 ```
 
@@ -213,6 +214,14 @@ Make sure the following files are in the project directory before running the pr
     "tag": __,
     "attribution_name": "",
     "location": ""
+}
+```
+
+### `/api/photos/{}/caption`
+* PATCH
+```javascript
+{
+    "caption": ""
 }
 ```
 

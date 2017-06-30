@@ -188,7 +188,7 @@ class PhotoAdmin(GuardedModelAdmin):
     fieldsets = (
         ('Image', {'fields': ('image', 'original_image_url', 'user', 'coordinates', 'location', 'gear', 'public', 'magazine_authorized',)}),
         ('Categorization', {'fields': ('category', 'tag', 'photo_feed')}),
-        ('Misc', {'fields': ('attribution_name', 'photo_data', 'created_at',)}),
+        ('Misc', {'fields': ('attribution_name', 'caption', 'photo_data', 'created_at',)}),
     )
 
     filter_horizontal = ('category', 'tag', 'photo_feed')

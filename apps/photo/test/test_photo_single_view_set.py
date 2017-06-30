@@ -254,6 +254,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         payload = {
             'gear': [gear_1.id, gear_2.id],
             'photo_feed': [feed.id],
+            'caption': "This is a test caption."
         }
 
         request = client.patch('/api/photos/{}'.format(photo.id), data=payload, format='json')
@@ -262,6 +263,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         self.assertEquals(len(result['gear']), 2)
         self.assertEquals(result['gear'][0], gear_1.id)
         self.assertEquals(result['photo_feed'], [feed.id])
+        self.assertEquals(result['caption'], "This is a test caption.")
 
         # Query for entry
         photos = photo_models.Photo.objects.filter(id=photo.id)
@@ -269,6 +271,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         self.assertEquals(len(photos), 1)
         self.assertEquals(len(photos[0].gear.all()), 2)
         self.assertEquals(photos[0].photo_feed.all()[0].id, feed.id)
+        self.assertEquals(photos[0].caption, "This is a test caption.")
 
     def test_photo_single_view_set_patch_cannot_change_user(self):
         """

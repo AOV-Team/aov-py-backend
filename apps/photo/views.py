@@ -553,6 +553,44 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
             raise PermissionDenied
 
 
+class PhotoSingleCaptionViewSet(generics.UpdateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def patch(self, request, **kwargs):
+        """
+            Allow user to submit their own caption
+
+        :param request: Request object
+        :param kwargs: Additional keyword arguments
+        :return: Response object
+        """
+        photo_id = kwargs.get('pk')
+
+        try:
+            photo = photo_models.Photo.objects.get(id=photo_id)
+            existing_caption = photo.caption
+            new_caption = request.data.get('caption', existing_caption)
+            payload = {
+                'caption': new_caption
+            }
+
+            serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                response = get_default_response('200')
+                response.data = serializer.data
+                return response
+            else:
+                raise ValidationError(serializer.errors)
+
+        except ObjectDoesNotExist:
+            raise NotFound
+
+
 class PhotoSingleFlagsViewSet(generics.CreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
