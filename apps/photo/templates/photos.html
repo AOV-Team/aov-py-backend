@@ -215,10 +215,15 @@ $( document ).ready(function() {
                         {% endfor %}
                     </div>
                     <div class="pure-u-1" style="margin-top: 10px;">
-                        <a target="_blank" href="">Caption </a><span class="fa fa-sticky-note-o"></span>
+                    {% if photo.caption %}
+                        <a target="_blank" href="/admin/photo/photo/{{ photo.id }}/change/#/tab/module_2/">Caption </a><span class="fa fa-sticky-note-o"></span><br>
                         <div class="caption">
                             <span>{{ photo.caption }}</span>
                         </div>
+                    {% endif %}
+                    {% if not photo.caption %}
+                        <a target="_blank" href="/admin/photo/photo/{{ photo.id }}/change/#/tab/module_2/">Add a Caption </a><span class="fa fa-sticky-note-o"></span><br>
+                    {% endif %}
                     </div>
                 </div>
             </div><!-- .feeds-modal -->
