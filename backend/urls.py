@@ -33,6 +33,8 @@ urlpatterns = [
     url(r'api/auth/social$', account_views.SocialSignUpViewSet.as_view()),
     url(r'api/gear$', account_views.GearViewSet.as_view()),
     url(r'api/gear/(?P<pk>[0-9^/]+)$', account_views.GearSingleViewSet.as_view()),
+    url(r'api/marketplace/users$', account_views.MarketplaceUserViewSet.as_view()),
+    url(r'api/marketplace/users/activate$', account_views.MarketplaceActivationViewSet.as_view()),
     url(r'api/me$', account_views.MeViewSet.as_view()),
     url(r'api/me/profile$', account_views.MeProfileViewSet.as_view()),
     url(r'api/users$', account_views.UserViewSet.as_view()),

@@ -12,5 +12,19 @@
   },
   "pk": 1,
   "model": "dbmail.mailtemplate"
+  },
+  {
+  "fields": {
+    "name": "User Authentication Code",
+    "subject": "Confirm your email",
+    "message": "<h2>Thanks for signing up for the AOV Marketplace!</h2>\nYou are almost done. Just click below to verify your email and activate your account.\n\n\n<a href='http://localhost:8000/{{ authentication_code }}'>Activate</a>",
+    "slug": "user-authentication-email",
+    "is_html": true,
+    "category": 1,
+    "created": "2017-07-05",
+    "updated": "2017-07-05"
+  },
+  "pk": 2,
+  "model": "dbmail.mailtemplate"
   }
 ]
