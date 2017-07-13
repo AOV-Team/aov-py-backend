@@ -16,6 +16,7 @@ Including another URLconf
 from apps.account import views as account_views
 from apps.analytic import views as analytic_views
 from apps.communication import views as communication_views
+from apps.marketplace import views as marketplace_views
 from apps.photo import views as photo_views
 from apps.utils import views as utils_views
 from django.conf import settings
@@ -33,8 +34,8 @@ urlpatterns = [
     url(r'api/auth/social$', account_views.SocialSignUpViewSet.as_view()),
     url(r'api/gear$', account_views.GearViewSet.as_view()),
     url(r'api/gear/(?P<pk>[0-9^/]+)$', account_views.GearSingleViewSet.as_view()),
-    url(r'api/marketplace/users$', account_views.MarketplaceUserViewSet.as_view()),
-    url(r'api/marketplace/users/activate$', account_views.MarketplaceActivationViewSet.as_view()),
+    url(r'api/marketplace/users$', marketplace_views.MarketplaceUserViewSet.as_view()),
+    url(r'api/marketplace/users/activate$', marketplace_views.MarketplaceActivationViewSet.as_view()),
     url(r'api/me$', account_views.MeViewSet.as_view()),
     url(r'api/me/profile$', account_views.MeProfileViewSet.as_view()),
     url(r'api/users$', account_views.UserViewSet.as_view()),

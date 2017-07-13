@@ -32,3 +32,4 @@ class TestMarketplaceUserViewSetPOST(TestCase):
         user = account_models.User.objects.get(email=payload['email'])
 
         self.assertFalse(user.is_active)
+        self.assertEqual(user.signup_source, 'MK')

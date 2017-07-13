@@ -88,6 +88,10 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
         ('Female', 'Female'),
         ('None', 'None')
     )
+    SIGNUP_SOURCE_CHOICES = (
+        ('ST', 'Standard'),
+        ('MK', 'Marketplace')
+    )
 
     follower = models.ManyToManyField('User', related_name='followers')
     gear = models.ManyToManyField(Gear, blank=True)
@@ -101,6 +105,7 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     is_admin = models.BooleanField(default=False, verbose_name='staff account')
     last_name = models.CharField(max_length=64, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
+    signup_source = models.CharField(max_length=3, choices=SIGNUP_SOURCE_CHOICES, default='ST', null=True, blank=True)
     social_name = models.CharField(max_length=64, blank=True,
                                    null=True)  # third party social platforms such as Instagram
     social_url = models.URLField(max_length=2083, blank=True, null=True)

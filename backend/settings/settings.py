@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'apps.account',
     'apps.analytic',
     'apps.communication',
+    'apps.marketplace',
     'apps.photo.apps.PhotoConfig',
     'apps.utils',
     'dbmail',
