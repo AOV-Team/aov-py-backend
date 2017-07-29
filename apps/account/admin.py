@@ -133,6 +133,7 @@ class StarUserFilter(admin.SimpleListFilter):
 
 
 class UserAdmin(BaseUserAdmin):
+    actions = ['download_csv']
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -213,6 +214,27 @@ class UserAdmin(BaseUserAdmin):
 
     photo_count.admin_order_field = 'photo__count'
     photo_count.short_description = 'Photos'
+
+    def download_csv(self, request, queryset):
+        import csv
+        from django.http import HttpResponse
+        from io import StringIO
+
+        queryset = queryset.exclude(email__icontains="test").exclude(email__icontains="Anonymous")
+        f = StringIO()
+        writer = csv.writer(f)
+
+        writer.writerow(["first_name", "last_name", "email"])
+
+        for first_name, last_name, email in queryset.values_list('first_name', 'last_name', 'email'):
+            writer.writerow([first_name, last_name, email])
+
+        f.seek(0)
+        response = HttpResponse(f, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=users.csv'
+        return response
+
+    download_csv.short_description = "Download CSV file for selected users"
 
 
 class ProfileAdmin(GuardedModelAdmin):
