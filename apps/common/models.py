@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models as geo_models
 from django.db import models
 import datetime
+import os
 import random
 
 
@@ -113,14 +114,14 @@ def get_classification_background_file_path(instance, filename):
     :param filename: name of file
     :return: path to file
     """
-
-    filename = "{}_background.{}".format(instance.name, filename.split('.')[-1])
+    new_filename = "{}_background.{}".format(instance.name, filename.split('.')[-1])
 
     # Date stamp
     current_time = get_date_stamp_str()
 
     # 2016-11-30_135957_{filename|username}.{ext}
-    filepath = build_file_name(current_time, filename)
+    filepath = build_file_name(current_time, new_filename)
+
     return filepath
 
 def get_classification_icon_file_path(instance, filename):
@@ -132,11 +133,12 @@ def get_classification_icon_file_path(instance, filename):
     :return: path to file
     """
 
-    filename = "{}_icon.{}".format(instance.name, filename.split('.')[-1])
+    new_filename = "{}_icon.{}".format(instance.name, filename.split('.')[-1])
 
     # Date stamp
     current_time = get_date_stamp_str()
 
     # 2016-11-30_135957_{filename|username}.{ext}
-    filepath = build_file_name(current_time, filename)
+    filepath = build_file_name(current_time, new_filename)
+
     return filepath

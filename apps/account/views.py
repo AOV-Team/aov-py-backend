@@ -828,6 +828,27 @@ class UserLocationViewSet(generics.GenericAPIView):
     """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = account_serializers.UserLocationSerializer
+
+    def get(self, request, **kwargs):
+        """
+        Retrieval method
+
+        :return: QuerySet
+        """
+        user_id = kwargs.get('user_id', None)
+
+        user = account_models.User.objects.filter(id=user_id)
+        user_location = account_models.UserLocation.objects.filter(user=user)
+
+        if user_location.exists():
+            serialized_data = account_serializers.UserLocationSerializer(user_location.first())
+
+            response = get_default_response('200')
+            response.data = serialized_data.data
+            return response
+        else:
+            raise NotFound('UserLocation does not exist')
 
     def post(self, request, **kwargs):
         """

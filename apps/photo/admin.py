@@ -122,10 +122,11 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
         # Deal with any images added
         if obj.category_image and obj.icon:
             obj.category_image = Photo(obj.category_image).save("{}_background.{}".format(
-                obj.name, obj.category_image.name.split('.')[-1]),
+                obj.name.lower(), obj.category_image.name.split('.')[-1]),
                 custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
-            obj.icon = Photo(obj.icon).save("{}_icon.{}".format(obj.name, obj.icon.name.split('.')[-1]),
-                                            custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
+            obj.icon = Photo(obj.icon).save("{}_icon.{}".format(
+                obj.name.lower(), obj.icon.name.split('.')[-1]),
+                custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
         obj.save()
 
     photo_count.admin_order_field = 'photos'
