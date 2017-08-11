@@ -188,12 +188,11 @@ $( document ).ready(function() {
                                 <strong>Photo location:</strong> {{ photo.location }}<br>
                                 <strong>Uploaded:</strong> {{ photo.created_at }}<br>
                                 <strong>AOV magazine authorization:</strong>
-                                <input name="authorized" title="authorized" value="{{ photo.magazine_authorized }}" type="checkbox">
-                                <!--{% if photo.magazine_authorized %}-->
-                                    <!--<input name="authorized" type="checkbox" value="{{ photo.magazine_authorized }}" checked>-->
-                                <!--{% else %}-->
-                                    <!--<input name="authorized" value="{{ photo.magazine_authorized }}" type="checkbox">-->
-                                <!--{% endif %}-->
+                                {% if photo.magazine_authorized %}
+                                    <input name="authorized" type="checkbox" value="{{ photo.magazine_authorized }}" checked>
+                                {% else %}
+                                    <input name="authorized" value="{{ photo.magazine_authorized }}" type="checkbox">
+                                {% endif %}
                                 {% csrf_token %}
                             </p>
                         </div>

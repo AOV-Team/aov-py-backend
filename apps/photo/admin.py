@@ -11,6 +11,7 @@ from django.core import urlresolvers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from guardian.admin import GuardedModelAdmin
+import os
 
 
 class FlaggedPhoto(photo_models.Photo):
@@ -121,12 +122,19 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
 
         # Deal with any images added
         if obj.category_image and obj.icon:
+            # Set the environment variable to overwrite files before attempting to save to remote storage
+            os.environ["AWS_S3_FILE_OVERWRITE"] = "True"
+
             obj.category_image = Photo(obj.category_image).save("{}_background.{}".format(
-                obj.name, obj.category_image.name.split('.')[-1]),
+                obj.name.lower(), obj.category_image.name.split('.')[-1]),
                 custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
-            obj.icon = Photo(obj.icon).save("{}_icon.{}".format(obj.name, obj.icon.name.split('.')[-1]),
-                                            custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
+            obj.icon = Photo(obj.icon).save("{}_icon.{}".format(
+                obj.name.lower(), obj.icon.name.split('.')[-1]),
+                custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
         obj.save()
+
+        # Reset the environment variable so it doesn't affect other functionalities.
+        os.environ["AWS_S3_FILE_OVERWRITE"] = "False"
 
     photo_count.admin_order_field = 'photos'
     photo_count.short_description = 'Photos'

@@ -18,6 +18,7 @@ class PhotoClassificationAdminForm(forms.ModelForm):
         category_image = cleaned_data.get('category_image', None)
         classification_type = cleaned_data.get('classification_type', None)
         icon = cleaned_data.get('icon', None)
+        name = cleaned_data.get('name', None)
 
         if classification_type == 'tag' and (category_image or icon):
             if self.is_valid():
@@ -29,10 +30,13 @@ class PhotoClassificationAdminForm(forms.ModelForm):
             existing = photo_models.PhotoClassification.objects.filter(admin_order_value=admin_order_value,
                                                                        classification_type=classification_type)
             if existing.exists():
-                raise forms.ValidationError('A {} already exists with an order value of {}. '
-                                            'Please choose a different value.'.format(
-                    classification_type, admin_order_value))
+                existing = existing.first()
 
+                # Check that the item being submitted is not the same as the existing one
+                if existing.name != name:
+                    raise forms.ValidationError('A {} already exists with an order value of {}. '
+                                                'Please choose a different value.'.format(
+                        classification_type, admin_order_value))
 
         return cleaned_data
 

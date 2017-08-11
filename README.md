@@ -151,6 +151,7 @@ Make sure the following files are in the project directory before running the pr
 * GET
 
 ### `/api/users/{}/location`
+* GET
 * POST
 ```javascript
 {
