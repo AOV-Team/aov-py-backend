@@ -79,9 +79,18 @@ class Photo(ImageFile):
         :param quality: image quality
         :return: None
         """
+        # Determine filetype by extension
+        ext = filename.split('.')[-1]
+        if ext == 'jpg':
+            format = "JPEG"
+        elif ext == 'png':
+            format = "PNG"
+        else:
+            raise TypeError("Files of extension type {} are not supported.".format(ext))
+
         if settings.REMOTE_IMAGE_STORAGE:
             mem_img = BytesIO()
-            self.pillow_image.save(fp=mem_img, format='JPEG', quality=quality)
+            self.pillow_image.save(fp=mem_img, format=format, quality=quality)
             content = ContentFile(mem_img.getvalue())
 
             if custom_bucket:
