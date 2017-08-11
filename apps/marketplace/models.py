@@ -17,9 +17,7 @@ class Listing(common_models.EditMixin):
         ('Other Accessory', 'Other Accessory')
     )
 
-    first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=512)
-    instagram_handle = models.CharField(max_length=128)
+    owner = models.ForeignKey(account_models.User)
     category = models.CharField(max_length=32, choices=CATEGORY_CHOICES)
     brand = models.CharField(max_length=512)
     title = models.CharField(max_length=512)
@@ -27,3 +25,43 @@ class Listing(common_models.EditMixin):
     photos = "" # Another potential FK
     price = models.DecimalField(max_digits=8, decimal_places=2)
     paypal_email = models.URLField(max_length=2083)
+
+    class Meta:
+        verbose_name_plural = "Listings"
+
+
+class OfferManager(models.Manager):
+    """
+        Manager class for the Offer model to allow for updating of the offer
+    """
+
+    def create_or_update(self, **kwargs):
+        new_offer = Offer(**kwargs)
+        existing = Offer.objects.filter(listing=new_offer.listing, owner=new_offer.owner, buyer=new_offer.buyer).first()
+
+        if existing:
+            new_offer.pk = existing.pk
+            new_offer.id = existing.id
+            new_offer.created_at = existing.created_at
+        new_offer.save()
+        return new_offer
+
+
+class Offer(common_models.EditMixin):
+    STATUS_CHOICES = (
+        ('O', 'Open'),
+        ('A', 'Accepted'),
+        ('R', 'Rescinded'),
+        ('D', 'Denied')
+    )
+
+    listing = models.ForeignKey(Listing) # FK to Gear model
+    owner = models.ForeignKey(account_models.User, related_name="owner")
+    buyer = models.ForeignKey(account_models.User, related_name="buyer")
+    offer_value = models.DecimalField(max_digits=8, decimal_places=2)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='O')
+
+    objects = OfferManager()
+
+    class Meta:
+        verbose_name_plural = "Offers"

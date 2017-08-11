@@ -3,9 +3,12 @@ from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.common.mailer import send_transactional_email
 from apps.common.views import get_default_response
+from apps.marketplace import models as marketplace_models
 from django.contrib.auth.hashers import make_password
 from rest_framework import generics, permissions
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import ValidationError
+from rest_framework.views import APIView
 
 
 class MarketplaceActivationViewSet(generics.GenericAPIView):
@@ -121,3 +124,29 @@ class MarketplaceUserViewSet(generics.CreateAPIView):
                 raise ValidationError(serializer.errors)
 
         return response
+
+
+class MarketplaceOfferViewSet(APIView):
+    """
+        API view set to handle Marketplace offers
+    """
+
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, **kwargs):
+        """
+            POST method to create MarketplaceOffer object
+
+        :param request: HTTP request object
+        :param kwargs: Additional keyword arguments from the url
+        :return: HTTP response object
+        """
+
+        auth_user = TokenAuthentication().authenticate(request)[0]
+
+        payload = request.data
+        owner = payload.get('owner', None)
+
+        if owner:
+            marketplace_models.Offer.objects.create_or_update()
