@@ -114,13 +114,9 @@ def get_classification_background_file_path(instance, filename):
     :param filename: name of file
     :return: path to file
     """
-    new_filename = "{}_background.{}".format(instance.name, filename.split('.')[-1])
+    new_filename = "{}_background.{}".format(instance.name.lower(), filename.split('.')[-1])
 
-    # Date stamp
-    current_time = get_date_stamp_str()
-
-    # 2016-11-30_135957_{filename|username}.{ext}
-    filepath = build_file_name(current_time, new_filename)
+    filepath = "{}".format(new_filename.replace(' ', '_'))
 
     return filepath
 
@@ -133,12 +129,8 @@ def get_classification_icon_file_path(instance, filename):
     :return: path to file
     """
 
-    new_filename = "{}_icon.{}".format(instance.name, filename.split('.')[-1])
+    new_filename = "{}_icon.{}".format(instance.name.lower(), filename.split('.')[-1])
 
-    # Date stamp
-    current_time = get_date_stamp_str()
-
-    # 2016-11-30_135957_{filename|username}.{ext}
-    filepath = build_file_name(current_time, new_filename)
+    filepath = "{}".format(new_filename.replace(' ', '_'))
 
     return filepath
