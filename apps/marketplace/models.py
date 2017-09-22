@@ -1,5 +1,6 @@
 from apps.account import models as account_models
 from apps.common import models as common_models
+from apps.photo import models as photo_models
 from django.db import models
 
 
@@ -21,8 +22,8 @@ class Listing(common_models.EditMixin):
     category = models.CharField(max_length=32, choices=CATEGORY_CHOICES)
     brand = models.CharField(max_length=512)
     title = models.CharField(max_length=512)
-    description = models.TextField()
-    photos = "" # Another potential FK
+    description = models.TextField(null=True, blank=True)
+    photos = models.ManyToManyField(photo_models.Photo, symmetrical=False, related_name="listing_photos")
     price = models.DecimalField(max_digits=8, decimal_places=2)
     paypal_email = models.URLField(max_length=2083)
 

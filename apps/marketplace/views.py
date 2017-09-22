@@ -4,6 +4,7 @@ from apps.account import serializers as account_serializers
 from apps.common.mailer import send_transactional_email
 from apps.common.views import get_default_response
 from apps.marketplace import models as marketplace_models
+from apps.marketplace import serializers as marketplace_serializers
 from django.contrib.auth.hashers import make_password
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -126,6 +127,15 @@ class MarketplaceUserViewSet(generics.CreateAPIView):
         return response
 
 
+class MarketplaceListingViewSet(APIView):
+    """
+        API view set to handle Marketplace offers
+    """
+
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+
 class MarketplaceOfferViewSet(APIView):
     """
         API view set to handle Marketplace offers
@@ -143,10 +153,76 @@ class MarketplaceOfferViewSet(APIView):
         :return: HTTP response object
         """
 
+        # Create a new Offer object
+        # Send email to owner notifying of offer
+        # Return 200 containing information about the offer to the Buyer
+
         auth_user = TokenAuthentication().authenticate(request)[0]
 
         payload = request.data
-        owner = payload.get('owner', None)
+        owner_id = payload.get('owner', None)
+        offer_amount = payload.get('amount', None)
+        listing_item = payload.get('listing_id', None)
 
-        if owner:
-            marketplace_models.Offer.objects.create_or_update()
+        owner = account_models.User.objects.filter(id=owner_id)
+
+        if owner.exists():
+            offer = marketplace_models.Offer.objects.create_or_update(owner_id=owner_id, buyer_id=auth_user.id,
+                                                                      offer_value=offer_amount,
+                                                                      listing_id=listing_item)
+
+            template_data = {
+                'buyer': offer.buyer.email,
+                'offer_value': offer.offer_value,
+                'listing_title': offer.listing.title
+            }
+
+            # Send the email to the owner, notifying them of the offer
+            send_transactional_email(owner.first(), 'marketplace-make-offer', **template_data)
+
+            serialized_offer = marketplace_serializers.OfferSerializer(offer).data
+
+            response = get_default_response('201')
+            response.data = serialized_offer
+            return response
+
+        else:
+            response = get_default_response('404')
+            return response
+
+    def get(self, request, **kwargs):
+        """
+            API Endpoint to retrieve current offers for a given user
+
+        :param request: HTTP request object
+        :param kwargs: Additional keyword arguments provided via url
+        :return: HTTP response object
+        """
+
+        user_id = kwargs.get('pk', None)
+
+        user = account_models.User.objects.filter(id=user_id)
+
+        if user.exists():
+            # Gather offers for which they are the buyer
+            buyer_offers = marketplace_models.Offer.objects.filter(buyer=user)
+
+            # Gather offers for which they are the owner
+            owner_offers = marketplace_models.Offer.objects.filter(owner=user)
+
+            serialized_buyer_offers = marketplace_serializers.OfferSerializer(buyer_offers, many=True).data
+            serialized_owner_offers = marketplace_serializers.OfferSerializer(owner_offers, many=True).data
+
+            response_data = {
+                'buyer': serialized_buyer_offers,
+                'owner': serialized_owner_offers
+            }
+
+            response = get_default_response('200')
+            response.data = response_data
+
+            return response
+
+        else:
+            response = get_default_response('404')
+            return response

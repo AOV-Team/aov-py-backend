@@ -130,6 +130,7 @@ class Photo(geo_models.Model):
     photo_data = models.TextField(blank=True, null=True)
     caption = models.TextField(blank=True, null=True)
     public = models.BooleanField(default=True)
+    votes = models.IntegerField(default=0)
 
     @property
     def geo_location(self):

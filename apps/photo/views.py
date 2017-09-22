@@ -713,3 +713,35 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
             response.data['message'] = 'User you attempted to star does not exist'
 
         return response
+
+
+class PhotoSingleVotesViewSet(generics.UpdateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = photo_models.Photo.objects.all()
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def patch(self, request, **kwargs):
+        """
+        Create a flag entry
+
+        :param request: Request object
+        :param kwargs: pk for the object being patched
+        :return: Response object
+        """
+
+        try:
+            payload = request.data
+            photo = photo_models.Photo.objects.get(id=kwargs.get('pk'))
+
+            serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                response = get_default_response('200')
+                response.data = serializer.data
+                return response
+
+        except ObjectDoesNotExist:
+            raise NotFound('Photo does not exist')

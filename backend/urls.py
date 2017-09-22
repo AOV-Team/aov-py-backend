@@ -34,8 +34,6 @@ urlpatterns = [
     url(r'api/auth/social$', account_views.SocialSignUpViewSet.as_view()),
     url(r'api/gear$', account_views.GearViewSet.as_view()),
     url(r'api/gear/(?P<pk>[0-9^/]+)$', account_views.GearSingleViewSet.as_view()),
-    url(r'api/marketplace/users$', marketplace_views.MarketplaceUserViewSet.as_view()),
-    url(r'api/marketplace/users/activate$', marketplace_views.MarketplaceActivationViewSet.as_view()),
     url(r'api/me$', account_views.MeViewSet.as_view()),
     url(r'api/me/profile$', account_views.MeProfileViewSet.as_view()),
     url(r'api/users$', account_views.UserViewSet.as_view()),
@@ -67,9 +65,17 @@ urlpatterns = [
     url(r'api/photos/(?P<pk>[0-9^/]+)/flags', photo_views.PhotoSingleFlagsViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/(?P<user_interest>stars|likes)$',
         photo_views.PhotoSingleInterestsViewSet.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/votes', photo_views.PhotoSingleVotesViewSet.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
+
+    # marketplace
+    # url(r'api/marketplace/listings/(?P<pk>[0-9^/]+)$', marketplace_views.MarketplaceListingViewSet.as_view()),
+    # url(r'api/marketplace/offers$', marketplace_views.MarketplaceOfferViewSet.as_view()),
+    # url(r'api/marketplace/users$', marketplace_views.MarketplaceUserViewSet.as_view()),
+    # url(r'api/marketplace/users/activate$', marketplace_views.MarketplaceActivationViewSet.as_view()),
+    # url(r'api/marketplace/users/(?P<pk>[0-9^/]+)/offers$', marketplace_views.MarketplaceOfferViewSet.as_view()),
 
     # utils
     url(r'api/me/actions$', utils_views.MeActionsViewSet.as_view()),
