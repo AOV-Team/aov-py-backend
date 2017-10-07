@@ -591,6 +591,69 @@ class PhotoSingleCaptionViewSet(generics.UpdateAPIView):
             raise NotFound
 
 
+class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
+    """
+        API view to retrieve and create comments for photos
+
+    :author: gallen
+    """
+
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.PhotoCommentSerializer
+
+    def get_queryset(self):
+        """
+            Overriding get_queryset to return a specific QuerySet of comments for a given photo
+
+        :return: Filtered QuerySet
+        """
+        try:
+            photo_id = self.kwargs.get('pk', None)
+            photo = photo_models.Photo.objects.get(id=photo_id)
+
+            return photo_models.PhotoComment.objects.filter(photo=photo)
+        except ObjectDoesNotExist:
+            raise NotFound
+
+    def post(self, request, **kwargs):
+        """
+            POST method to create a new comment
+
+        :param request: HTTP Request object
+        :param kwargs: Additional keyword arguments passed via url
+        :return: HTTP response object
+        """
+
+        auth_user = TokenAuthentication().authenticate(request)[0]
+
+        photo_id = kwargs.get('pk', None)
+        data = request.data
+        comment = data.get('comment', None)
+
+        photo = photo_models.Photo.objects.filter(id=photo_id)
+
+        if photo.exists() and comment:
+            serializer_payload = {
+                "user_id": auth_user.id,
+                "comment": comment,
+                "photo_id": photo_id
+            }
+
+            new_comment = photo_models.PhotoComment.objects.create_or_update(**serializer_payload)
+
+            serializer = photo_serializers.PhotoCommentSerializer(new_comment)
+            response = get_default_response('201')
+            response.data = serializer.data
+
+        else:
+            response = get_default_response('400')
+            response.data["userMessage"] = "A comment string cannot be empty."
+            response.data["message"] = "Missing required field 'comment' in request data."
+
+        return response
+
+
 class PhotoSingleFlagsViewSet(generics.CreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
@@ -713,3 +776,35 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
             response.data['message'] = 'User you attempted to star does not exist'
 
         return response
+
+
+class PhotoSingleVotesViewSet(generics.UpdateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = photo_models.Photo.objects.all()
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def patch(self, request, **kwargs):
+        """
+        Create a flag entry
+
+        :param request: Request object
+        :param kwargs: pk for the object being patched
+        :return: Response object
+        """
+
+        try:
+            payload = request.data
+            photo = photo_models.Photo.objects.get(id=kwargs.get('pk'))
+
+            serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                response = get_default_response('200')
+                response.data = serializer.data
+                return response
+
+        except ObjectDoesNotExist:
+            raise NotFound('Photo does not exist')

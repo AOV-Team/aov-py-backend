@@ -75,6 +75,23 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
+### `/api/marketplace/users`
+* POST
+```javascript
+{
+    "email": "",
+    "password": "",
+    "username": ""
+}
+```
+
+### `/api/marketplace/users/activate`
+* POST
+```javascript
+{
+    'code': uuid
+}
+
 ### `/api/me`
 * GET
 * PATCH
@@ -223,6 +240,15 @@ Make sure the following files are in the project directory before running the pr
 ```javascript
 {
     "caption": ""
+}
+```
+
+### `/api/photos/{}/comments`
+* GET
+* POST
+```javascript
+{
+    "comment": ""
 }
 ```
 

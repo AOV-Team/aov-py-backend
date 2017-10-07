@@ -16,6 +16,7 @@ Including another URLconf
 from apps.account import views as account_views
 from apps.analytic import views as analytic_views
 from apps.communication import views as communication_views
+from apps.marketplace import views as marketplace_views
 from apps.photo import views as photo_views
 from apps.utils import views as utils_views
 from django.conf import settings
@@ -61,12 +62,21 @@ urlpatterns = [
     url(r'api/photos$', photo_views.PhotoViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)$', photo_views.PhotoSingleViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/caption$', photo_views.PhotoSingleCaptionViewSet.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/comments$', photo_views.PhotoSingleCommentViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/flags', photo_views.PhotoSingleFlagsViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/(?P<user_interest>stars|likes)$',
         photo_views.PhotoSingleInterestsViewSet.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/votes', photo_views.PhotoSingleVotesViewSet.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
+
+    # marketplace
+    # url(r'api/marketplace/listings/(?P<pk>[0-9^/]+)$', marketplace_views.MarketplaceListingViewSet.as_view()),
+    # url(r'api/marketplace/offers$', marketplace_views.MarketplaceOfferViewSet.as_view()),
+    # url(r'api/marketplace/users$', marketplace_views.MarketplaceUserViewSet.as_view()),
+    # url(r'api/marketplace/users/activate$', marketplace_views.MarketplaceActivationViewSet.as_view()),
+    # url(r'api/marketplace/users/(?P<pk>[0-9^/]+)/offers$', marketplace_views.MarketplaceOfferViewSet.as_view()),
 
     # utils
     url(r'api/me/actions$', utils_views.MeActionsViewSet.as_view()),

@@ -145,7 +145,7 @@ class UserAdmin(BaseUserAdmin):
         ('User', {'fields': ('email', 'username', 'social_name', 'password', )}),
         ('User Details',
             {'fields': ('first_name', 'last_name', 'age', 'gender', 'location', 'avatar', 'created_at', 'last_login',
-                        'gear', 'follower', 'social_url', 'website_url',)}),
+                        'gear', 'follower', 'social_url', 'website_url', 'signup_source',)}),
         ('Permissions', {'fields': ('groups', 'is_active', 'is_admin', 'is_superuser', 'user_permissions')}),
     )
 

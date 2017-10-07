@@ -52,7 +52,7 @@ class AuthenticateViewSet(APIView):
         except TypeError:
             response = get_default_response('401')
             response.data['message'] = 'User not logged in'
-            response.data['userMessage'] = 'Cannot log out you - you are not logged in!'
+            response.data['userMessage'] = 'Cannot log you out - you are not logged in!'
 
         return response
 
@@ -746,6 +746,7 @@ class UserFollowingViewSet(generics.ListAPIView):
 
         else:
             raise NotFound('User does not exist')
+
 
 class UserFollowersViewSet(generics.ListCreateAPIView):
     pagination_class = LargeResultsSetPagination

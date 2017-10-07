@@ -37,10 +37,12 @@ class TestPhotoViewSetGET(TestCase):
                    user=user)
         photo1.save()
         photo1.gear = [gear_1, gear_2]
+        photo1.votes = 12
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.votes = 1
         photo2.save()
 
         # Simulate auth
@@ -60,6 +62,7 @@ class TestPhotoViewSetGET(TestCase):
         self.assertEquals(results[1]['gear'][0], gear_1.id)
         self.assertEquals(results[1]['latitude'], 43.0)
         self.assertEquals(results[1]['longitude'], -116.0)
+        self.assertEquals(results[1]['votes'], 12)
         self.assertIsNotNone(results[0]['image_blurred'])
         self.assertIsNotNone(results[0]['image_medium'])
         self.assertIsNotNone(results[0]['image_small'])
@@ -69,6 +72,7 @@ class TestPhotoViewSetGET(TestCase):
         self.assertEquals(results[0]['user_details']['location'], user.location)
         self.assertEquals(results[0]['user_details']['social_name'], user.social_name)
         self.assertEquals(results[0]['user_details']['username'], user.username)
+        self.assertEquals(results[0]['votes'], 1)
 
     def test_photo_view_set_get_public(self):
         """

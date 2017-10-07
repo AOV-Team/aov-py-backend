@@ -140,6 +140,20 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
     photo_count.short_description = 'Photos'
 
 
+class PhotoCommentAdmin(admin.ModelAdmin):
+    """
+       Admin class for the PhotoComment model
+
+    :author: gallen
+    """
+
+    list_display = ('id', 'photo', 'votes')
+    list_display_links = ('photo', 'id')
+    raw_id_fields = ('photo',)
+    readonly_fields = ('user',)
+    search_fields = ('user', 'id')
+
+
 class PhotoFeedAdmin(GuardedModelAdmin):
     fieldsets = (
         ('Photo Feed', {'fields': ('name', 'public',)}),
@@ -455,6 +469,7 @@ class StarredPhotoAdmin(admin.ModelAdmin):
 
 admin.site.register(FlaggedPhoto, FlaggedPhotoAdmin)
 admin.site.register(photo_models.PhotoClassification, PhotoClassificationAdmin)
+admin.site.register(photo_models.PhotoComment, PhotoCommentAdmin)
 admin.site.register(photo_models.PhotoFeed, PhotoFeedAdmin)
 admin.site.register(photo_models.Photo, PhotoAdmin)
 admin.site.register(PhotoFeedPhoto, PhotoFeedPhotoAdmin)
