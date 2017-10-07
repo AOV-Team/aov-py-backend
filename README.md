@@ -243,6 +243,15 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
+### `/api/photos/{}/comments`
+* GET
+* POST
+```javascript
+{
+    "comment": ""
+}
+```
+
 ### `/api/photos/{}/flags`
 * POST
 

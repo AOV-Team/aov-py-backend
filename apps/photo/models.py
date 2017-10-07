@@ -8,6 +8,7 @@ from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from imagekit.models import ImageSpecField
 
@@ -180,3 +181,53 @@ class Photo(geo_models.Model):
 
     class Meta:
         default_permissions = ('add', 'change', 'delete', 'view')
+
+
+class PhotoCommentManager(geo_models.Manager):
+    """
+        Manager to define a create_or_update method for the PhotoComment model class
+
+    :author: gallen
+    """
+
+    def create_or_update(self, **kwargs):
+        """
+            Method that checks for an existing entry in the table. If there is on, updates it.
+
+        :param kwargs: Dictionary containing values to create a new PhotoComment object
+        :return: Saved instance of a PhotoComment
+        """
+        # Create a new PhotoComment
+        new_photo_comment = PhotoComment(**kwargs)
+
+        # check for an existing entry with the same content, user, and photo_id
+        existing = PhotoComment.objects.filter(user_id=new_photo_comment.user_id,
+                                               photo_id=new_photo_comment.photo_id,
+                                               comment=new_photo_comment.comment).first()
+
+        if existing:
+            new_photo_comment.pk = existing.pk
+            new_photo_comment.id = existing.id
+            new_photo_comment.created_at = existing.created_at
+            new_photo_comment.modified_at = timezone.now()
+
+        new_photo_comment.save()
+        return new_photo_comment
+
+
+class PhotoComment(common_models.GeoEditMixin):
+    """
+        Model for users' comments on a photo
+
+    :author: gallen
+    """
+
+    photo = models.ForeignKey(Photo)
+    comment = models.TextField()
+    user = models.ForeignKey(account_models.User)
+    votes = models.IntegerField(default=0)
+
+    objects = PhotoCommentManager()
+
+    class Meta:
+        verbose_name_plural = "Photo Comments"
