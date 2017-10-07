@@ -16,7 +16,6 @@ Including another URLconf
 from apps.account import views as account_views
 from apps.analytic import views as analytic_views
 from apps.communication import views as communication_views
-from apps.marketplace import views as marketplace_views
 from apps.photo import views as photo_views
 from apps.utils import views as utils_views
 from django.conf import settings
