@@ -794,8 +794,24 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
         """
 
         try:
-            payload = request.data
+            data = request.data
             photo = photo_models.Photo.objects.get(id=kwargs.get('pk'))
+
+            if "operation" not in data:
+                response = get_default_response('400')
+                return response
+
+            payload = dict()
+
+            if data["operation"] == "increment":
+                payload = {
+                    "votes": photo.votes + 1
+                }
+
+            if data["operation"] == "decrement":
+                payload = {
+                    "votes": photo.votes - 1
+                }
 
             serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
 
