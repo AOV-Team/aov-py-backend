@@ -263,6 +263,14 @@ Make sure the following files are in the project directory before running the pr
 * DELETE
 * POST
 
+### `api/photos/{}/votes`
+* PATCH
+```javascript
+{
+    "operation": "increment | decrement"
+}
+```
+
 ### `/api/me/actions`
 * POST
 ```javascript
