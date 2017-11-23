@@ -1,6 +1,7 @@
 from apps.account import models as account_models
 from apps.account.serializers import UserBasicSerializer
 from apps.photo import models
+from django.db.models import Max
 from rest_framework import serializers
 import re
 
@@ -54,6 +55,7 @@ class PhotoFeedSerializer(serializers.ModelSerializer):
 
 
 class PhotoSerializer(serializers.ModelSerializer):
+    comments = serializers.SerializerMethodField()
     dimensions = serializers.SerializerMethodField()
     gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
@@ -64,6 +66,17 @@ class PhotoSerializer(serializers.ModelSerializer):
     image_tiny_246 = serializers.ImageField(required=False)
     image_tiny_272 = serializers.ImageField(required=False)
     user_details = serializers.SerializerMethodField()
+    votes_behind = serializers.SerializerMethodField()
+
+    def get_comments(self, obj):
+        """
+            Get the number of comments currently on the photo
+
+        :param obj: Photo object
+        :return: Number of comments related to the photo
+        """
+        photo_comments = models.PhotoComment.objects.filter(photo=obj)
+        return photo_comments.count()
 
     def get_dimensions(self, obj):
         """
@@ -88,6 +101,26 @@ class PhotoSerializer(serializers.ModelSerializer):
 
         return None
 
+    def get_votes_behind(self, obj):
+        """
+            Returns the difference between
+
+        :param obj: Photo object
+        :return: dict of the form - { "feed_name": number of votes behind top photo in feed }
+        """
+
+        photo_feeds = obj.photo_feed.all()
+        votes_behind_dict = {}
+
+        for feed_id, feed_name in photo_feeds.values_list('id', 'name'):
+            feed_photos = models.Photo.objects.filter(photo_feed=feed_id)
+            max_votes = feed_photos.aggregate(Max('votes'))
+            votes_behind_dict.update({
+                feed_name: max_votes["votes__max"] - obj.votes
+            })
+
+        return votes_behind_dict
+
     @staticmethod
     def setup_eager_loading(queryset):
         queryset = queryset\
@@ -111,10 +144,10 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
                   'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246', 'image_tiny_272',
                   'latitude', 'location', 'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed',
-                  'user_details', 'magazine_authorized', 'caption', 'votes')
+                  'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments')
         extra_kwargs = {'original_image_url':  {'write_only': True},
                         'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
         read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
-                            'image_tiny_272', 'photo_data', 'user_details',)
+                            'image_tiny_272', 'photo_data', 'user_details', 'comments')
