@@ -2,13 +2,13 @@ from apps.account import models as account_models
 from apps.analytic import dates
 from apps.common.views import get_default_response
 from apps.photo import models as photo_models
+from apps.utils import models as utils_models
 from datetime import datetime
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Avg, Min, Max
 from django.shortcuts import render
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
-import statistics
 
 
 @staff_member_required
@@ -19,21 +19,15 @@ def statistics_admin(request):
     :param request: Request object
     :return: render()
     """
-    ages = list()
-    photos = list()
 
     # Age
-    users = account_models.User.objects.filter(is_active=True).annotate(Count('photo'))
-
-    for u in users:
-        if u.age:
-            ages.append(u.age)
-
-        # Photos per user
-        photos.append(u.photo__count)
+    users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count('photo'))
+    age_stats = users.aggregate(Avg('age'), Max('age'), Min('age'))
+    photos = users.aggregate(Avg('photo__count'))
 
     # Feed stats
     feeds = photo_models.PhotoFeed.objects.filter(public=True)
+    # feed_photos = photo_models.Photo.objects.filter(photo_feed__id__in=feeds.values_list('id', flat=True))
 
     for feed in feeds:
         photo_counts = 0
@@ -46,10 +40,10 @@ def statistics_admin(request):
         feed.total_clicks = photo_counts
 
     context = {
-        'age_avg': round(statistics.mean(ages), 2),
-        'age_high': max(int(age) for age in ages),
-        'age_low': min(int(age) for age in ages),
-        'avg_photos': round(statistics.mean(photos), 2),
+        'age_avg': round(age_stats["age__avg"], 2),
+        'age_high': age_stats["age__max"],
+        'age_low': age_stats["age__min"],
+        'avg_photos': round(photos["photo__count__avg"], 2),
         'feeds': feeds
     }
 
