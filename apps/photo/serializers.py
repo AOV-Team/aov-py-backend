@@ -25,6 +25,7 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
     """
     photo = serializers.CharField(source='photo.id', read_only=True)
     user = serializers.SerializerMethodField()
+    # created_at = serializers.DateTimeField(format=)
 
     def get_user(self, obj):
         """
@@ -42,7 +43,7 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.PhotoComment
-        fields = ('id', 'comment', 'user', 'photo')
+        fields = ('id', 'comment', 'user', 'photo', 'created_at')
         read_only_fields = ('user',)
 
 
