@@ -1,5 +1,5 @@
 from apps.account import models as account_models
-from apps.account.serializers import UserPublicSerializer
+from apps.account.serializers import UserBasicSerializer, UserPublicSerializer
 from apps.photo import models
 from django.db.models import Max
 from rest_framework import serializers
@@ -144,7 +144,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
                   'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246', 'image_tiny_272',
                   'latitude', 'location', 'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed',
-                  'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments')
+                  'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes')
         extra_kwargs = {'original_image_url':  {'write_only': True},
                         'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')

@@ -48,6 +48,11 @@ class TestPhotoSingleVotesViewSetPATCH(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result["votes"], 1)
 
+        # Check for the new PhotoVote entry
+        photo_vote = photo_models.PhotoVote.objects.filter(photo=photo1, user=user)
+        self.assertTrue(photo_vote.exists())
+        self.assertTrue(photo_vote.first().upvote)
+
     def test_photo_single_votes_view_set_decrement_from_zero_patch_successful(self):
         """
         Test that we can do a partial update, allowing for incrementing of votes
@@ -85,6 +90,11 @@ class TestPhotoSingleVotesViewSetPATCH(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result["votes"], -1)
+
+        # Check for the new PhotoVote entry
+        photo_vote = photo_models.PhotoVote.objects.filter(photo=photo1, user=user)
+        self.assertTrue(photo_vote.exists())
+        self.assertFalse(photo_vote.first().upvote)
 
     def test_photo_single_votes_view_set_decrement_patch_successful(self):
         """
@@ -124,3 +134,8 @@ class TestPhotoSingleVotesViewSetPATCH(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result["votes"], 0)
+
+        # Check for the new PhotoVote entry
+        photo_vote = photo_models.PhotoVote.objects.filter(photo=photo1, user=user)
+        self.assertTrue(photo_vote.exists())
+        self.assertFalse(photo_vote.first().upvote)

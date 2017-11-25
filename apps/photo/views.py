@@ -786,7 +786,7 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
 
     def patch(self, request, **kwargs):
         """
-        Create a flag entry
+        Create a vote entry
 
         :param request: Request object
         :param kwargs: pk for the object being patched
@@ -802,18 +802,29 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                 return response
 
             payload = dict()
+            new_photo_vote_data = {
+                "user": TokenAuthentication().authenticate(request)[0],
+                "photo": photo
+            }
 
             if data["operation"] == "increment":
                 payload = {
                     "votes": photo.votes + 1
                 }
+                new_photo_vote_data.update({
+                    "upvote": True
+                })
 
             if data["operation"] == "decrement":
                 payload = {
                     "votes": photo.votes - 1
                 }
+                new_photo_vote_data.update({
+                    "upvote": False
+                })
 
             serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
+            photo_models.PhotoVote.objects.create_or_update(**new_photo_vote_data)
 
             if serializer.is_valid():
                 serializer.save()

@@ -231,3 +231,41 @@ class PhotoComment(common_models.GeoEditMixin):
 
     class Meta:
         verbose_name_plural = "Photo Comments"
+
+
+class PhotoVoteManager(models.Manager):
+    """
+        Manage class to define a create_or_update method for PhotoVote objects
+        
+    :author: gallen
+    """
+    
+    def create_or_update(self, **kwargs):
+        new_photo_vote = PhotoVote(**kwargs)
+        existing = PhotoVote.objects.filter(photo=new_photo_vote.photo, user=new_photo_vote.user).first()
+        
+        if existing:
+            new_photo_vote.pk = existing.pk
+            new_photo_vote.id = existing.id
+            new_photo_vote.created_at = existing.created_at
+            new_photo_vote.modified_at = timezone.now()
+
+        new_photo_vote.save()
+        return new_photo_vote
+
+
+class PhotoVote(common_models.EditMixin):
+    """
+        Model to track who has voted on what images
+
+    :author: gallen
+    """
+
+    photo = models.ForeignKey(Photo)
+    upvote = models.BooleanField(default=False)
+    user = models.ForeignKey(account_models.User)
+
+    objects = PhotoVoteManager()
+
+    class Meta:
+        verbose_name_plural = "Photo Vote Records"
