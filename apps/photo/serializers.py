@@ -1,5 +1,5 @@
 from apps.account import models as account_models
-from apps.account.serializers import UserBasicSerializer
+from apps.account.serializers import UserPublicSerializer
 from apps.photo import models
 from django.db.models import Max
 from rest_framework import serializers
@@ -38,7 +38,7 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
         user = obj.user
 
         if user:
-            return UserBasicSerializer(obj.user).data
+            return UserPublicSerializer(obj.user).data
 
         return None
 
