@@ -27,6 +27,8 @@ class TestPhotoViewSetGET(TestCase):
         user.location = 'Boise'
         user.social_name = '@theaov'
         user.save()
+        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
+                                                                             classification_type='category')
 
         # Create some gear
         gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
@@ -36,13 +38,16 @@ class TestPhotoViewSetGET(TestCase):
             .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
                    user=user)
         photo1.save()
-        photo1.gear = [gear_1, gear_2]
-        photo1.votes = 12
+        photo1.gear.add(gear_1, gear_2)
+        photo1.category.add(category)
+        photo1.votes = 1
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
-        photo2.votes = 1
+        photo2.save()
+        photo2.votes = 12
+        photo2.category.add(category)
         photo2.save()
 
         # Simulate auth
@@ -62,7 +67,8 @@ class TestPhotoViewSetGET(TestCase):
         self.assertEquals(results[1]['gear'][0], gear_1.id)
         self.assertEquals(results[1]['latitude'], 43.0)
         self.assertEquals(results[1]['longitude'], -116.0)
-        self.assertEquals(results[1]['votes'], 12)
+        self.assertEquals(results[1]['votes'], 1)
+        self.assertEqual(results[1]['votes_behind'][category.name], 11)
         self.assertIsNotNone(results[0]['image_blurred'])
         self.assertIsNotNone(results[0]['image_medium'])
         self.assertIsNotNone(results[0]['image_small'])
@@ -72,7 +78,7 @@ class TestPhotoViewSetGET(TestCase):
         self.assertEquals(results[0]['user_details']['location'], user.location)
         self.assertEquals(results[0]['user_details']['social_name'], user.social_name)
         self.assertEquals(results[0]['user_details']['username'], user.username)
-        self.assertEquals(results[0]['votes'], 1)
+        self.assertEquals(results[0]['votes'], 12)
 
     def test_photo_view_set_get_public(self):
         """

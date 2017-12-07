@@ -3,6 +3,7 @@ from apps.account.serializers import UserBasicSerializer, UserPublicSerializer
 from apps.photo import models
 from django.db.models import Max
 from rest_framework import serializers
+from rest_framework.authentication import TokenAuthentication
 import re
 
 
@@ -66,6 +67,7 @@ class PhotoSerializer(serializers.ModelSerializer):
     image_tiny_246 = serializers.ImageField(required=False)
     image_tiny_272 = serializers.ImageField(required=False)
     user_details = serializers.SerializerMethodField()
+    user_voted = serializers.SerializerMethodField()
     votes_behind = serializers.SerializerMethodField()
 
     def get_comments(self, obj):
@@ -101,22 +103,41 @@ class PhotoSerializer(serializers.ModelSerializer):
 
         return None
 
+    def get_user_voted(self, obj):
+        """
+            Check if there is a PhotoVote object for the accessing user and set the necessary data
+
+        :param obj: Photo obj
+        :return: dict of data denoting type of vote a user gave
+        """
+        user = TokenAuthentication().authenticate(self.context["request"])[0]
+        photo_vote = models.PhotoVote.objects.filter(photo=obj, user=user)
+        if photo_vote.exists():
+            return {
+                "voted": True,
+                "type": "upvote" if photo_vote.first().upvote else "downvote"
+            }
+
+        return {
+            "voted": photo_vote.exists(),
+        }
+
     def get_votes_behind(self, obj):
         """
             Returns the difference between
 
         :param obj: Photo object
-        :return: dict of the form - { "feed_name": number of votes behind top photo in feed }
+        :return: dict of the form - { "classification_name": number of votes behind top photo in category }
         """
 
-        photo_feeds = obj.photo_feed.all()
+        classifications = obj.category.all()
         votes_behind_dict = {}
 
-        for feed_id, feed_name in photo_feeds.values_list('id', 'name'):
-            feed_photos = models.Photo.objects.filter(photo_feed=feed_id)
-            max_votes = feed_photos.aggregate(Max('votes'))
+        for classification_id, classification_name in classifications.values_list('id', 'name'):
+            category_photos = models.Photo.objects.filter(category=classification_id)
+            max_votes = category_photos.aggregate(Max('votes'))
             votes_behind_dict.update({
-                feed_name: max_votes["votes__max"] - obj.votes
+                classification_name: max_votes["votes__max"] - obj.votes
             })
 
         return votes_behind_dict
@@ -144,10 +165,10 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
                   'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246', 'image_tiny_272',
                   'latitude', 'location', 'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed',
-                  'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes')
+                  'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes', 'user_voted')
         extra_kwargs = {'original_image_url':  {'write_only': True},
                         'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
         read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
-                            'image_tiny_272', 'photo_data', 'user_details', 'comments')
+                            'image_tiny_272', 'photo_data', 'user_details', 'comments', 'user_voted')

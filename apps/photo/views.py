@@ -20,7 +20,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 
 @staff_member_required
@@ -242,12 +242,12 @@ class PhotoViewSet(generics.ListCreateAPIView):
                     .get(Q(id=classification_id_param) | Q(name__iexact=classification_param))
 
                 return photo_models.Photo.objects\
-                    .filter(Q(category=classification) | Q(tag=classification), **query_params).order_by('-id')
+                    .filter(Q(category=classification) | Q(tag=classification), **query_params).order_by('-votes')
             except ObjectDoesNotExist:
                 # Empty queryset
                 return photo_models.Photo.objects.none()
         else:
-            return photo_models.Photo.objects.filter(**query_params).order_by('-id')
+            return photo_models.Photo.objects.filter(**query_params).order_by('-votes')
 
     def post(self, request, *args, **kwargs):
         """
@@ -369,7 +369,7 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
 
 
 class PhotoClassificationPhotosViewSet(generics.ListAPIView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = photo_serializers.PhotoSerializer
 
     def get_queryset(self):
@@ -378,13 +378,19 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
 
         :return: Queryset
         """
+        # Determine if the request is for the Featured tab or the Recent Tab
+        display_tab = self.request.query_params.get("display_tab", None)
+        order_by = "-votes"
+        length = self.request.query_params.get("length", 100)
+        if display_tab == "recent":
+            order_by = "-created_at"
         try:
             photo_classification_id = self.kwargs.get('photo_classification_id')
             classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
 
-            return photo_models.Photo.objects\
-                .filter(Q(category=classification) | Q(tag=classification), public=True)\
-                .order_by('-id')
+            return photo_models.Photo.objects.filter(
+                Q(category=classification) | Q(tag=classification), public=True).order_by(order_by)[:length]
+
         except ObjectDoesNotExist:
             raise NotFound
 
@@ -408,34 +414,10 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
 
         :return: Queryset
         """
-        # TODO figure out why randomness isn't functioning properly
-        # try:
-        #     photo_feed_id = self.kwargs['photo_feed_id']
-        #     self.photo_feed = photo_models.PhotoFeed.objects.get(id=photo_feed_id)
-        #     queryset = photo_models.Photo.objects.filter(public=True, photo_feed=self.photo_feed)
-        #
-        #     if self.photo_feed.randomize:
-        #         count = self.photo_feed.photo_limit if self.photo_feed.photo_limit else self.paginator.get_page_size(self.request)
-        #         r = list(common_models.get_random_queryset_elements(queryset, count, False))
-        #
-        #         queryset = queryset.filter(id__in=r)
-        #     else:
-        #         queryset = queryset.extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
-        #             .order_by('-creation_seq')
-        #
-        #     if self.photo_feed.photo_limit:
-        #         return queryset[:self.photo_feed.photo_limit]
-        #
-        #     return queryset
-        # except ObjectDoesNotExist:
-        #     raise NotFound
         try:
             photo_feed_id = self.kwargs['photo_feed_id']
             self.photo_feed = photo_models.PhotoFeed.objects.get(id=photo_feed_id)
-            queryset = photo_models.Photo.objects\
-                .filter(public=True, photo_feed=self.photo_feed)\
-                .extra(select={'creation_seq': 'photo_photo_photo_feed.id'})\
-                .order_by('-creation_seq')
+            queryset = photo_models.Photo.objects.filter(public=True, photo_feed=self.photo_feed).order_by('-votes')
 
             return queryset
         except ObjectDoesNotExist:
