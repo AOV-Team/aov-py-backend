@@ -72,6 +72,9 @@ class TestIntegrationSignup(TestCase):
 
         # Add photos to main feed
         photo_1 = photo_models.Photo.objects.get(location='Paris')
+        # Add votes to ensure the ordering matches expected result in asserts.
+        photo_1.votes = 2
+        photo_1.save()
         photo_2 = photo_models.Photo.objects.get(location='NYC')
 
         superuser_token = test_helpers.get_token_for_user(superuser)
@@ -135,7 +138,8 @@ class TestIntegrationSignup(TestCase):
             payload = {
                 'category': 8,
                 'image': image,
-                'location': 'Shanghai'
+                'location': 'Shanghai',
+                'votes': 3
             }
 
             photo_request = client.post('/api/photos', data=payload, format='multipart')

@@ -27,17 +27,9 @@ def statistics_admin(request):
 
     # Feed stats
     feeds = photo_models.PhotoFeed.objects.filter(public=True)
-    # feed_photos = photo_models.Photo.objects.filter(photo_feed__id__in=feeds.values_list('id', flat=True))
-
     for feed in feeds:
-        photo_counts = 0
-
         feed_photos = photo_models.Photo.objects.filter(photo_feed__id=feed.id)
-
-        for photo in feed_photos:
-            photo_counts += photo.user_action.filter(action='photo_click').count()
-
-        feed.total_clicks = photo_counts
+        feed.votes = sum(feed_photos.values_list("votes", flat=True))
 
     context = {
         'age_avg': round(age_stats["age__avg"], 2),
