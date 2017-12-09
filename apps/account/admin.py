@@ -1,4 +1,5 @@
 from apps.account import models
+from apps.photo import models as photo_models
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -224,10 +225,12 @@ class UserAdmin(BaseUserAdmin):
         f = StringIO()
         writer = csv.writer(f)
 
-        writer.writerow(["first_name", "last_name", "email"])
+        writer.writerow(["Username", "Email", "First Name", "Last Name", "Location", "# of Photo Uploads"])
 
-        for first_name, last_name, email in queryset.values_list('first_name', 'last_name', 'email'):
-            writer.writerow([first_name, last_name, email])
+        for id, username, email, first_name, last_name, location in queryset.values_list(
+                'id', 'username', 'email', 'first_name', 'last_name', 'location'):
+            photos = photo_models.Photo.objects.filter(user_id=id).count()
+            writer.writerow([username, first_name, last_name, email, location, photos])
 
         f.seek(0)
         response = HttpResponse(f, content_type='text/csv')
