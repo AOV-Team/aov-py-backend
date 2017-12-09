@@ -280,7 +280,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
             except TypeError:
                 raise ValidationError('Image is not of type image')
 
-        serializer = photo_serializers.PhotoSerializer(data=payload)
+        serializer = photo_serializers.PhotoSerializer(data=payload, context={"request": request})
 
         if serializer.is_valid():
             serializer.save()
@@ -384,6 +384,7 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
         length = self.request.query_params.get("length", 100)
         if display_tab == "recent":
             order_by = "-created_at"
+            length = None
         try:
             photo_classification_id = self.kwargs.get('photo_classification_id')
             classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
@@ -479,7 +480,7 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
             photo = photo_models.Photo.objects.get(id=photo_id, public=True)
 
             response = get_default_response('200')
-            response.data = photo_serializers.PhotoSerializer(photo).data
+            response.data = photo_serializers.PhotoSerializer(photo, context={"request": request}).data
         except ObjectDoesNotExist:
             raise NotFound
 
@@ -519,7 +520,8 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
 
             try:
                 photo = photo_models.Photo.objects.get(id=photo_id)
-                serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
+                serializer = photo_serializers.PhotoSerializer(
+                    photo, data=payload, partial=True, context={"request": request})
 
                 if serializer.is_valid():
                     serializer.save()
@@ -558,7 +560,8 @@ class PhotoSingleCaptionViewSet(generics.UpdateAPIView):
                 'caption': new_caption
             }
 
-            serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
+            serializer = photo_serializers.PhotoSerializer(
+                photo, data=payload, partial=True, context={"request": request})
 
             if serializer.is_valid():
                 serializer.save()
@@ -805,7 +808,8 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                     "upvote": False
                 })
 
-            serializer = photo_serializers.PhotoSerializer(photo, data=payload, partial=True)
+            serializer = photo_serializers.PhotoSerializer(
+                photo, data=payload, partial=True, context={"request": request})
             photo_models.PhotoVote.objects.create_or_update(**new_photo_vote_data)
 
             if serializer.is_valid():

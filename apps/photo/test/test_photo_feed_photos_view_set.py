@@ -27,6 +27,7 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
+        photo1.votes = 23
         photo1.category = [category]
         photo1.photo_feed = [feed]
         photo1.save()
@@ -34,6 +35,7 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
+        photo2.votes = 2
         photo2.category = [category]
         photo2.photo_feed = [feed]
         photo2.save()
@@ -53,7 +55,7 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
 
         self.assertIn('next', request.data)
         self.assertEquals(len(results), 2)
-        self.assertGreater(results[0]['id'], results[1]['id'])
+        self.assertGreater(results[0]['votes'], results[1]['votes'])
 
     @skip('disabled')
     def test_photo_feed_photos_view_set_get_limited(self):

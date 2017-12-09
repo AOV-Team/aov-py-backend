@@ -180,8 +180,12 @@ class TestPhotoClassificationPhotosViewSetGET(TestCase):
         photo2.category = [classification]
         photo2.save()
 
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
         # Get data from endpoint
         client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/photo_classifications/{}/photos'.format(classification.id))
         results = request.data['results']

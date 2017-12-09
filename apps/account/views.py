@@ -912,7 +912,7 @@ class UserPhotosViewSet(generics.ListAPIView):
         serialized_items = list()
 
         for photo in paginated_photos:
-            serialized_items.append(photo_serializers.PhotoSerializer(photo).data)
+            serialized_items.append(photo_serializers.PhotoSerializer(photo, context={"request": request}).data)
 
         response = self.get_paginated_response(serialized_items)
 

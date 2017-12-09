@@ -341,7 +341,6 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         # Test data
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI',
                                                        username='aov1')
-        photo_models.PhotoClassification.objects.create_or_update(name='night', classification_type='tag')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)

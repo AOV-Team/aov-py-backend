@@ -201,8 +201,12 @@ class TestPhotoSingleViewSetGET(TestCase):
                       account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
         photo.save()
 
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
         # Get data from endpoint
         client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/photos/{}'.format(photo.id))
         result = request.data
@@ -435,9 +439,12 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         photo.category = [category]
         photo.save()
 
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
         # Get data from endpoint
         client = APIClient()
-        client.login(username=user.email, password='WhoAmI')
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         payload = {
             'photo_feed': [feed.id],
