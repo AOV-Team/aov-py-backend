@@ -147,8 +147,8 @@ def photo_admin(request):
 
         # Has user starred photo?
         photo_type = ContentType.objects.get_for_model(photo)
-        interest = account_models.UserInterest.objects \
-            .filter(user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=photo.id).first()
+        interest = account_models.UserInterest.objects.filter(
+            user=request.user, interest_type='star', content_type__pk=photo_type.id, object_id=photo.id).first()
 
         if interest:
             photo.starred = True
@@ -291,6 +291,30 @@ class PhotoViewSet(generics.ListCreateAPIView):
             raise ValidationError(serializer.errors)
 
         return response
+
+
+class PhotoAppTopPhotosViewSet(generics.ListAPIView):
+    pagination_class = DefaultResultsSetPagination
+    permission_classes = (permissions.AllowAny,)
+    photo_feed = None
+    serializer_class = photo_serializers.PhotoSerializer
+
+    @setup_eager_loading
+    def get_queryset(self):
+        """
+        Return list of photos for requested photo feed
+
+        :return: Queryset
+        """
+        page = self.request.query_params.get("display_tab", None)
+
+        if page == "picks":
+            aov_feed = photo_models.PhotoFeed.objects.filter(id=1)
+            aov_picks = photo_models.Photo.objects.filter(photo_feed=aov_feed, public=True).order_by("-votes")
+            return aov_picks
+
+        top_photos = photo_models.Photo.objects.filter(public=True, category__isnull=False).order_by("-votes")[:100]
+        return top_photos
 
 
 class PhotoClassificationViewSet(generics.ListCreateAPIView):
@@ -731,7 +755,6 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
         """
         authentication = TokenAuthentication().authenticate(request)
         authenticated_user = authentication[0] if authentication else request.user
-        response = get_default_response('400')
         photo_id = kwargs.get('pk')
         user_interest = kwargs.get('user_interest')
 
