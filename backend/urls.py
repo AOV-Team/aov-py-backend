@@ -65,6 +65,7 @@ urlpatterns = [
     url(r'api/photos/(?P<pk>[0-9^/]+)/flags', photo_views.PhotoSingleFlagsViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/(?P<user_interest>stars|likes)$',
         photo_views.PhotoSingleInterestsViewSet.as_view()),
+    url(r'api/photos/top$', photo_views.PhotoAppTopPhotosViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/votes', photo_views.PhotoSingleVotesViewSet.as_view()),
 
     # sample

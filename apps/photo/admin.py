@@ -88,7 +88,7 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
 
     def get_queryset(self, request):
         return super(PhotoClassificationAdmin, self).get_queryset(request)\
-            .annotate(photos_in_category=Count('category'), photos_in_tag=Count('tag'))
+            .annotate(photos_in_category=Count('category', distinct=True), photos_in_tag=Count('tag', distinct=True))
 
     def action_buttons(self, obj):
         """
