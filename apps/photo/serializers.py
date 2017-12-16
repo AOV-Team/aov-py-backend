@@ -1,5 +1,6 @@
 from apps.account import models as account_models
 from apps.account.serializers import UserBasicSerializer, UserPublicSerializer
+from apps.common.serializers import DateTimeFieldWithTZ
 from apps.photo import models
 from django.db.models import Max
 from rest_framework import serializers
@@ -25,9 +26,9 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
         Serializer class for the PhotoSerializer class
     :author: gallen
     """
+    created_at = DateTimeFieldWithTZ(format='%Y-%m-%d %H:%M')
     photo = serializers.CharField(source='photo.id', read_only=True)
     user = serializers.SerializerMethodField()
-    # created_at = serializers.DateTimeField(format=)
 
     def get_user(self, obj):
         """

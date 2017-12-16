@@ -310,7 +310,8 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
 
         if page == "picks":
             aov_feed = photo_models.PhotoFeed.objects.filter(id=1)
-            aov_picks = photo_models.Photo.objects.filter(photo_feed=aov_feed, public=True).order_by("-votes")
+            aov_picks = photo_models.Photo.objects.filter(
+                photo_feed=aov_feed, public=True).order_by("-aov_feed_add_date")
             return aov_picks
 
         top_photos = photo_models.Photo.objects.filter(public=True, category__isnull=False).order_by("-votes")[:100]

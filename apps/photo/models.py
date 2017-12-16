@@ -116,6 +116,7 @@ class Photo(geo_models.Model):
     attribution_name = models.CharField(max_length=255, blank=True, null=True)
     coordinates = geo_models.PointField(srid=4326, blank=True, null=True)  # Lat/long
     created_at = models.DateTimeField(auto_now_add=True)
+    aov_feed_add_date = models.DateTimeField(null=True, blank=True)
 
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path)
     image_tiny_246 = ImageSpecField(source='image', processors=[WidthResize(246)], format='JPEG')
@@ -132,6 +133,17 @@ class Photo(geo_models.Model):
     caption = models.TextField(blank=True, null=True)
     public = models.BooleanField(default=True)
     votes = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        try:
+            # 1 is the ID of AoV Feed, by way of a fixture migration. Hard coding is ok.
+            if 1 in self.photo_feed.all().values_list("id", flat=True):
+                self.aov_feed_add_date = timezone.now()
+            else:
+                self.aov_feed_add_date = None
+        except ValueError:
+            pass
+        super(Photo, self).save(*args, **kwargs)
 
     @property
     def geo_location(self):

@@ -1,3 +1,6 @@
+from django.utils import timezone
+from rest_framework import serializers
+
 def setup_eager_loading(get_queryset):
     def decorator(self):
         queryset = get_queryset(self)
@@ -5,3 +8,17 @@ def setup_eager_loading(get_queryset):
         return queryset
 
     return decorator
+
+
+class DateTimeFieldWithTZ(serializers.DateTimeField):
+    """
+        Class to make output of a DateTime Field timezone aware
+
+        Reference: https://fixes.co.za/django/make-django-rest-framework-date-time-fields-timezone-aware/
+    :author: gallen
+    """
+    def to_representation(self, value):
+        value = timezone.localtime(value)
+        return super(DateTimeFieldWithTZ, self).to_representation(value)
+
+
