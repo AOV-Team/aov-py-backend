@@ -10,9 +10,12 @@ def setup_eager_loading(get_queryset):
     return decorator
 
 
-class DateTimeFieldWihTZ(serializers.DateTimeField):
+class DateTimeFieldWithTZ(serializers.DateTimeField):
     """
         Class to make output of a DateTime Field timezone aware
+
+        Reference: https://fixes.co.za/django/make-django-rest-framework-date-time-fields-timezone-aware/
+    :author: gallen
     """
     def to_representation(self, value):
         value = timezone.localtime(value)
