@@ -139,6 +139,8 @@ class Photo(geo_models.Model):
             # 1 is the ID of AoV Feed, by way of a fixture migration. Hard coding is ok.
             if 1 in self.photo_feed.all().values_list("id", flat=True):
                 self.aov_feed_add_date = timezone.now()
+            else:
+                self.aov_feed_add_date = None
         except ValueError:
             pass
         super(Photo, self).save(*args, **kwargs)
