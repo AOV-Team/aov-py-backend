@@ -19,6 +19,6 @@ class DateTimeFieldWithTZ(serializers.DateTimeField):
     """
     def to_representation(self, value):
         value = timezone.localtime(value)
-        return super(DateTimeFieldWihTZ, self).to_representation(value)
+        return super(DateTimeFieldWithTZ, self).to_representation(value)
 
 
