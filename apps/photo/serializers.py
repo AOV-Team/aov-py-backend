@@ -26,7 +26,7 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
         Serializer class for the PhotoSerializer class
     :author: gallen
     """
-    created_at = DateTimeFieldWithTZ(format='%Y-%m-%d %H:%M')
+    created_at = DateTimeFieldWithTZ()
     photo = serializers.CharField(source='photo.id', read_only=True)
     user = serializers.SerializerMethodField()
 
