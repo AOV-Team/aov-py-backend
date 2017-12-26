@@ -47,7 +47,6 @@ class PhotoClassification(models.Model):
         ('tag', 'Tag')
     )
 
-    admin_order_value = models.PositiveIntegerField(null=True, blank=True)
     category_image = models.ImageField(
         upload_to=common_models.get_classification_background_file_path, blank=True, null=True)
     classification_type = models.CharField(max_length=32, choices=CLASSIFICATION_TYPE_CHOICES, default='tag')

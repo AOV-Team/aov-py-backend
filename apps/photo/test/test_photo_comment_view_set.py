@@ -110,11 +110,20 @@ class TestPhotoSingleCommentViewSetGET(TestCase):
 
         self.assertEquals(request.status_code, 201)
 
+        second_payload = {
+            'comment': 'Impressive.'
+        }
+
+        request = client.post('/api/photos/{}/comments'.format(photo.id), second_payload)
+
+        self.assertEquals(request.status_code, 201)
+
         # Use a get request to retrieve the comment
         result = client.get('/api/photos/{}/comments'.format(photo.id))
 
         self.assertEqual(result.status_code, 200)
-        self.assertEqual(len(result.data["results"]), 1)
+        self.assertEqual(len(result.data["results"]), 2)
+        self.assertEqual(result.data["results"][0]["comment"], second_payload["comment"])
 
     def test_photo_single_comment_view_set_get_no_comments(self):
         """
