@@ -16,7 +16,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -343,7 +343,8 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
                 # HTTP 400
                 raise ValidationError('Classification type "{}" not valid'.format(classification_type))
 
-        return photo_models.PhotoClassification.objects.filter(**query_params)
+        return photo_models.PhotoClassification.objects.filter(
+            **query_params).annotate(photo_count=Count("category", distinct=True)).order_by("-photo_count")
 
     def post(self, request, *args, **kwargs):
         """
