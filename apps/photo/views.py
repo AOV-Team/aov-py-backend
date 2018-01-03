@@ -622,7 +622,8 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             photo_id = self.kwargs.get('pk', None)
             photo = photo_models.Photo.objects.get(id=photo_id)
 
-            return photo_models.PhotoComment.objects.filter(photo=photo).order_by("-created_at")
+            # return photo_models.PhotoComment.objects.filter(photo=photo).order_by("-created_at")
+            return photo_models.PhotoComment.objects.filter(photo=photo)
         except ObjectDoesNotExist:
             raise NotFound
 
