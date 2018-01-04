@@ -247,7 +247,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
                 # Empty queryset
                 return photo_models.Photo.objects.none()
         else:
-            return photo_models.Photo.objects.filter(**query_params).order_by('-votes')
+            return photo_models.Photo.objects.filter(**query_params).order_by('-created_at')
 
     def post(self, request, *args, **kwargs):
         """
