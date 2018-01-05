@@ -309,12 +309,13 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
         page = self.request.query_params.get("display_tab", None)
 
         if page == "picks":
-            aov_feed = photo_models.PhotoFeed.objects.filter(id=1)
+            picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks")
             aov_picks = photo_models.Photo.objects.filter(
-                photo_feed=aov_feed, public=True).order_by("-aov_feed_add_date")
+                photo_feed=picks_feed, public=True).distinct().order_by("-aov_feed_add_date")
             return aov_picks
 
-        top_photos = photo_models.Photo.objects.filter(public=True, category__isnull=False).order_by("-votes")[:100]
+        top_photos = photo_models.Photo.objects.filter(
+            public=True, category__isnull=False).distinct().order_by("-votes")[:100]
         return top_photos
 
 
@@ -416,7 +417,7 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
             classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
 
             return photo_models.Photo.objects.filter(
-                Q(category=classification) | Q(tag=classification), public=True).order_by(order_by)[:length]
+                Q(category=classification) | Q(tag=classification), public=True).distinct().order_by(order_by)[:length]
 
         except ObjectDoesNotExist:
             raise NotFound

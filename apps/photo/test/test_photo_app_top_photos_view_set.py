@@ -68,7 +68,7 @@ class TestPhotoAppTopPhotosViewSetGET(TestCase):
         photo1.save()
         photo1.category.add(classification)
         photo1.votes = 89
-        photo1.photo_feed.add(1)
+        photo1.photo_feed.add(photo_models.PhotoFeed.objects.create(name="AOV Picks"))
         photo1.save()
 
         photo2 = photo_models \
