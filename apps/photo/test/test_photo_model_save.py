@@ -11,7 +11,7 @@ class TestPhotoSave(TestCase):
     """
     def test_photo_save_successful(self):
         """
-        Test that when saving a photo with the AoV Feed, it sets the date correctly
+        Test that when saving a photo with the AoV Picks feed, it sets the date correctly
 
         :return: None
         """
@@ -34,7 +34,7 @@ class TestPhotoSave(TestCase):
         photo1.gear.add(gear_1, gear_2)
         photo1.category.add(category)
         photo1.votes = 1
-        photo1.photo_feed.add(1)
+        photo1.photo_feed.add(photo_models.PhotoFeed.objects.create_or_update(name="AOV Picks"))
         photo1.save()
 
         updated_photo = photo_models.Photo.objects.get(id=photo1.id)
