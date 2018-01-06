@@ -306,7 +306,7 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
 
         :return: Queryset
         """
-        page = self.request.query_params.get("display_tab", None)
+        page = self.request.query_params.get("display_page", None)
 
         if page == "picks":
             picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks")
