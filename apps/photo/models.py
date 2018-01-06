@@ -135,8 +135,8 @@ class Photo(geo_models.Model):
 
     def save(self, *args, **kwargs):
         try:
-            # 1 is the ID of AoV Feed, by way of a fixture migration. Hard coding is ok.
-            if 1 in self.photo_feed.all().values_list("id", flat=True):
+            # AOV Picks is the name of the feed that is curated by Prince. Set the add_date field for proper ordering
+            if "AOV Picks" in self.photo_feed.all().values_list("name", flat=True):
                 self.aov_feed_add_date = timezone.now()
             else:
                 self.aov_feed_add_date = None
