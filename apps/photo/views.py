@@ -60,10 +60,17 @@ def photo_admin(request):
             photos = photos | photo_models.Photo.objects.filter(created_at__gte=start, created_at__lte=end)
 
     if feed:
-        feed = photo_models.PhotoFeed.objects.filter(name__icontains=feed)
+        if feed == "AOV Picks":
+            feed = photo_models.PhotoFeed.objects.filter(name__icontains=feed)
 
-        if feed:
-            photos = photos | photo_models.Photo.objects.filter(photo_feed=feed)
+            if feed:
+                photos = photos | photo_models.Photo.objects.filter(
+                    photo_feed=feed).distinct().order_by("-aov_feed_add_date")
+        else:
+            feed = photo_models.PhotoFeed.objects.filter(name__icontains=feed)
+
+            if feed:
+                photos = photos | photo_models.Photo.objects.filter(photo_feed=feed)
 
     if g:
         # Search gear
