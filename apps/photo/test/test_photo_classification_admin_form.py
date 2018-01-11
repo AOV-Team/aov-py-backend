@@ -2,40 +2,13 @@ from apps.photo import forms as photo_forms
 from apps.photo import models as photo_models
 from django.forms import ValidationError
 from django.test import TestCase
+from unittest import skip
 
-
+@skip("No longer support admin_order_value. Needs updated.")
 class TestPhotoClassificationAdminForm(TestCase):
     """
         Test class to validate correct functionality of the PhotoClassificationAdminForm
     """
-    def test_photo_classification_admin_form_clean_controls_admin_order_value_uniqueness_tag(self):
-        """
-            Unit test to validate that clean() method of PhotoClassificationAdmin class does not allow the same order
-            value for tags
-        :return: No return value
-        """
-        form_data = {
-            'classification_type': 'tag',
-            'name': 'test_tag',
-            'public': True,
-            'admin_order_value': 1
-        }
-        form = photo_forms.PhotoClassificationAdminForm(form_data)
-        form.is_valid()  # Necessary to generated the cleaned_data needed for the next call
-        cleaned = form.clean()
-
-        self.assertEqual(cleaned.get('admin_order_value'), form_data['admin_order_value'])
-
-        # Save the above object to the database to simulate what would happen in the admin
-        photo_models.PhotoClassification.objects.create_or_update(**form_data)
-
-        # Attempt to add another tag with the same order_value
-        form_data['name'] = 'second_tag'
-        second_form =  photo_forms.PhotoClassificationAdminForm(form_data)
-        second_form.is_valid()
-
-        with self.assertRaises(ValidationError):
-            second_form.clean()
 
     def test_photo_classification_admin_form_clean_controls_admin_order_value_uniqueness_category(self):
         """
@@ -47,13 +20,10 @@ class TestPhotoClassificationAdminForm(TestCase):
             'classification_type': 'category',
             'name': 'test_category',
             'public': True,
-            'admin_order_value': 1
         }
         form = photo_forms.PhotoClassificationAdminForm(form_data)
         form.is_valid()  # Necessary to generated the cleaned_data needed for the next call
         cleaned = form.clean()
-
-        self.assertEqual(cleaned.get('admin_order_value'), form_data['admin_order_value'])
 
         # Save the above object to the database to simulate what would happen in the admin
         photo_models.PhotoClassification.objects.create_or_update(**form_data)
