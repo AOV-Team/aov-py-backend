@@ -78,13 +78,9 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
     Categories and tags
     """
     form = photo_forms.PhotoClassificationAdminForm
-    list_display = ('name', 'order_value', 'classification_type', 'photo_count', 'public', 'id', 'action_buttons',)
+    list_display = ('name', 'classification_type', 'photo_count', 'public', 'id', 'action_buttons',)
     ordering = ['classification_type', 'name']
     search_fields = ('name', 'classification_type', 'id',)
-
-    def order_value(self, obj):
-        return obj.admin_order_value
-    order_value.short_description = 'Display Order'
 
     def get_queryset(self, request):
         return super(PhotoClassificationAdmin, self).get_queryset(request)\
