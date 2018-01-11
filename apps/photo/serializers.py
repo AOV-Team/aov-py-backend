@@ -111,7 +111,11 @@ class PhotoSerializer(serializers.ModelSerializer):
         :param obj: Photo obj
         :return: dict of data denoting type of vote a user gave
         """
-        user = TokenAuthentication().authenticate(self.context["request"])[0]
+        authenticate = TokenAuthentication().authenticate(self.context["request"])
+        if authenticate:
+            user = authenticate[0]
+        else:
+            user = self.context["request"].user
         photo_vote = models.PhotoVote.objects.filter(photo=obj, user=user)
         if photo_vote.exists():
             return {
