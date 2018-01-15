@@ -137,7 +137,8 @@ class Photo(geo_models.Model):
         try:
             # AOV Picks is the name of the feed that is curated by Prince. Set the add_date field for proper ordering
             if "AOV Picks" in self.photo_feed.all().values_list("name", flat=True):
-                self.aov_feed_add_date = timezone.now()
+                if not self.aov_feed_add_date:
+                    self.aov_feed_add_date = timezone.now()
             else:
                 self.aov_feed_add_date = None
         except ValueError:
