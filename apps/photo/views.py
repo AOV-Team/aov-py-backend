@@ -854,3 +854,33 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
 
         except ObjectDoesNotExist:
             raise NotFound('Photo does not exist')
+
+
+class UserFollowingPhotoViewSet(generics.ListAPIView):
+    """
+        View to retrieve all photos for the users being followed by the requesting user
+
+    :author: gallen
+    """
+    pagination_class = LargeResultsSetPagination
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def get_queryset(self):
+        """
+           Get the photos for users that a user is following
+
+        :return: Queryset
+        """
+        authentication = TokenAuthentication().authenticate(self.request)
+        accessing_user = authentication[0] if authentication else self.request.user
+
+        if accessing_user:
+            # Gather the users he is following
+            following = account_models.User.objects.filter(follower=accessing_user)
+            following_photos = photo_models.Photo.objects.filter(user__in=following).order_by('-created_at')
+            return following_photos
+
+        else:
+            raise NotFound('User does not exist')
