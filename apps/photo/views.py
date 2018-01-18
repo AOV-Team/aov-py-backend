@@ -321,6 +321,11 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
                 photo_feed=picks_feed, public=True).distinct().order_by("-aov_feed_add_date")
             return aov_picks
 
+        if page == "popular":
+            popular_photos = photo_models.Photo.objects.filter(public=True, category__isnull=False).distinct().annotate(
+                actions=Count("user_action")).order_by("-actions")
+            return popular_photos
+
         top_photos = photo_models.Photo.objects.filter(
             public=True, category__isnull=False).distinct().order_by("-votes")[:100]
         return top_photos
