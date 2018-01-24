@@ -18,6 +18,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 from django.shortcuts import render
+from django.utils import timezone
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
@@ -322,7 +323,9 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
             return aov_picks
 
         if page == "popular":
-            popular_photos = photo_models.Photo.objects.filter(public=True, category__isnull=False).distinct().annotate(
+            cutoff = timezone.now() - timedelta(days=30)
+            popular_photos = photo_models.Photo.objects.filter(
+                created_at__gte=cutoff, public=True, category__isnull=False).distinct().annotate(
                 actions=Count("user_action")).order_by("-actions")
             return popular_photos
 

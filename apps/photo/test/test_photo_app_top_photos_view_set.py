@@ -3,7 +3,9 @@ from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from apps.utils.models import UserAction
+from datetime import timedelta
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 
@@ -129,6 +131,24 @@ class TestPhotoAppTopPhotosViewSetGET(TestCase):
         UserAction.objects.create(user=user, action='photo_click', content_object=photo2)
         UserAction.objects.create(user=user, action='photo_click', content_object=photo2)
         UserAction.objects.create(user=user, action='photo_click', content_object=photo2)
+
+        photo3 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
+        photo3.save()
+        photo3.category.add(classification)
+        photo3.votes = 179
+        photo3.created_at = timezone.now() - timedelta(days=32)
+        photo3.save()
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
+        UserAction.objects.create(user=user, action='photo_click', content_object=photo3)
 
         access_user = account_models.User.objects \
             .create_user(email='mr@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov2')
