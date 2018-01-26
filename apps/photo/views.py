@@ -323,7 +323,7 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
             return aov_picks
 
         if page == "popular":
-            cutoff = timezone.now() - timedelta(days=30)
+            cutoff = timezone.now() - timedelta(days=7)
             popular_photos = photo_models.Photo.objects.filter(
                 created_at__gte=cutoff, public=True, category__isnull=False).distinct().annotate(
                 actions=Count("user_action")).order_by("-actions")
