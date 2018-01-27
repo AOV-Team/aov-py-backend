@@ -1,8 +1,19 @@
 from apps.communication import models as communication_models
 from celery import task
-from datetime import timedelta
 from django.utils import timezone
 from push_notifications.models import APNSDevice
+
+
+def chunk_devices(queryset, size: int):
+    """
+        Yields a QuerySet of count 'size'
+
+    :param queryset: QuerySet of objects
+    :param size: Size of sub-QuerySet to be returned
+    :return: QuerySet of count 'size'
+    """
+    for i in range(0, queryset.count(), size):
+        yield queryset[i:i + size]
 
 
 @task(name='send_push_notification')
@@ -19,7 +30,17 @@ def send_push_notification(message, recipients, **kwargs):
 
     if type(recipients) is str:
         if recipients == 'all':
-            devices = APNSDevice.objects.all()
+            # To prevent ConnectionErrors,
+            # the queryset is passed off to a generator function to return smaller querysets
+            all_devices = APNSDevice.objects.all()
+            for devices in chunk_devices(all_devices, 100):
+                devices = APNSDevice.objects.filter(id__in=devices.values_list("id", flat=True))
+                try:
+                    devices.send_message(message, **kwargs)
+                except ConnectionError:
+                    continue
+
+            return
     elif type(recipients) is list:
         devices = APNSDevice.objects.filter(id__in=recipients)
 

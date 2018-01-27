@@ -2,6 +2,7 @@ from apps.communication.tasks import send_push_notification
 from django.test import override_settings, TestCase
 from push_notifications.models import APNSDevice
 from unittest import mock
+import uuid
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
