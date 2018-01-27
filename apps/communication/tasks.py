@@ -35,7 +35,10 @@ def send_push_notification(message, recipients, **kwargs):
             all_devices = APNSDevice.objects.all()
             for devices in chunk_devices(all_devices, 100):
                 devices = APNSDevice.objects.filter(id__in=devices.values_list("id", flat=True))
-                devices.send_message(message, **kwargs)
+                try:
+                    devices.send_message(message, **kwargs)
+                except ConnectionError:
+                    continue
 
             return
     elif type(recipients) is list:
