@@ -1,6 +1,7 @@
 from apps.communication import models as communication_models
 from celery import task
 from django.utils import timezone
+from push_notifications.apns import APNSError, APNSServerError
 from push_notifications.models import APNSDevice
 
 
@@ -38,6 +39,8 @@ def send_push_notification(message, recipients, **kwargs):
                 try:
                     devices.send_message(message, **kwargs)
                 except ConnectionError:
+                    continue
+                except (APNSError, APNSServerError):
                     continue
 
             return
