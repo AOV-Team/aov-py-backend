@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'api/me$', account_views.MeViewSet.as_view()),
     url(r'api/me/following/photos$', photo_views.UserFollowingPhotoViewSet.as_view()),
     url(r'api/me/profile$', account_views.MeProfileViewSet.as_view()),
+    url(r'api/users/search$', account_views.UserSearchViewSet.as_view()),
     url(r'api/users$', account_views.UserViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)$', account_views.UserSingleViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/following$', account_views.UserFollowingViewSet.as_view()),
