@@ -945,7 +945,7 @@ class UserProfileViewSet(generics.RetrieveAPIView):
             raise NotFound('User does not exist')
 
 
-class UserSearchViewSet(generics.RetrieveAPIView):
+class UserSearchViewSet(generics.ListAPIView):
     """
         /api/users/search
 
