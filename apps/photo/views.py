@@ -197,7 +197,7 @@ def photo_map_admin(request):
 
 class PhotoViewSet(generics.ListCreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
-    pagination_class = LargeResultsSetPagination
+    pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
 
@@ -315,6 +315,7 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
         :return: Queryset
         """
         page = self.request.query_params.get("display_page", None)
+        cutoff = timezone.now() - timedelta(days=30)
 
         if page == "picks":
             picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks")
@@ -330,7 +331,7 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
             return popular_photos
 
         top_photos = photo_models.Photo.objects.filter(
-            public=True, category__isnull=False).distinct().order_by("-votes")[:100]
+            public=True, category__isnull=False, created_at__gte=cutoff).distinct().order_by("-votes")[:100]
         return top_photos
 
 
@@ -411,6 +412,7 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
 
 
 class PhotoClassificationPhotosViewSet(generics.ListAPIView):
+    pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = photo_serializers.PhotoSerializer
 
@@ -870,7 +872,7 @@ class UserFollowingPhotoViewSet(generics.ListAPIView):
 
     :author: gallen
     """
-    pagination_class = LargeResultsSetPagination
+    pagination_class = DefaultResultsSetPagination
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.PhotoSerializer
