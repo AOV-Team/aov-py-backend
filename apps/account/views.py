@@ -15,7 +15,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.search import TrigramSimilarity
+from django.contrib.postgres.search import TrigramSimilarity, SearchQuery, SearchVector, SearchRank
 from django.core.exceptions import ObjectDoesNotExist
 from json.decoder import JSONDecodeError
 from rest_framework import generics, permissions
@@ -943,6 +943,47 @@ class UserProfileViewSet(generics.RetrieveAPIView):
             return response
         except ObjectDoesNotExist:
             raise NotFound('User does not exist')
+
+
+class UserSearchViewSet(generics.ListAPIView):
+    """
+        /api/users/search
+
+        Endpoint to allow searching for a user by name, username, or social_name
+
+        Search weight priority: First Name, Last Name, Username, Social Name
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = account_models.User.objects.all()
+    serializer_class = account_serializers.UserPublicSerializer
+
+    def get_queryset(self):
+        """
+            GET method to return Users based on query values
+
+        :param request: HTTP request object with the query parameters
+        :param kwargs: Additional keyword arguments
+        :return:
+        """
+        query_params = self.request.query_params
+        keywords = query_params.get("q", None)
+        qs = account_models.User.objects.none()
+        if keywords:
+            query = SearchQuery(keywords)
+
+            # Set up the Vectors with appropriate weights
+            first_name_vector = SearchVector("first_name", weight="A")
+            last_name_vector = SearchVector("last_name", weight="B")
+            username_vector = SearchVector("username", weight="C")
+            social_name_vector = SearchVector("social_name", weight="D")
+
+            vectors = first_name_vector + last_name_vector + username_vector + social_name_vector
+
+            qs = self.queryset.annotate(search=vectors).filter(search=query)
+            qs = qs.annotate(rank=SearchRank(vectors, query)).order_by("-rank")
+
+        return qs
 
 
 class UserSingleViewSet(generics.RetrieveAPIView):
