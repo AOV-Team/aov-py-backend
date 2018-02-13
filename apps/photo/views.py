@@ -4,6 +4,7 @@ from apps.common import models as common_models
 from apps.common.serializers import setup_eager_loading
 from apps.common.views import DefaultResultsSetPagination, get_default_response, handle_jquery_empty_array, \
     LargeResultsSetPagination, MediumResultsSetPagination, remove_pks_from_payload
+from apps.communication import tasks as communication_tasks
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -19,6 +20,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 from django.shortcuts import render
 from django.utils import timezone
+from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
@@ -670,6 +672,16 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             }
 
             new_comment = photo_models.PhotoComment.objects.create_or_update(**serializer_payload)
+
+            # After creating the comment, send a push notification to the photo owner
+            photo = photo_models.Photo.objects.filter(id=photo_id)
+            owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
+            owning_apns = APNSDevice.objects.filter(user=owning_user)
+
+            # TODO Need verification from Prince
+            message = "One of your photos has a new comment!"
+
+            communication_tasks.send_push_notification(message, owning_apns)
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
             response = get_default_response('201')

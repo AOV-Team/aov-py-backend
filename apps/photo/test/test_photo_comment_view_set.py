@@ -3,11 +3,14 @@ from apps.common.test import helpers as test_helpers
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from django.test import TestCase, override_settings
+from push_notifications.models import APNSDevice
 from rest_framework.test import APIClient
+from unittest import mock
 
 
 @override_settings(REMOTE_IMAGE_STORAGE=False,
-                   DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+                   DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage',
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestPhotoSingleCommentViewSetPOST(TestCase):
     def test_photo_single_comment_view_set_post_successful(self):
         """
@@ -17,26 +20,31 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         """
 
         user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        device = APNSDevice.objects.create(
+            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=user)
 
         photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo.save()
 
-        client = APIClient()
-        client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
+        with mock.patch('apps.communication.tasks.send_push_notification') as p:
+        # with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+            client = APIClient()
+            client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
 
-        payload = {
-            'comment': 'Dude, sick photo! I dig it.'
-        }
+            payload = {
+                'comment': 'Dude, sick photo! I dig it.'
+            }
 
-        request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
+            request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
 
-        self.assertEquals(request.status_code, 201)
+            self.assertEquals(request.status_code, 201)
+            self.assertEqual(p.call_args, p._call_matcher(p.call_args))
 
-        # Check db
-        new_comment = photo_models.PhotoComment.objects.first()
+            # Check db
+            new_comment = photo_models.PhotoComment.objects.first()
 
-        self.assertEqual(new_comment.comment, payload['comment'])
-        self.assertEqual(new_comment.user.email, user.email)
+            self.assertEqual(new_comment.comment, payload['comment'])
+            self.assertEqual(new_comment.user.email, user.email)
 
     def test_photo_single_comment_view_set_post_no_comment_text(self):
         """
