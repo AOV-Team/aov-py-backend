@@ -8,6 +8,7 @@ from apps.common.exceptions import ForbiddenValue, OverLimitException
 from apps.common.serializers import setup_eager_loading
 from apps.common.views import get_default_response, LargeResultsSetPagination, MediumResultsSetPagination, \
     remove_pks_from_payload
+from apps.communication.tasks import send_push_notification
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -18,6 +19,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity, SearchQuery, SearchVector, SearchRank
 from django.core.exceptions import ObjectDoesNotExist
 from json.decoder import JSONDecodeError
+from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -788,6 +790,11 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
                 if not follow:
                     user.follower.add(auth_user)
                     user.save()
+
+                    # Send a push notification to the followed user
+                    followed_device = APNSDevice.objects.filter(user=user)
+                    message = "{} started following you.".format(auth_user.username)
+                    send_push_notification(message, followed_device)
 
                     return get_default_response('201')
                 else:
