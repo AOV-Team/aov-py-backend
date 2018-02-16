@@ -678,8 +678,7 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
             owning_apns = APNSDevice.objects.filter(user=owning_user)
 
-            # TODO Need verification from Prince
-            message = "One of your photos has a new comment!"
+            message = "{} has commented on your artwork.".format(auth_user.username)
 
             communication_tasks.send_push_notification(message, owning_apns)
 

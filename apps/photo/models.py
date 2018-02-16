@@ -1,5 +1,6 @@
 from apps.account import models as account_models
 from apps.common import models as common_models
+from apps.communication.tasks import send_push_notification
 from apps.photo.photo import BlurResize, WidthResize
 from apps.utils import models as utils_models
 from django.conf import settings
@@ -11,6 +12,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from imagekit.models import ImageSpecField
+from push_notifications.models import APNSDevice
 
 
 class PhotoClassificationManager(models.Manager):
@@ -141,6 +143,15 @@ class Photo(geo_models.Model):
                     self.aov_feed_add_date = timezone.now()
             else:
                 self.aov_feed_add_date = None
+
+            # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
+            owning_user = account_models.User.objects.filter(id=self.user.id)
+            owning_apns = APNSDevice.objects.filter(user=owning_user)
+
+            # TODO Need verification from Prince
+            message = "Your artwork has been featured in the AOV Picks gallery!"
+
+            send_push_notification(message, owning_apns)
         except ValueError:
             pass
         super(Photo, self).save(*args, **kwargs)
