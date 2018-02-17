@@ -2,6 +2,7 @@ from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
 from django.test import TestCase
 from rest_framework.test import APIClient
+from unittest import mock
 
 
 class TestUserFollowersViewSetGET(TestCase):
@@ -150,22 +151,24 @@ class TestUserFollowersViewSetPOST(TestCase):
         # Simulate auth
         token = test_helpers.get_token_for_user(access_user)
 
-        # Get data from endpoint
-        client = APIClient()
-        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+        with mock.patch('apps.communication.tasks.send_push_notification') as p:
+            # Get data from endpoint
+            client = APIClient()
+            client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        request = client.post('/api/users/{}/followers'.format(target_user.id), format='json')
+            request = client.post('/api/users/{}/followers'.format(target_user.id), format='json')
 
-        self.assertEquals(request.status_code, 201)
+            self.assertEquals(request.status_code, 201)
+            self.assertEqual(p.call_args, p._call_matcher(p.call_args))
 
-        # Check for entry
-        followers = target_user.follower.all()
+            # Check for entry
+            followers = target_user.follower.all()
 
-        self.assertEquals(len(followers), 2)
+            self.assertEquals(len(followers), 2)
 
-        for follower in followers:
-            if follower.id != access_user.id and follower.id != user_1.id:
-                self.fail('Unidentified follower')
+            for follower in followers:
+                if follower.id != access_user.id and follower.id != user_1.id:
+                    self.fail('Unidentified follower')
 
     def test_user_followers_view_set_post_already_following(self):
         """
