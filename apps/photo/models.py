@@ -15,6 +15,41 @@ from imagekit.models import ImageSpecField
 from push_notifications.models import APNSDevice
 
 
+class GalleryManager(models.Manager):
+    """
+        Checks for an existing entry. If existing, update it otherwise create a new one.
+
+    :author: gallen
+    """
+
+    pass
+
+
+class Gallery(common_models.EditMixin):
+    """
+        Model representation of the Gallery database table.
+
+    :author: gallen
+    """
+
+    name = models.CharField(max_length=32)
+    photos = models.ManyToManyField("Photo", related_name="gallery_photo")
+    public = models.BooleanField(default=True)
+    user = models.ForeignKey(account_models.User)
+
+    class Meta:
+        verbose_name_plural = "Galleries"
+
+    def __str__(self):
+        """
+            Method to define a custom string representation of the model
+
+        :return: String representation of the model
+        """
+
+        return "{}: {} - {} photos".format(self.pk, self.name, self.photos.all().count())
+
+
 class PhotoClassificationManager(models.Manager):
     def create_or_update(self, **kwargs):
         """
