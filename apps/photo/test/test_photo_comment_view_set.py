@@ -26,8 +26,7 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo.save()
 
-        with mock.patch('apps.communication.tasks.send_push_notification') as p:
-        # with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
 
@@ -38,7 +37,8 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
             request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
 
             self.assertEquals(request.status_code, 201)
-            self.assertEqual(p.call_args, p._call_matcher(p.call_args))
+            p.assert_called_with(alert="{} has commented on your artwork.".format(user.username),
+                                 registration_ids=[device.registration_id])
 
             # Check db
             new_comment = photo_models.PhotoComment.objects.first()

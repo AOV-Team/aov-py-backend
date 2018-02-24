@@ -1,6 +1,7 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from push_notifications.models import APNSDevice
 from rest_framework.test import APIClient
 from unittest import mock
 
@@ -129,7 +130,7 @@ class TestUserFollowersViewSetGET(TestCase):
             if result['username'] != user_1.username and result['username'] != user_2.username:
                 self.fail('Unidentified follower')
 
-
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class TestUserFollowersViewSetPOST(TestCase):
     def test_user_followers_view_set_post_successful(self):
         """
@@ -143,6 +144,9 @@ class TestUserFollowersViewSetPOST(TestCase):
         user_1 = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
 
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
+        device = APNSDevice.objects \
+            .create(registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50',
+                    user=target_user)
 
         # Follow target user
         target_user.follower = [user_1]
@@ -151,7 +155,7 @@ class TestUserFollowersViewSetPOST(TestCase):
         # Simulate auth
         token = test_helpers.get_token_for_user(access_user)
 
-        with mock.patch('apps.communication.tasks.send_push_notification') as p:
+        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
             # Get data from endpoint
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -159,7 +163,8 @@ class TestUserFollowersViewSetPOST(TestCase):
             request = client.post('/api/users/{}/followers'.format(target_user.id), format='json')
 
             self.assertEquals(request.status_code, 201)
-            self.assertEqual(p.call_args, p._call_matcher(p.call_args))
+            p.assert_called_with(alert="{} started following you.".format(access_user.username),
+                                 registration_ids=[device.registration_id])
 
             # Check for entry
             followers = target_user.follower.all()

@@ -151,7 +151,7 @@ class Photo(geo_models.Model):
             # TODO Need verification from Prince
             message = "Your artwork has been featured in the AOV Picks gallery!"
 
-            send_push_notification(message, owning_apns)
+            send_push_notification(message, owning_apns.values_list("id", flat=True))
         except ValueError:
             pass
         super(Photo, self).save(*args, **kwargs)
