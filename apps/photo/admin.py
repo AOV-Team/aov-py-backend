@@ -73,6 +73,19 @@ class FlaggedPhotoAdmin(admin.ModelAdmin):
     user_info.short_description = 'Username / Social Name'
 
 
+class GalleryAdmin(admin.ModelAdmin):
+    """
+        Admin class for Galleries
+
+    :author: gallen
+    """
+
+    filter_horizontal = ["photos"]
+    list_display = ["name", "user"]
+    ordering = ["name", "user"]
+    search_fields = ["name", "user", "id"]
+
+
 class PhotoClassificationAdmin(GuardedModelAdmin):
     """
     Categories and tags
@@ -464,6 +477,7 @@ class StarredPhotoAdmin(admin.ModelAdmin):
 
 
 admin.site.register(FlaggedPhoto, FlaggedPhotoAdmin)
+admin.site.register(photo_models.Gallery, GalleryAdmin)
 admin.site.register(photo_models.PhotoClassification, PhotoClassificationAdmin)
 admin.site.register(photo_models.PhotoComment, PhotoCommentAdmin)
 admin.site.register(photo_models.PhotoFeed, PhotoFeedAdmin)
