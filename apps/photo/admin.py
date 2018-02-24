@@ -80,10 +80,11 @@ class GalleryAdmin(admin.ModelAdmin):
     :author: gallen
     """
 
-    filter_horizontal = ["photos"]
+    raw_id_fields = ["photos"]
     list_display = ["name", "user"]
-    ordering = ["name", "user"]
-    search_fields = ["name", "user", "id"]
+    list_filter = ["public"]
+    readonly_fields = ["user"]
+    search_fields = ["name", "user__email", "id"]
 
 
 class PhotoClassificationAdmin(GuardedModelAdmin):
