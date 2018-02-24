@@ -197,6 +197,41 @@ def photo_map_admin(request):
     return render(request, 'photo_map.html', context)
 
 
+class GalleryViewSet(generics.GenericAPIView):
+    """
+        View set to handle creation and  updating of a Gallery
+
+    :author: gallen
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    pagination_class = DefaultResultsSetPagination
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.GallerySerializer
+
+    def get_queryset(self):
+        """
+            Return Galleries
+
+        :return: QuerySet
+        """
+        authenticated_user = TokenAuthentication().authenticate(self.request)[0]
+        name = self.request.query_params.get("name")
+        query_params = {
+            "public": True
+        }
+
+        if name:
+            query_params.update({
+                "name__icontains": name
+            })
+
+        galleries = photo_models.Gallery.objects.filter(user=authenticated_user, **query_params)
+
+        return galleries
+
+
+
+
 class PhotoViewSet(generics.ListCreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     pagination_class = DefaultResultsSetPagination
