@@ -1,8 +1,9 @@
 from apps.communication import models as communication_models
-from celery import task
+from celery import shared_task
+from django.db.models import QuerySet
 from django.utils import timezone
 from push_notifications.apns import APNSError, APNSServerError
-from push_notifications.models import APNSDevice
+from push_notifications.models import APNSDevice, APNSDeviceQuerySet
 
 
 def chunk_devices(queryset, size: int):
@@ -17,7 +18,7 @@ def chunk_devices(queryset, size: int):
         yield queryset[i:i + size]
 
 
-@task(name='send_push_notification')
+@shared_task(name='send_push_notification')
 def send_push_notification(message, recipients, **kwargs):
     """
     Send a notification
@@ -28,7 +29,6 @@ def send_push_notification(message, recipients, **kwargs):
     :return: None
     """
     devices = APNSDevice.objects.none()
-
     if type(recipients) is str:
         if recipients == 'all':
             # To prevent ConnectionErrors,
@@ -38,19 +38,20 @@ def send_push_notification(message, recipients, **kwargs):
                 devices = APNSDevice.objects.filter(id__in=devices.values_list("id", flat=True))
                 try:
                     devices.send_message(message, **kwargs)
-                except ConnectionError:
+                except ConnectionError as e:
+                    print("ERROR: ", e)
                     continue
-                except (APNSError, APNSServerError):
+                except (APNSError, APNSServerError) as e:
+                    print("ERROR: ", e)
                     continue
 
             return
-    elif type(recipients) is list:
+    elif type(recipients) is list or type(recipients) is APNSDeviceQuerySet:
         devices = APNSDevice.objects.filter(id__in=recipients)
-
     devices.send_message(message, **kwargs)
 
 
-@task(name='send_scheduled_push_notifications')
+@shared_task(name='send_scheduled_push_notifications')
 def send_scheduled_push_notifications():
     """
     Check for push notifications to be sent out.

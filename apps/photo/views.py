@@ -680,7 +680,7 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
 
             message = "{} has commented on your artwork.".format(auth_user.username)
 
-            communication_tasks.send_push_notification(message, owning_apns)
+            communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
             response = get_default_response('201')
