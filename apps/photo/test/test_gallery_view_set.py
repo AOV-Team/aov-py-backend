@@ -17,16 +17,19 @@ class TestGalleryViewSetGET(TestCase):
         :return: No return
         """
 
-        user = account_models.User.objects.create_user(email='mrtest@artofvisuals.com', password='WhoAmI',
-                                                       username='aov1')
+        account_models.User.objects.create_user(email='mrtest@artofvisuals.com', password='WhoAmI', username='aov2')
+        target_user = account_models.User.objects.create_user(email='mrstest@artofvisuals.com', password='WhoAmI',
+                                                              username='aov1')
         photo = photo_models.Photo(coordinates=Point(-116, 43),
-                                   image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+                                   image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                                   user=target_user)
         photo.save()
         photo2 = photo_models.Photo(coordinates=Point(-116, 43),
-                                   image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+                                    image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
+                                    user=target_user)
         photo2.save()
         photo_models.Gallery.objects.create_or_update(
-            name="Test Gallery", user=user, photos=photo_models.Photo.objects.all())
+            name="Test Gallery", user=target_user, photos=photo_models.Photo.objects.all())
 
     def tearDown(self):
         """
@@ -45,15 +48,17 @@ class TestGalleryViewSetGET(TestCase):
         :return: No return
         :author: gallen
         """
-        user = account_models.User.objects.get(username="aov1")
+        user = account_models.User.objects.get(username="aov2")
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
+        target_user = account_models.User.objects.get(username="aov1")
 
         # Get data from endpoint
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        request = client.get('/api/user/galleries')
+        request = client.get('/api/users/{}/galleries'.format(target_user.id))
         results = request.data['results']
 
-        print(results)
+        self.assertEqual(request.status_code, 200)
+        self.assertEqual(results[0]["photo_count"], 2)

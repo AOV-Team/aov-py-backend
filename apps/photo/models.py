@@ -36,9 +36,10 @@ class GalleryManager(models.Manager):
             new_gallery.pk = existing.pk
             new_gallery.created_at = existing.created_at
             new_gallery.save() # Has to occur to allow adding of objects to M2M on next lines
-            new_gallery.photos.add(*photos)
             new_gallery.photos.add(*existing.photos.all().values_list("id", flat=True))
 
+        new_gallery.save()
+        new_gallery.photos.add(*photos)
         new_gallery.save()
         return new_gallery
 

@@ -197,7 +197,7 @@ def photo_map_admin(request):
     return render(request, 'photo_map.html', context)
 
 
-class GalleryViewSet(generics.GenericAPIView):
+class GalleryRetrieveViewSet(generics.ListAPIView):
     """
         View set to handle creation and  updating of a Gallery
 
@@ -207,6 +207,7 @@ class GalleryViewSet(generics.GenericAPIView):
     pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = photo_serializers.GallerySerializer
+    queryset = photo_models.Gallery.objects.all()
 
     def get_queryset(self):
         """
@@ -214,18 +215,22 @@ class GalleryViewSet(generics.GenericAPIView):
 
         :return: QuerySet
         """
-        authenticated_user = TokenAuthentication().authenticate(self.request)[0]
-        name = self.request.query_params.get("name")
-        query_params = {
-            "public": True
-        }
+        gallery_user = account_models.User.objects.filter(id=self.kwargs.get("user_id"))
 
-        if name:
-            query_params.update({
-                "name__icontains": name
-            })
+        if gallery_user.exists():
+            name = self.request.query_params.get("name")
+            query_params = {
+                "public": True
+            }
 
-        galleries = photo_models.Gallery.objects.filter(user=authenticated_user, **query_params)
+            if name:
+                query_params.update({
+                    "name__icontains": name
+                })
+
+            galleries = self.queryset.filter(user=gallery_user, **query_params)
+        else:
+            galleries = photo_models.Gallery.objects.none()
 
         return galleries
 
