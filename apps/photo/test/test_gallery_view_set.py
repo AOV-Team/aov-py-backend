@@ -62,3 +62,31 @@ class TestGalleryViewSetGET(TestCase):
 
         self.assertEqual(request.status_code, 200)
         self.assertEqual(results[0]["photo_count"], 2)
+
+    def test_gallery_get_me_successful(self):
+        """
+            Unit test to verify that private Galleries can be retrieved by the authenticated user
+
+        :return: No return
+        """
+
+        user = account_models.User.objects.get(username="aov2")
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Set the Gallery to private
+        gallery = photo_models.Gallery.objects.first()
+        gallery.public = False
+        gallery.user = user
+        gallery.save()
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/me/galleries')
+        results = request.data['results']
+
+        self.assertEqual(request.status_code, 200)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["photo_count"], 2)

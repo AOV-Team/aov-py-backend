@@ -215,22 +215,26 @@ class GalleryRetrieveViewSet(generics.ListAPIView):
 
         :return: QuerySet
         """
-        gallery_user = account_models.User.objects.filter(id=self.kwargs.get("user_id"))
+        authenticated_user = TokenAuthentication().authenticate(self.request)[0]
+        user_id = self.kwargs.get("user_id")
+        query_params = {
+            "public": True
+        }
 
-        if gallery_user.exists():
-            name = self.request.query_params.get("name")
-            query_params = {
-                "public": True
-            }
-
-            if name:
-                query_params.update({
-                    "name__icontains": name
-                })
-
-            galleries = self.queryset.filter(user=gallery_user, **query_params)
+        if user_id:
+            gallery_user = account_models.User.objects.filter(id=user_id)
         else:
-            galleries = photo_models.Gallery.objects.none()
+            gallery_user = authenticated_user
+            query_params["public"] = False
+
+        name = self.request.query_params.get("name")
+
+        if name:
+            query_params.update({
+                "name__icontains": name
+            })
+
+        galleries = self.queryset.filter(user=gallery_user, **query_params)
 
         return galleries
 

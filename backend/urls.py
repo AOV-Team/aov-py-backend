@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'api/gear/(?P<pk>[0-9^/]+)$', account_views.GearSingleViewSet.as_view()),
     url(r'api/me$', account_views.MeViewSet.as_view()),
     url(r'api/me/following/photos$', photo_views.UserFollowingPhotoViewSet.as_view()),
+    url(r'api/me/galleries$', photo_views.GalleryRetrieveViewSet.as_view()),
     url(r'api/me/profile$', account_views.MeProfileViewSet.as_view()),
     url(r'api/search/users$', account_views.UserSearchViewSet.as_view()),
     url(r'api/users$', account_views.UserViewSet.as_view()),
