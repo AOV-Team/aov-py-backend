@@ -80,6 +80,11 @@ def push_notification_manager(request):
     :return: render()
     """
     post = request.POST
+    authentication = TokenAuthentication().authenticate(request)
+    authenticated_user = authentication[0] if authentication else request.user
+
+    if authenticated_user.email == "andre@nations.io":
+        return HttpResponseRedirect('/admin/')
 
     if len(post) > 0:
         # Set up message
@@ -89,10 +94,8 @@ def push_notification_manager(request):
 
         if len(message) > 0:
             if len(recipients) > 0:
-                # send_push_notification.delay(message, recipients)
                 send_push_notification(message, recipients)
             else:
-                # send_push_notification.delay(message, 'all')
                 send_push_notification(message, 'all')
 
             # Scheduling is disabled for now
