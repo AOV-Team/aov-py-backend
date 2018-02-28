@@ -238,7 +238,70 @@ class GalleryRetrieveViewSet(generics.ListAPIView):
 
         return galleries
 
+    def post(self, request, **kwargs):
+        """
+            Method to create new Galleries
 
+        :param request: HTTP Request object containing data to create a new Gallery
+        :param kwargs: Additional Keyword arguments passed to the view from the url conf
+        :return: HTTP Response confirming/denying creation of a new Gallery
+        """
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        request_data = request.data
+
+        response = get_default_response('400')
+
+        if "name" in request_data:
+            new_gallery = photo_models.Gallery.objects.create_or_update(user=authenticated_user, **request_data)
+
+            response = get_default_response('201')
+            response.data = {
+                "results": photo_serializers.GallerySerializer(new_gallery).data
+            }
+
+        return response
+
+    def put(self, request, **kwargs):
+        """
+            Method to update Gallery entries
+
+        :param request: HTTP Request containing the new data to be entered
+        :param kwargs: Additional Keyword arguments passed to the view from the url conf
+        :return: HTTP Response confirming/denying update
+        """
+
+        authenticated_user = TokenAuthentication().authenticate(request)[0]
+        request_data = request.data
+        gallery_id = kwargs.get("gallery_id")
+        gallery = photo_models.Gallery.objects.filter(id=gallery_id)
+        response = get_default_response('404')
+
+        if gallery.exists():
+            gallery = gallery.first()
+            object_changed = False
+            response = get_default_response('200')
+
+            if "name" in request_data:
+                gallery.name = request_data.get("name")
+                object_changed = True
+
+            if "photos" in request_data:
+                gallery.photos.add(*request_data.get("photos"))
+                object_changed = True
+
+            if "public" in request_data:
+                if any([gallery.user.email == authenticated_user.email,
+                        authenticated_user.is_superuser, authenticated_user.is_staff]):
+                    gallery.public = request_data.get("public")
+                    object_changed = True
+
+            if object_changed:
+                gallery.save()
+                response.data = {
+                    "results": self.serializer_class(gallery).data
+                }
+
+        return response
 
 
 class PhotoViewSet(generics.ListCreateAPIView):

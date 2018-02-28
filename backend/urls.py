@@ -45,6 +45,7 @@ urlpatterns = [
     url(r'api/users/(?P<user_id>[0-9^/]+)/followers/(?P<follower_id>[0-9^/]+)$',
         account_views.UserFollowerSingleViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/galleries$', photo_views.GalleryRetrieveViewSet.as_view()),
+    url(r'api/users/(?P<user_id>[0-9^/]+)/galleries/(?P<gallery_id>[0-9^/]+)$', photo_views.GalleryRetrieveViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/location$', account_views.UserLocationViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/photos$', account_views.UserPhotosViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)/profile$', account_views.UserProfileViewSet.as_view()),
