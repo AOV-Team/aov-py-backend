@@ -8,6 +8,24 @@ from rest_framework.authentication import TokenAuthentication
 import re
 
 
+class GallerySerializer(serializers.ModelSerializer):
+    """
+        Serializer for GalleryModel instances
+
+    :author: gallen
+    """
+
+    photo_count = serializers.SerializerMethodField()
+
+    def get_photo_count(self, obj):
+        return obj.photos.all().count()
+
+    class Meta:
+        model = models.Gallery
+        fields = ["id", "name", "photo_count", "public"]
+        read_only_fields = ["user"]
+
+
 class PhotoClassificationSerializer(serializers.ModelSerializer):
     feed_id = serializers.SerializerMethodField()
 

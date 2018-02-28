@@ -15,6 +15,64 @@ from imagekit.models import ImageSpecField
 from push_notifications.models import APNSDevice
 
 
+class GalleryManager(models.Manager):
+    """
+        Manager class for the new Gallery model
+
+    :author: gallen
+    """
+
+    def create_or_update(self, **kwargs):
+        """
+            Checks for an existing entry. If existing, update it otherwise create a new one.
+
+        :return:
+        """
+        photos = kwargs.pop("photos", [])
+        new_gallery = Gallery(**kwargs)
+        existing = Gallery.objects.filter(name=new_gallery.name, user=new_gallery.user).first()
+
+        if existing:
+            new_gallery.pk = existing.pk
+            new_gallery.created_at = existing.created_at
+            new_gallery.save() # Has to occur to allow adding of objects to M2M on next lines
+            new_gallery.photos.add(*existing.photos.all().values_list("id", flat=True))
+
+        new_gallery.save()
+        new_gallery.photos.add(*photos)
+        new_gallery.save()
+        return new_gallery
+
+
+class Gallery(common_models.EditMixin):
+    """
+        Model representation of the Gallery database table.
+
+    :author: gallen
+    """
+
+    name = models.CharField(max_length=32)
+    photos = models.ManyToManyField("Photo", related_name="gallery_photo")
+    public = models.BooleanField(default=True)
+    user = models.ForeignKey(account_models.User)
+
+    objects = GalleryManager()
+
+    def __str__(self):
+        """
+            Method to define a custom string representation of the model
+
+        :return: String representation of the model
+        """
+
+        # return "{}: {} - {} photos".format(self.id, self.name, self.photos.all().count())
+
+        return "{} {} - {} photos".format(self.id, self.name, 0)
+
+    class Meta:
+        verbose_name_plural = "Galleries"
+
+
 class PhotoClassificationManager(models.Manager):
     def create_or_update(self, **kwargs):
         """
