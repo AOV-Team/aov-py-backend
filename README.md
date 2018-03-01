@@ -75,23 +75,6 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
-### `/api/marketplace/users`
-* POST
-```javascript
-{
-    "email": "",
-    "password": "",
-    "username": ""
-}
-```
-
-### `/api/marketplace/users/activate`
-* POST
-```javascript
-{
-    'code': uuid
-}
-
 ### `/api/me`
 * GET
 * PATCH
@@ -106,6 +89,26 @@ Make sure the following files are in the project directory before running the pr
     "location": "",
     "password": "",
     "social_name": ""
+}
+```
+
+### `/api/me/following/photos`
+* GET
+
+### `/api/me/galleries`
+* GET
+* POST
+```javascript
+{
+    "name": "",
+    "photos": [##, ##]
+}
+```
+* PUT
+```javascript
+{
+    "name": "",
+    "photos": [##, ##]
 }
 ```
 
@@ -126,6 +129,9 @@ Make sure the following files are in the project directory before running the pr
     "cover_image": ""
 }
 ```
+
+### `/api/search/users?q=`
+* GET
 
 ### `/api/users`
 * POST
@@ -149,6 +155,32 @@ Make sure the following files are in the project directory before running the pr
 
 ### `/api/users/{}/following`
 * GET
+
+### `/api/users/followers`
+* GET
+* POST
+
+### `/api/users/followers/{}`
+* DELETE
+
+### `/api/users/{}/galleries`
+* GET
+* POST
+```javascript
+{
+    "name": "",
+    "photos": [##, ##]
+}
+```
+
+### `/api/users/{}/galleries/{}`
+* PUT
+```javascript
+{
+    "name": "",
+    "photos": [##, ##]
+}
+```
 
 ### `/api/users/{}/location`
 * GET
