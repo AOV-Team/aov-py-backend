@@ -304,6 +304,35 @@ class GalleryRetrieveViewSet(generics.ListAPIView):
         return response
 
 
+class GalleryPhotoViewSet(generics.ListAPIView):
+    """
+        API view to return the photos for a specific Gallery
+
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    pagination_class = DefaultResultsSetPagination
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.PhotoSerializer
+    queryset = photo_models.Photo.objects.all()
+
+    def get_queryset(self):
+        """
+            Method to return a queryset of photos for a given Gallery
+
+        :return: QuerySet of Photo
+        """
+        user_id = self.kwargs.get("user_id")
+        gallery_id = self.kwargs.get("gallery_id")
+
+        gallery = photo_models.Gallery.objects.filter(user_id=user_id, id=gallery_id)
+
+        if gallery.exists():
+            gallery = gallery.first()
+            return gallery.photos.all()
+
+        return photo_models.Photo.objects.none()
+
+
 class PhotoViewSet(generics.ListCreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     pagination_class = DefaultResultsSetPagination

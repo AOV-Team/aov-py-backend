@@ -6,8 +6,8 @@ from apps.common import models as common_models
 from apps.common.mailer import send_transactional_email
 from apps.common.exceptions import ForbiddenValue, OverLimitException
 from apps.common.serializers import setup_eager_loading
-from apps.common.views import get_default_response, LargeResultsSetPagination, MediumResultsSetPagination, \
-    remove_pks_from_payload
+from apps.common.views import get_default_response, DefaultResultsSetPagination, LargeResultsSetPagination, \
+    MediumResultsSetPagination, remove_pks_from_payload
 from apps.communication.tasks import send_push_notification
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
@@ -1109,6 +1109,29 @@ class UserSingleStarsViewSet(generics.CreateAPIView, generics.RetrieveDestroyAPI
             response.data['message'] = 'User you attempted to star does not exist'
 
         return response
+
+
+class UserStarredPhotosViewSet(generics.ListAPIView):
+    """
+        API view to retrieve the photos starred by the accessing user
+
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = DefaultResultsSetPagination
+    serializer_class = photo_serializers.PhotoSerializer
+
+    def get_queryset(self):
+        """
+            Method to retrieve the queryset of appropriate photos
+
+        :return: QuerySet of photos
+        """
+
+        auth_user = TokenAuthentication().authenticate(self.request)[0]
+        stars = account_models.UserInterest.objects.filter(interest_type="star", user=auth_user)
+
+        return photo_models.Photo.objects.filter(id__in=stars.values_list("object_id", flat=True).distinct("object_id"))
 
 
 class UserViewSet(generics.CreateAPIView):

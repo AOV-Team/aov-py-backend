@@ -95,6 +95,9 @@ Make sure the following files are in the project directory before running the pr
 ### `/api/me/following/photos`
 * GET
 
+### `/api/me/starred/photos`
+* GET
+
 ### `/api/me/galleries`
 * GET
 * POST
@@ -181,6 +184,9 @@ Make sure the following files are in the project directory before running the pr
     "photos": [##, ##]
 }
 ```
+
+### `/api/users/{}/galleries/{}/photos`
+* GET
 
 ### `/api/users/{}/location`
 * GET
