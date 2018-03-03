@@ -55,7 +55,7 @@ class TestUserStarredPhotosViewSetGET(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        request = client.get('/api/me/photos/starred')
+        request = client.get('/api/me/starred/photos')
         results = request.data['results']
 
 
