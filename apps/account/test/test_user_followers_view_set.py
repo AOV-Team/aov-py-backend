@@ -166,14 +166,14 @@ class TestUserFollowersViewSetPOST(TestCase):
             p.assert_called_with(alert="{} started following you.".format(access_user.username),
                                  registration_ids=[device.registration_id])
 
-            # Check for entry
-            followers = target_user.follower.all()
+        # Check for entry
+        followers = target_user.follower.all()
 
-            self.assertEquals(len(followers), 2)
+        self.assertEquals(len(followers), 2)
 
-            for follower in followers:
-                if follower.id != access_user.id and follower.id != user_1.id:
-                    self.fail('Unidentified follower')
+        for follower in followers:
+            if follower.id != access_user.id and follower.id != user_1.id:
+                self.fail('Unidentified follower')
 
     def test_user_followers_view_set_post_already_following(self):
         """
