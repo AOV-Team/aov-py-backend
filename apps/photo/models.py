@@ -196,33 +196,35 @@ class Photo(geo_models.Model):
     votes = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
+        message = "Your artwork has been featured in the AOV Picks gallery!"
+        new_notification_sent = False
+        owning_user = account_models.User.objects.filter(id=self.user.id)
+        owning_apns = APNSDevice.objects.filter(user=owning_user)
+
         try:
             # AOV Picks is the name of the feed that is curated by Prince. Set the add_date field for proper ordering
             if "AOV Picks" in self.photo_feed.all().values_list("name", flat=True):
                 if not self.aov_feed_add_date:
                     self.aov_feed_add_date = timezone.now()
 
-                    # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
-                    owning_user = account_models.User.objects.filter(id=self.user.id)
-                    owning_apns = APNSDevice.objects.filter(user=owning_user)
-                    message = "Your artwork has been featured in the AOV Picks gallery!"
-
                     # Check for record of a notification being sent for this already
                     photo_type = ContentType.objects.get_for_model(self)
                     already_sent = PushNotificationRecord.objects.filter(message=message, receiver=owning_apns,
                                                                          object_id=self.id, action="A",
                                                                          content_type__pk=photo_type.id)
+
                     if not already_sent.exists():
+                        # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
                         send_push_notification(message, owning_apns.values_list("id", flat=True))
-                        print('passed send call')
-                        record = PushNotificationRecord.objects.create(message=message, receiver=owning_apns,
-                                                              action="A", content_object=self)
-                        print('record created', record)
+                        new_notification_sent = True
 
             else:
                 self.aov_feed_add_date = None
         except ValueError:
             pass
+        if new_notification_sent:
+            PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="A",
+                                                  content_object=self)
         super(Photo, self).save(*args, **kwargs)
 
     @property
