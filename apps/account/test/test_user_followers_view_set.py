@@ -1,5 +1,6 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
+from apps.communication.models import PushNotificationRecord
 from django.test import TestCase, override_settings
 from push_notifications.models import APNSDevice
 from rest_framework.test import APIClient
@@ -170,6 +171,7 @@ class TestUserFollowersViewSetPOST(TestCase):
         followers = target_user.follower.all()
 
         self.assertEquals(len(followers), 2)
+        self.assertEqual(PushNotificationRecord.objects.count(), 1)
 
         for follower in followers:
             if follower.id != access_user.id and follower.id != user_1.id:
