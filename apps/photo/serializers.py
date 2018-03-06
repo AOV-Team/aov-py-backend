@@ -139,7 +139,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         star_interest = account_models.UserInterest.objects.filter(interest_type='star', user=user,
                                                                    object_id=user.id, content_type__pk=obj.id)
         return {
-            "voted": star_interest.exists(),
+            "starred": star_interest.exists(),
         }
 
     def get_user_voted(self, obj):
