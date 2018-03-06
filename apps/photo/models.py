@@ -1,10 +1,12 @@
 from apps.account import models as account_models
 from apps.common import models as common_models
+from apps.communication.models import PushNotificationRecord
 from apps.communication.tasks import send_push_notification
 from apps.photo.photo import BlurResize, WidthResize
 from apps.utils import models as utils_models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.validators import MaxValueValidator
@@ -199,17 +201,26 @@ class Photo(geo_models.Model):
             if "AOV Picks" in self.photo_feed.all().values_list("name", flat=True):
                 if not self.aov_feed_add_date:
                     self.aov_feed_add_date = timezone.now()
+
+                    # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
+                    owning_user = account_models.User.objects.filter(id=self.user.id)
+                    owning_apns = APNSDevice.objects.filter(user=owning_user)
+                    message = "Your artwork has been featured in the AOV Picks gallery!"
+
+                    # Check for record of a notification being sent for this already
+                    photo_type = ContentType.objects.get_for_model(self)
+                    already_sent = PushNotificationRecord.objects.filter(message=message, receiver=owning_apns,
+                                                                         object_id=self.id, action="A",
+                                                                         content_type__pk=photo_type.id)
+                    if not already_sent.exists():
+                        send_push_notification(message, owning_apns.values_list("id", flat=True))
+                        print('passed send call')
+                        record = PushNotificationRecord.objects.create(message=message, receiver=owning_apns,
+                                                              action="A", content_object=self)
+                        print('record created', record)
+
             else:
                 self.aov_feed_add_date = None
-
-            # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
-            owning_user = account_models.User.objects.filter(id=self.user.id)
-            owning_apns = APNSDevice.objects.filter(user=owning_user)
-
-            # TODO Need verification from Prince
-            message = "Your artwork has been featured in the AOV Picks gallery!"
-
-            send_push_notification(message, owning_apns.values_list("id", flat=True))
         except ValueError:
             pass
         super(Photo, self).save(*args, **kwargs)

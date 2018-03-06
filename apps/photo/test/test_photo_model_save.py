@@ -1,4 +1,5 @@
 from apps.account import models as account_models
+from apps.communication.models import PushNotificationRecord
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from django.contrib.gis.geos import Point
@@ -114,6 +115,8 @@ class TestPhotoSave(TestCase):
 
             p.assert_called_with(alert="Your artwork has been featured in the AOV Picks gallery!",
                                  registration_ids=[device.registration_id])
+
+        print(PushNotificationRecord.objects.all())
 
         updated_photo = photo_models.Photo.objects.get(id=photo1.id)
         self.assertEqual(len(updated_photo.photo_feed.all()), 1)
