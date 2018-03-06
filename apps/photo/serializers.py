@@ -86,6 +86,7 @@ class PhotoSerializer(serializers.ModelSerializer):
     image_tiny_246 = serializers.ImageField(required=False)
     image_tiny_272 = serializers.ImageField(required=False)
     user_details = serializers.SerializerMethodField()
+    user_starred = serializers.SerializerMethodField()
     user_voted = serializers.SerializerMethodField()
     votes_behind = serializers.SerializerMethodField()
 
@@ -121,6 +122,25 @@ class PhotoSerializer(serializers.ModelSerializer):
             return UserBasicSerializer(obj.user).data
 
         return None
+
+    def get_user_starred(self, obj):
+        """
+            Check if there is a UserInterest with type of 'star' for the accessing user on this photo
+
+        :param obj: Photo object
+        :return: Dict denoting whether a star has occurred
+        """
+
+        authenticate = TokenAuthentication().authenticate(self.context["request"])
+        if authenticate:
+            user = authenticate[0]
+        else:
+            user = self.context["request"].user
+        star_interest = account_models.UserInterest.objects.filter(interest_type='star', user=user,
+                                                                   object_id=user.id, content_type__pk=obj.id)
+        return {
+            "voted": star_interest.exists(),
+        }
 
     def get_user_voted(self, obj):
         """
