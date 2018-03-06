@@ -2,6 +2,7 @@ from apps.account import models as account_models
 from apps.account.serializers import UserBasicSerializer, UserPublicSerializer
 from apps.common.serializers import DateTimeFieldWithTZ
 from apps.photo import models
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Max
 from rest_framework import serializers
 from rest_framework.authentication import TokenAuthentication
@@ -136,8 +137,9 @@ class PhotoSerializer(serializers.ModelSerializer):
             user = authenticate[0]
         else:
             user = self.context["request"].user
+        photo_type = ContentType.objects.get_for_model(obj)
         star_interest = account_models.UserInterest.objects.filter(interest_type='star', user=user,
-                                                                   object_id=user.id, content_type__pk=obj.id)
+                                                                   object_id=obj.id, content_type__pk=photo_type.id)
         return {
             "starred": star_interest.exists(),
         }

@@ -156,6 +156,10 @@ class TestPhotoSingleStarsViewSetPOST(TestCase):
         self.assertEquals(len(interests), 1)
         self.assertEquals(interests[0].object_id, photo1.id)
 
+        photos = client.get('/api/photos/{}'.format(photo1.id))
+
+        self.assertTrue(photos.data["user_starred"]["starred"])
+
     def test_photo_single_stars_view_set_post_duplicate(self):
         """
         Test that we get 409 if star already exists
