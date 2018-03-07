@@ -975,6 +975,7 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
         try:
             data = request.data
             photo = photo_models.Photo.objects.get(id=kwargs.get('pk'))
+            send_notification = False
 
             if "operation" not in data:
                 response = get_default_response('400')
@@ -993,6 +994,7 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                 new_photo_vote_data.update({
                     "upvote": True
                 })
+                send_notification = True
 
             if data["operation"] == "decrement":
                 payload = {
@@ -1008,6 +1010,20 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
 
             if serializer.is_valid():
                 serializer.save()
+
+                # Send a push notification ONLY for upvote, and keep a record of it
+                if send_notification:
+                    auth_user = TokenAuthentication().authenticate(request)[0]
+                    owning_user = account_models.User.objects.filter(id=photo.user.id)
+                    owning_apns = APNSDevice.objects.filter(user=owning_user)
+
+                    message = "{} has upvoted your artwork.".format(auth_user.username)
+
+                    communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+
+                    # Create the record of the notification being sent
+                    PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="U",
+                                                          content_object=photo)
 
                 response = get_default_response('200')
                 response.data = serializer.data
