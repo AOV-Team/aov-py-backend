@@ -820,7 +820,7 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
 
             # Create the record of the notification being sent
             PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
-                                                  content_object=photo.first())
+                                                  content_object=photo.first(), sender=auth_user)
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
             response = get_default_response('201')
@@ -1023,7 +1023,7 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
 
                     # Create the record of the notification being sent
                     PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="U",
-                                                          content_object=photo)
+                                                          content_object=photo, sender=auth_user)
 
                 response = get_default_response('200')
                 response.data = serializer.data

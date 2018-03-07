@@ -1,3 +1,4 @@
+from apps.account.models import User
 from apps.common.models import EditMixin
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -28,9 +29,12 @@ class PushNotificationRecord(EditMixin):
         ("U", "Upvote")
     )
 
-    receiver = models.ForeignKey(APNSDevice)
-    message = models.TextField()
     action = models.CharField(max_length=1, choices=ACTION_CHOICES)
+    message = models.TextField()
+    receiver = models.ForeignKey(APNSDevice)
+    sender = models.ForeignKey(User, blank=True, null=True)
+
+    viewed = models.BooleanField(default=False)
 
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()

@@ -40,6 +40,7 @@ class TestGalleryViewSetGET(TestCase):
 
         account_models.User.objects.all().delete()
         photo_models.Photo.objects.all().delete()
+        test_helpers.clear_directory('backend/media/', '*.jpg')
 
     def test_gallery_get_successful(self):
         """

@@ -799,7 +799,7 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
 
                     # Add history of the notification.
                     PushNotificationRecord.objects.create(message=message, receiver=followed_device.first(), action="F",
-                                                          content_object=user)
+                                                          content_object=user, sender=auth_user)
 
                     return get_default_response('201')
                 else:
