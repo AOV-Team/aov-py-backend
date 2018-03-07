@@ -1,5 +1,6 @@
 from apps.account.models import User
 from apps.common.test import helpers as test_helpers
+from apps.communication.models import PushNotificationRecord
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from django.test import TestCase, override_settings
@@ -40,11 +41,12 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
             p.assert_called_with(alert="{} has commented on your artwork.".format(user.username),
                                  registration_ids=[device.registration_id])
 
-            # Check db
-            new_comment = photo_models.PhotoComment.objects.first()
+        # Check db
+        new_comment = photo_models.PhotoComment.objects.first()
 
-            self.assertEqual(new_comment.comment, payload['comment'])
-            self.assertEqual(new_comment.user.email, user.email)
+        self.assertEqual(PushNotificationRecord.objects.count(), 1)
+        self.assertEqual(new_comment.comment, payload['comment'])
+        self.assertEqual(new_comment.user.email, user.email)
 
     def test_photo_single_comment_view_set_post_no_comment_text(self):
         """
