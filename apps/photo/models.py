@@ -196,10 +196,10 @@ class Photo(geo_models.Model):
     votes = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
-        message = "Your artwork has been featured in the AOV Picks gallery!"
         new_notification_sent = False
         owning_user = account_models.User.objects.filter(id=self.user.id)
         owning_apns = APNSDevice.objects.filter(user=owning_user)
+        message = "Your artwork has been featured in the AOV Picks gallery, {}!".format(owning_user.first().username)
 
         try:
             # AOV Picks is the name of the feed that is curated by Prince. Set the add_date field for proper ordering
@@ -213,7 +213,7 @@ class Photo(geo_models.Model):
                                                                          object_id=self.id, action="A",
                                                                          content_type__pk=photo_type.id)
 
-                    if not already_sent.exists():
+                    if not already_sent.exists() and owning_apns.exists():
                         # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
                         send_push_notification(message, owning_apns.values_list("id", flat=True))
                         new_notification_sent = True

@@ -58,7 +58,7 @@ class TestPhotoSingleVotesViewSetPATCH(TestCase):
 
             self.assertEqual(response.status_code, 200)
             self.assertEqual(result["votes"], 1)
-            p.assert_called_with(alert="{} has upvoted your artwork.".format(user.username),
+            p.assert_called_with(alert="{} has upvoted your artwork, {}.".format(user.username, photo_owner.username),
                                  registration_ids=[device.registration_id])
 
         self.assertEqual(PushNotificationRecord.objects.count(), 1)

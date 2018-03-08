@@ -794,7 +794,7 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
 
                     # Send a push notification to the followed user
                     followed_device = APNSDevice.objects.filter(user=user)
-                    message = "{} started following you.".format(auth_user.username)
+                    message = "{} started following you, {}.".format(auth_user.username, user.username)
                     send_push_notification(message, followed_device.values_list("id", flat=True))
 
                     # Add history of the notification.

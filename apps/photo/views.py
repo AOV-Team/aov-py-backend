@@ -814,13 +814,14 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
             owning_apns = APNSDevice.objects.filter(user=owning_user)
 
-            message = "{} has commented on your artwork.".format(auth_user.username)
+            message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
 
-            communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+            if auth_user.username != owning_user.first().username:
+                communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
 
-            # Create the record of the notification being sent
-            PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
-                                                  content_object=photo.first(), sender=auth_user)
+                # Create the record of the notification being sent
+                PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
+                                                      content_object=photo.first(), sender=auth_user)
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
             response = get_default_response('201')
@@ -1017,7 +1018,8 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                     owning_user = account_models.User.objects.filter(id=photo.user.id)
                     owning_apns = APNSDevice.objects.filter(user=owning_user)
 
-                    message = "{} has upvoted your artwork.".format(auth_user.username)
+                    message = "{} has upvoted your artwork, {}.".format(
+                        auth_user.username, owning_user.first().username)
 
                     communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
 

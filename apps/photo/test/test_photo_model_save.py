@@ -113,8 +113,9 @@ class TestPhotoSave(TestCase):
         with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
             photo1.save()
 
-            p.assert_called_with(alert="Your artwork has been featured in the AOV Picks gallery!",
-                                 registration_ids=[device.registration_id])
+            p.assert_called_with(
+                alert="Your artwork has been featured in the AOV Picks gallery, {}!".format(user.username),
+                registration_ids=[device.registration_id])
 
         updated_photo = photo_models.Photo.objects.get(id=photo1.id)
         self.assertEqual(len(updated_photo.photo_feed.all()), 1)
@@ -152,8 +153,9 @@ class TestPhotoSave(TestCase):
         with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
             photo1.save()
 
-            p.assert_called_with(alert="Your artwork has been featured in the AOV Picks gallery!",
-                                 registration_ids=[device.registration_id])
+            p.assert_called_with(
+                alert="Your artwork has been featured in the AOV Picks gallery, {}!".format(user.username),
+                registration_ids=[device.registration_id])
 
         with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
             photo1.save()

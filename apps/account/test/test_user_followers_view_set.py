@@ -164,8 +164,9 @@ class TestUserFollowersViewSetPOST(TestCase):
             request = client.post('/api/users/{}/followers'.format(target_user.id), format='json')
 
             self.assertEquals(request.status_code, 201)
-            p.assert_called_with(alert="{} started following you.".format(access_user.username),
-                                 registration_ids=[device.registration_id])
+            p.assert_called_with(
+                alert="{} started following you, {}.".format(access_user.username, target_user.username),
+                registration_ids=[device.registration_id])
 
         # Check for entry
         followers = target_user.follower.all()
