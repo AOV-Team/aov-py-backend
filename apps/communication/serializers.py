@@ -9,7 +9,11 @@ class AOVAPNSDeviceSerializer(APNSDeviceSerializer):
 
 
 class PushNotificationRecordSerializer(serializers.ModelSerializer):
+    action = serializers.SerializerMethodField()
     sender_avatar = serializers.SerializerMethodField()
+
+    def get_action(self, obj):
+        return obj.get_action_display()
 
     def get_sender_avatar(self, obj):
         if obj.action == "A":
@@ -19,7 +23,7 @@ class PushNotificationRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.PushNotificationRecord
-        fields = ('id', 'message', 'sender_avatar', 'created_at', 'viewed')
+        fields = ('id', 'message', 'sender_avatar', 'created_at', 'viewed', 'action', 'object_id')
 
 
 class PushNotificationSenderAvatarSerializer(serializers.ModelSerializer):
