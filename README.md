@@ -115,6 +115,12 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
+### `/api/me/notifications`
+* GET
+
+### `/api/me/notifications/{}/view`
+* POST
+
 ### `/api/me/profile`
 * GET
 * PATCH
