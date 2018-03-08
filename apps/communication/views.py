@@ -72,7 +72,7 @@ class DevicesViewSet(generics.ListCreateAPIView):
             raise ValidationError('Missing required key "registration_id"')
 
 
-class UserNotificationRecordViewSet(generics.ListAPIView, generics.UpdateAPIView):
+class UserNotificationRecordViewSet(generics.ListCreateAPIView):
     """
         /api/users/me/notifications
 
@@ -95,6 +95,30 @@ class UserNotificationRecordViewSet(generics.ListAPIView, generics.UpdateAPIView
 
         return PushNotificationRecord.objects.filter(
             receiver__user=auth_user, created_at__gte=cutoff).order_by("-created_at")
+
+    def post(self, request, **kwargs):
+        """
+            PUT Method allowing for updating the "viewed" value of the Notification Record
+
+        :param request: HTTP Request object
+        :param kwargs: Additional keyword arguments provided in the url
+        :return: HTTP Response object
+        """
+
+        auth_user = TokenAuthentication().authenticate(request)[0]
+        record_id = kwargs.get("record_id")
+        response = get_default_response('404')
+
+        record_entry = PushNotificationRecord.objects.filter(receiver__user=auth_user, id=record_id)
+
+        if record_entry.exists():
+            record_entry = record_entry.first()
+
+            record_entry.viewed = True
+            record_entry.save()
+            response = get_default_response('200')
+
+        return response
 
 
 @staff_member_required

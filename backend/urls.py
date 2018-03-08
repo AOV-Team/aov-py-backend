@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'api/me/following/photos$', photo_views.UserFollowingPhotoViewSet.as_view()),
     url(r'api/me/galleries$', photo_views.GalleryRetrieveViewSet.as_view()),
     url(r'api/me/notifications$', communication_views.UserNotificationRecordViewSet.as_view()),
+    url(r'api/me/notifications/(?P<record_id>[0-9^/]+)/view$', communication_views.UserNotificationRecordViewSet.as_view()),
     url(r'api/me/profile$', account_views.MeProfileViewSet.as_view()),
     url(r'api/search/users$', account_views.UserSearchViewSet.as_view()),
     url(r'api/me/starred/photos$', account_views.UserStarredPhotosViewSet.as_view()),
