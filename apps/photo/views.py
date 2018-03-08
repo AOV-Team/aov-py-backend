@@ -4,6 +4,7 @@ from apps.common import models as common_models
 from apps.common.serializers import setup_eager_loading
 from apps.common.views import DefaultResultsSetPagination, get_default_response, handle_jquery_empty_array, \
     LargeResultsSetPagination, MediumResultsSetPagination, remove_pks_from_payload
+from apps.communication.models import PushNotificationRecord
 from apps.communication import tasks as communication_tasks
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
@@ -810,13 +811,17 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             new_comment = photo_models.PhotoComment.objects.create_or_update(**serializer_payload)
 
             # After creating the comment, send a push notification to the photo owner
-            photo = photo_models.Photo.objects.filter(id=photo_id)
             owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
             owning_apns = APNSDevice.objects.filter(user=owning_user)
 
-            message = "{} has commented on your artwork.".format(auth_user.username)
+            message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
 
-            communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+            if auth_user.username != owning_user.first().username:
+                communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+
+                # Create the record of the notification being sent
+                PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
+                                                      content_object=photo.first(), sender=auth_user)
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
             response = get_default_response('201')
@@ -971,6 +976,7 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
         try:
             data = request.data
             photo = photo_models.Photo.objects.get(id=kwargs.get('pk'))
+            send_notification = False
 
             if "operation" not in data:
                 response = get_default_response('400')
@@ -989,6 +995,7 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                 new_photo_vote_data.update({
                     "upvote": True
                 })
+                send_notification = True
 
             if data["operation"] == "decrement":
                 payload = {
@@ -1004,6 +1011,21 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
 
             if serializer.is_valid():
                 serializer.save()
+
+                # Send a push notification ONLY for upvote, and keep a record of it
+                if send_notification:
+                    auth_user = TokenAuthentication().authenticate(request)[0]
+                    owning_user = account_models.User.objects.filter(id=photo.user.id)
+                    owning_apns = APNSDevice.objects.filter(user=owning_user)
+
+                    message = "{} has upvoted your artwork, {}.".format(
+                        auth_user.username, owning_user.first().username)
+
+                    communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+
+                    # Create the record of the notification being sent
+                    PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="U",
+                                                          content_object=photo, sender=auth_user)
 
                 response = get_default_response('200')
                 response.data = serializer.data

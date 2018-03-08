@@ -8,6 +8,7 @@ from apps.common.exceptions import ForbiddenValue, OverLimitException
 from apps.common.serializers import setup_eager_loading
 from apps.common.views import get_default_response, DefaultResultsSetPagination, LargeResultsSetPagination, \
     MediumResultsSetPagination, remove_pks_from_payload
+from apps.communication.models import PushNotificationRecord
 from apps.communication.tasks import send_push_notification
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
@@ -793,8 +794,12 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
 
                     # Send a push notification to the followed user
                     followed_device = APNSDevice.objects.filter(user=user)
-                    message = "{} started following you.".format(auth_user.username)
+                    message = "{} started following you, {}.".format(auth_user.username, user.username)
                     send_push_notification(message, followed_device.values_list("id", flat=True))
+
+                    # Add history of the notification.
+                    PushNotificationRecord.objects.create(message=message, receiver=followed_device.first(), action="F",
+                                                          content_object=user, sender=auth_user)
 
                     return get_default_response('201')
                 else:

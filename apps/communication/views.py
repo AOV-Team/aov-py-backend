@@ -1,14 +1,15 @@
 from apps.common.views import get_default_response
-from apps.communication.serializers import AOVAPNSDeviceSerializer
-# from apps.communication.models import PushMessage
+from apps.communication.models import PushNotificationRecord
+from apps.communication.serializers import AOVAPNSDeviceSerializer, PushNotificationRecordSerializer
 from apps.communication.tasks import send_push_notification
-# from datetime import datetime, timedelta
+from datetime import timedelta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.utils import timezone
 from push_notifications.models import APNSDevice
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -69,6 +70,55 @@ class DevicesViewSet(generics.ListCreateAPIView):
                 raise ValidationError(serializer.errors)
         else:
             raise ValidationError('Missing required key "registration_id"')
+
+
+class UserNotificationRecordViewSet(generics.ListCreateAPIView):
+    """
+        /api/users/me/notifications
+
+        Endpoint to retrieve the notification history for a user. Serves history for 30 days prior, as anything beyond
+        that is excessive
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = PushNotificationRecordSerializer
+
+    def get_queryset(self):
+        """
+            Method to retrieve appropriate queryset to return
+
+        :return: QuerySet
+        """
+
+        auth_user = TokenAuthentication().authenticate(self.request)[0]
+        cutoff = timezone.now() - timedelta(days=7)
+
+        return PushNotificationRecord.objects.filter(
+            receiver__user=auth_user, created_at__gte=cutoff).order_by("-created_at")
+
+    def post(self, request, **kwargs):
+        """
+            PUT Method allowing for updating the "viewed" value of the Notification Record
+
+        :param request: HTTP Request object
+        :param kwargs: Additional keyword arguments provided in the url
+        :return: HTTP Response object
+        """
+
+        auth_user = TokenAuthentication().authenticate(request)[0]
+        record_id = kwargs.get("record_id")
+        response = get_default_response('404')
+
+        record_entry = PushNotificationRecord.objects.filter(receiver__user=auth_user, id=record_id)
+
+        if record_entry.exists():
+            record_entry = record_entry.first()
+
+            record_entry.viewed = True
+            record_entry.save()
+            response = get_default_response('200')
+
+        return response
 
 
 @staff_member_required
