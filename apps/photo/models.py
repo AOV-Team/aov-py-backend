@@ -297,7 +297,8 @@ class PhotoCommentManager(geo_models.Manager):
         # check for an existing entry with the same content, user, and photo_id
         existing = PhotoComment.objects.filter(user_id=new_photo_comment.user_id,
                                                photo_id=new_photo_comment.photo_id,
-                                               comment=new_photo_comment.comment).first()
+                                               comment=new_photo_comment.comment,
+                                               parent_id=new_photo_comment.parent_id).first()
 
         if existing:
             new_photo_comment.pk = existing.pk
@@ -318,6 +319,7 @@ class PhotoComment(common_models.GeoEditMixin):
 
     photo = models.ForeignKey(Photo)
     comment = models.TextField()
+    parent = models.ForeignKey("self", null=True, related_name="replies")
     user = models.ForeignKey(account_models.User)
     votes = models.IntegerField(default=0)
 
@@ -325,6 +327,54 @@ class PhotoComment(common_models.GeoEditMixin):
 
     class Meta:
         verbose_name_plural = "Photo Comments"
+        
+        
+# class PhotoCommentReplyManager(models.Manager):
+#     """
+#         Manager to define a create_or_update method for the PhotoCommentReply model class
+#
+#     :author: gallen
+#     """
+#
+#     def create_or_update(self, **kwargs):
+#         """
+#             Method that checks for an existing entry in the table. If there is on, updates it.
+#
+#         :param kwargs: Dictionary containing values to create a new PhotoComment object
+#         :return: Saved instance of a PhotoComment
+#         """
+#         # Create a new PhotoCommentReply
+#         new_photo_comment_reply = PhotoCommentReply(**kwargs)
+#
+#         # check for an existing entry with the same content, user, and photo_id
+#         existing = PhotoCommentReply.objects.filter(user_id=new_photo_comment_reply.user_id,
+#                                                     comment=new_photo_comment_reply.comment_id,
+#                                                     reply=new_photo_comment_reply.reply).first()
+#
+#         if existing:
+#             new_photo_comment_reply.pk = existing.pk
+#             new_photo_comment_reply.id = existing.id
+#             new_photo_comment_reply.created_at = existing.created_at
+#             new_photo_comment_reply.modified_at = timezone.now()
+#
+#         new_photo_comment_reply.save()
+#         return new_photo_comment_reply
+#
+#
+# class PhotoCommentReply(common_models.EditMixin):
+#     """
+#         Model for replies to a Comment
+#
+#     """
+#     comment = models.ForeignKey(PhotoComment)
+#     reply = models.TextField()
+#     user = models.ForeignKey(account_models.User)
+#     votes = models.IntegerField(default=0)
+#
+#     objects = PhotoCommentReplyManager()
+#
+#     class Meta:
+#         verbose_name_plural = "Comment Replies"
 
 
 class PhotoVoteManager(models.Manager):

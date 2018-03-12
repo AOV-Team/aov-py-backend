@@ -71,6 +71,8 @@ urlpatterns = [
     url(r'api/photos/(?P<pk>[0-9^/]+)$', photo_views.PhotoSingleViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/caption$', photo_views.PhotoSingleCaptionViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/comments$', photo_views.PhotoSingleCommentViewSet.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/comments/(?P<comment_id>[0-9^/]+)/replies$',
+        photo_views.PhotoSingleCommentReplyViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/flags', photo_views.PhotoSingleFlagsViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/(?P<user_interest>stars|likes)$',
         photo_views.PhotoSingleInterestsViewSet.as_view()),

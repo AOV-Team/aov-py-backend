@@ -40,12 +40,41 @@ class PhotoClassificationSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'classification_type', 'icon', 'category_image', 'feed_id')
 
 
+class PhotoCommentReplySerializer(serializers.ModelSerializer):
+    """
+        Serializer for Comment Replies
+
+    """
+    created_at = DateTimeFieldWithTZ()
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        """
+        Get basic user details
+
+        :param obj: Photo object
+        :return: user info
+        """
+        user = obj.user
+
+        if user:
+            return UserPublicSerializer(obj.user).data
+
+        return None
+
+    class Meta:
+        model = models.PhotoComment
+        fields = ('id', 'comment', 'user', 'created_at',)
+        read_only_fields = ('user',)
+
+
 class PhotoCommentSerializer(serializers.ModelSerializer):
     """
         Serializer class for the PhotoSerializer class
     :author: gallen
     """
     created_at = DateTimeFieldWithTZ()
+    replies = PhotoCommentReplySerializer()
     photo = serializers.CharField(source='photo.id', read_only=True)
     user = serializers.SerializerMethodField()
 
@@ -65,7 +94,7 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.PhotoComment
-        fields = ('id', 'comment', 'user', 'photo', 'created_at')
+        fields = ('id', 'comment', 'user', 'photo', 'created_at', 'replies')
         read_only_fields = ('user',)
 
 

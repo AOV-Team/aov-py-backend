@@ -835,6 +835,84 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
         return response
 
 
+class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
+    """
+        API view to create a new
+
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = photo_serializers.PhotoCommentSerializer
+
+    def post(self, request, **kwargs):
+        """
+            POST method to create a new comment
+
+        :param request: HTTP Request object
+        :param kwargs: Additional keyword arguments passed via url
+        :return: HTTP response object
+        """
+
+        auth_user = TokenAuthentication().authenticate(request)[0]
+
+        photo_id = kwargs.get('pk', None)
+        comment_id = kwargs.get('comment_id', None)
+        data = request.data
+        reply = data.get('reply', None)
+
+
+        photo = photo_models.Photo.objects.filter(id=photo_id)
+        photo_comment = photo_models.PhotoComment.objects.filter(photo=photo, id=comment_id)
+
+        if photo_comment.exists() and reply:
+            serializer_payload = {
+                "user_id": auth_user.id,
+                "comment": reply,
+                "parent_id": comment_id,
+                "photo_id": photo_id
+            }
+
+            new_comment = photo_models.PhotoComment.objects.create_or_update(**serializer_payload)
+
+            # After creating the comment, send a push notification to the photo owner
+            owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
+            owning_apns = APNSDevice.objects.filter(user=owning_user)
+
+            message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
+
+            if auth_user.username != owning_user.first().username:
+                communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+
+                # Create the record of the notification being sent
+                PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
+                                                      content_object=photo.first(), sender=auth_user)
+
+            # Send a push notification to the person being replied to, as well.
+            original_commenter = account_models.User.objects.filter(id__in=photo_comment.values_list("user", flat=True))
+            original_commenter_apns = APNSDevice.objects.filter(user=original_commenter)
+
+            message = "{} replied to your comment, {}.".format(auth_user.username, original_commenter.first().username)
+
+            if auth_user.username != owning_user.first().username:
+                communication_tasks.send_push_notification(message,
+                                                           original_commenter_apns.values_list("id", flat=True))
+
+                # Create the record of the notification being sent
+                PushNotificationRecord.objects.create(message=message, receiver=original_commenter_apns.first(),
+                                                      action="C", content_object=photo.first(), sender=auth_user)
+
+            serializer = photo_serializers.PhotoCommentSerializer(new_comment)
+            response = get_default_response('201')
+            response.data = serializer.data
+
+        else:
+            response = get_default_response('400')
+            response.data["userMessage"] = "A comment string cannot be empty."
+            response.data["message"] = "Missing required field 'comment' in request data."
+
+        return response
+
+
 class PhotoSingleFlagsViewSet(generics.CreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
