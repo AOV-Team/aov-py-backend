@@ -35,11 +35,10 @@ class DevicesViewSet(generics.ListCreateAPIView):
 
         # If searching by user
         if query:
-            queryset = queryset\
-                .filter(active=True)\
-                .filter(Q(user__email__icontains=query) | Q(user__first_name__icontains=query) |
-                        Q(user__last_name__icontains=query) | Q(user__social_name__icontains=query) |
-                        Q(user__username__icontains=query))
+            queryset = queryset.filter(active=True).filter(
+                Q(user__email__icontains=query) | Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query) | Q(user__social_name__icontains=query) |
+                Q(user__username__icontains=query))
 
         return queryset.order_by('-date_created')
 

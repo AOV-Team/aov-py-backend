@@ -893,7 +893,7 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
 
             message = "{} replied to your comment, {}.".format(auth_user.username, original_commenter.first().username)
 
-            if auth_user.username != owning_user.first().username:
+            if auth_user.username != original_commenter.first().username:
                 communication_tasks.send_push_notification(message,
                                                            original_commenter_apns.values_list("id", flat=True))
 
