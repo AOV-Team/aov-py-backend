@@ -74,7 +74,7 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
     :author: gallen
     """
     created_at = DateTimeFieldWithTZ()
-    replies = PhotoCommentReplySerializer()
+    replies = PhotoCommentReplySerializer(many=True)
     photo = serializers.CharField(source='photo.id', read_only=True)
     user = serializers.SerializerMethodField()
 
