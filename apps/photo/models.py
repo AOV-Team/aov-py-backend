@@ -222,7 +222,10 @@ class Photo(geo_models.Model):
                 self.aov_feed_add_date = None
         except ValueError:
             pass
-        if new_notification_sent:
+
+        # This check is here to make sure the record is only created for devices that we have. No APNS means no
+        # permission for notifications on the device.
+        if new_notification_sent and owning_apns.exists():
             PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="A",
                                                   content_object=self)
         super(Photo, self).save(*args, **kwargs)
