@@ -459,7 +459,8 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
         if page == "picks":
             picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks")
             aov_picks = photo_models.Photo.objects.filter(
-                photo_feed=picks_feed, public=True).distinct().order_by("-aov_feed_add_date")
+                photo_feed=picks_feed, public=True,
+                aov_feed_add_date__isnull=False).distinct().order_by("-aov_feed_add_date")
             return aov_picks
 
         if page == "popular":
