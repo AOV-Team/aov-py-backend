@@ -209,7 +209,7 @@ class Photo(geo_models.Model):
 
                     # Check for record of a notification being sent for this already
                     photo_type = ContentType.objects.get_for_model(self)
-                    already_sent = PushNotificationRecord.objects.filter(message=message, receiver=owning_apns,
+                    already_sent = PushNotificationRecord.objects.filter(message=message, receiver__in=owning_apns,
                                                                          object_id=self.id, action="A",
                                                                          content_type__pk=photo_type.id)
 
