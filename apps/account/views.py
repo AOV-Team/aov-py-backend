@@ -20,6 +20,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity, SearchQuery, SearchVector, SearchRank
 from django.core.exceptions import ObjectDoesNotExist
 from json.decoder import JSONDecodeError
+from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -799,11 +800,17 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
                     # This check is here to make sure the record is only created for devices that we have. No APNS means no
                     # permission for notifications on the device.
                     if followed_device.exists():
-                        send_push_notification(message, followed_device.values_list("id", flat=True))
+                        # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
+                        followed_device = APNSDevice.objects.filter(id=followed_device.first().id)
 
-                        # Add history of the notification.
-                        PushNotificationRecord.objects.create(message=message, receiver=followed_device.first(), action="F",
-                                                              content_object=user, sender=auth_user)
+                        try:
+                            send_push_notification(message, followed_device.values_list("id", flat=True))
+
+                            # Add history of the notification.
+                            PushNotificationRecord.objects.create(message=message, receiver=followed_device.first(), action="F",
+                                                                  content_object=user, sender=auth_user)
+                        except APNSServerError:
+                            pass
 
                     return get_default_response('201')
                 else:

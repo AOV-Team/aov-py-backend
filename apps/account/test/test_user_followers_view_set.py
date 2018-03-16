@@ -178,6 +178,47 @@ class TestUserFollowersViewSetPOST(TestCase):
             if follower.id != access_user.id and follower.id != user_1.id:
                 self.fail('Unidentified follower')
 
+    def test_user_followers_view_set_post_no_apns_device(self):
+        """
+            Unit test to make sure the endpoint still functions correctly even if the push notification code fails
+
+        :return: No return value
+        """
+
+        # Test data
+        target_user = account_models.User.objects.create_user(age=25, email='mrtest@mypapaya.io',
+                                                              social_name='@ronquilloaeon', username='aov_hov')
+        user_1 = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
+
+        access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
+
+        # Follow target user
+        target_user.follower = [user_1]
+        target_user.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(access_user)
+
+        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+            # Get data from endpoint
+            client = APIClient()
+            client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+            request = client.post('/api/users/{}/followers'.format(target_user.id), format='json')
+
+            self.assertEquals(request.status_code, 201)
+            p.assert_not_called()
+
+        # Check for entry
+        followers = target_user.follower.all()
+
+        self.assertEquals(len(followers), 2)
+        self.assertEqual(PushNotificationRecord.objects.count(), 0)
+
+        for follower in followers:
+            if follower.id != access_user.id and follower.id != user_1.id:
+                self.fail('Unidentified follower')
+
     def test_user_followers_view_set_post_already_following(self):
         """
         Test that we get a 409 status code if we are already following a user

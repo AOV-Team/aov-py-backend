@@ -51,6 +51,42 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         self.assertEqual(new_comment.comment, payload['comment'])
         self.assertEqual(new_comment.user.email, user.email)
 
+
+    def test_photo_single_comment_view_set_post_no_apns_device(self):
+        """
+            Unit test to make sure the endpoint still functions correctly even if push notifications fail
+
+        :return: No return
+        """
+
+        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        photo_owner = User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
+
+        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
+                                   user=photo_owner)
+        photo.save()
+
+        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+            client = APIClient()
+            client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
+
+            payload = {
+                'comment': 'Dude, sick photo! I dig it.'
+            }
+
+            request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
+
+            self.assertEquals(request.status_code, 201)
+            p.assert_not_called()
+
+        # Check db
+        new_comment = photo_models.PhotoComment.objects.first()
+
+        self.assertEqual(PushNotificationRecord.objects.count(), 0)
+        self.assertEqual(new_comment.comment, payload['comment'])
+        self.assertEqual(new_comment.user.email, user.email)
+
+
     def test_photo_single_comment_view_set_post_no_comment_text(self):
         """
             Test that posting a new comment works

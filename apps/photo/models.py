@@ -14,6 +14,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from imagekit.models import ImageSpecField
+from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
 
 
@@ -214,9 +215,15 @@ class Photo(geo_models.Model):
                                                                          content_type__pk=photo_type.id)
 
                     if not already_sent.exists() and owning_apns.exists():
+                        # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
+                        owning_apns = APNSDevice.objects.filter(id=owning_apns.first().id)
+
                         # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
-                        send_push_notification(message, owning_apns.values_list("id", flat=True))
-                        new_notification_sent = True
+                        try:
+                            send_push_notification(message, owning_apns.values_list("id", flat=True))
+                            new_notification_sent = True
+                        except APNSServerError:
+                            pass
 
             else:
                 self.aov_feed_add_date = None
