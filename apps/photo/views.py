@@ -817,12 +817,12 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
 
             message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
 
-            if auth_user.username != owning_user.first().username:
-                communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+            # This check is here to make sure the record is only created for devices that we have. No APNS means no
+            # permission for notifications on the device.
+            if owning_apns.exists():
+                if auth_user.username != owning_user.first().username:
+                    communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
 
-                # This check is here to make sure the record is only created for devices that we have. No APNS means no
-                # permission for notifications on the device.
-                if owning_apns.exists():
                     # Create the record of the notification being sent
                     PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
                                                           content_object=photo.first(), sender=auth_user)
@@ -1025,10 +1025,10 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                     message = "{} has upvoted your artwork, {}.".format(
                         auth_user.username, owning_user.first().username)
 
-                    communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
                     # This check is here to make sure the record is only created for devices that we have. No APNS means no
                     # permission for notifications on the device.
                     if owning_apns.exists():
+                        communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
                         # Create the record of the notification being sent
                         PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="U",
                                                               content_object=photo, sender=auth_user)

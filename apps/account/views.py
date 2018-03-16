@@ -795,11 +795,12 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
                     # Send a push notification to the followed user
                     followed_device = APNSDevice.objects.filter(user=user)
                     message = "{} started following you, {}.".format(auth_user.username, user.username)
-                    send_push_notification(message, followed_device.values_list("id", flat=True))
 
                     # This check is here to make sure the record is only created for devices that we have. No APNS means no
                     # permission for notifications on the device.
                     if followed_device.exists():
+                        send_push_notification(message, followed_device.values_list("id", flat=True))
+
                         # Add history of the notification.
                         PushNotificationRecord.objects.create(message=message, receiver=followed_device.first(), action="F",
                                                               content_object=user, sender=auth_user)
