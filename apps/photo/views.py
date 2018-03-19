@@ -21,6 +21,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 from django.shortcuts import render
 from django.utils import timezone
+from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -459,7 +460,8 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
         if page == "picks":
             picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks")
             aov_picks = photo_models.Photo.objects.filter(
-                photo_feed=picks_feed, public=True).distinct().order_by("-aov_feed_add_date")
+                photo_feed=picks_feed, public=True,
+                aov_feed_add_date__isnull=False).distinct().order_by("-aov_feed_add_date")
             return aov_picks
 
         if page == "popular":
@@ -816,12 +818,20 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
 
             message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
 
-            if auth_user.username != owning_user.first().username:
-                communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+            # This check is here to make sure the record is only created for devices that we have. No APNS means no
+            # permission for notifications on the device.
+            if owning_apns.exists():
+                if auth_user.username != owning_user.first().username:
+                    # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
+                    owning_apns = APNSDevice.objects.filter(id=owning_apns.first().id)
 
-                # Create the record of the notification being sent
-                PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
-                                                      content_object=photo.first(), sender=auth_user)
+                    try:
+                        communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+                        # Create the record of the notification being sent
+                        PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
+                                                              content_object=photo.first(), sender=auth_user)
+                    except APNSServerError:
+                        pass
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
             response = get_default_response('201')
@@ -1099,11 +1109,19 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                     message = "{} has upvoted your artwork, {}.".format(
                         auth_user.username, owning_user.first().username)
 
-                    communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+                    # This check is here to make sure the record is only created for devices that we have. No APNS means no
+                    # permission for notifications on the device.
+                    if owning_apns.exists():
+                        # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
+                        owning_apns = APNSDevice.objects.filter(id=owning_apns.first().id)
 
-                    # Create the record of the notification being sent
-                    PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="U",
-                                                          content_object=photo, sender=auth_user)
+                        try:
+                            communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+                            # Create the record of the notification being sent
+                            PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="U",
+                                                                  content_object=photo, sender=auth_user)
+                        except APNSServerError:
+                            pass
 
                 response = get_default_response('200')
                 response.data = serializer.data

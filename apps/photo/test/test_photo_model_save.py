@@ -166,3 +166,39 @@ class TestPhotoSave(TestCase):
         self.assertEqual(len(updated_photo.photo_feed.all()), 1)
         self.assertIsNotNone(updated_photo.aov_feed_add_date)
         self.assertEqual(PushNotificationRecord.objects.count(), 1)
+
+    def test_photo_save_successful_no_apns_device(self):
+        """
+            Unit test to verify the photo still saves successfully, even if a notification is not sent
+
+        :return: No return value
+        """
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user.location = 'Boise'
+        user.social_name = '@theaov'
+        user.save()
+        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
+                                                                             classification_type='category')
+
+        # Create some gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
+        photo1 = photo_models \
+            .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                   user=user)
+        photo1.save()
+        photo1.gear.add(gear_1, gear_2)
+        photo1.category.add(category)
+        photo1.votes = 1
+        photo1.photo_feed.add(photo_models.PhotoFeed.objects.create_or_update(name="AOV Picks"))
+        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+            photo1.save()
+
+            p.assert_not_called()
+
+        updated_photo = photo_models.Photo.objects.get(id=photo1.id)
+        self.assertEqual(len(updated_photo.photo_feed.all()), 1)
+        self.assertIsNotNone(updated_photo.aov_feed_add_date)
+        self.assertEqual(PushNotificationRecord.objects.count(), 0)
+

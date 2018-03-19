@@ -14,6 +14,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from imagekit.models import ImageSpecField
+from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
 
 
@@ -209,20 +210,29 @@ class Photo(geo_models.Model):
 
                     # Check for record of a notification being sent for this already
                     photo_type = ContentType.objects.get_for_model(self)
-                    already_sent = PushNotificationRecord.objects.filter(message=message, receiver=owning_apns,
+                    already_sent = PushNotificationRecord.objects.filter(message=message, receiver__in=owning_apns,
                                                                          object_id=self.id, action="A",
                                                                          content_type__pk=photo_type.id)
 
                     if not already_sent.exists() and owning_apns.exists():
+                        # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
+                        owning_apns = APNSDevice.objects.filter(id=owning_apns.first().id)
+
                         # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
-                        send_push_notification(message, owning_apns.values_list("id", flat=True))
-                        new_notification_sent = True
+                        try:
+                            send_push_notification(message, owning_apns.values_list("id", flat=True))
+                            new_notification_sent = True
+                        except APNSServerError:
+                            pass
 
             else:
                 self.aov_feed_add_date = None
         except ValueError:
             pass
-        if new_notification_sent:
+
+        # This check is here to make sure the record is only created for devices that we have. No APNS means no
+        # permission for notifications on the device.
+        if new_notification_sent and owning_apns.exists():
             PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="A",
                                                   content_object=self)
         super(Photo, self).save(*args, **kwargs)
