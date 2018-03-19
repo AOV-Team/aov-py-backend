@@ -890,12 +890,16 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
 
             message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
 
-            if auth_user.username != owning_user.first().username:
-                communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+            if owning_apns.exists():
+                if auth_user.username != owning_user.first().username:
+                    try:
+                        communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
 
-                # Create the record of the notification being sent
-                PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
-                                                      content_object=photo.first(), sender=auth_user)
+                        # Create the record of the notification being sent
+                        PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
+                                                              content_object=photo.first(), sender=auth_user)
+                    except APNSServerError:
+                        pass
 
             # Send a push notification to the person being replied to, as well.
             original_commenter = account_models.User.objects.filter(id__in=photo_comment.values_list("user", flat=True))
