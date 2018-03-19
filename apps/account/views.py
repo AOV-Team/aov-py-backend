@@ -17,8 +17,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.search import TrigramSimilarity, SearchQuery, SearchVector, SearchRank
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from json.decoder import JSONDecodeError
 from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
@@ -993,20 +994,10 @@ class UserSearchViewSet(generics.ListAPIView):
         keywords = query_params.get("q", None)
         qs = account_models.User.objects.none()
         if keywords:
-            query = SearchQuery(keywords)
+            qs = self.queryset.filter(Q(username__icontains=keywords) | Q(social_name__icontains=keywords) |
+                                      Q(first_name__icontains=keywords) | Q(last_name__icontains=keywords))
 
-            # Set up the Vectors with appropriate weights
-            first_name_vector = SearchVector("first_name", weight="A")
-            last_name_vector = SearchVector("last_name", weight="B")
-            username_vector = SearchVector("username", weight="C")
-            social_name_vector = SearchVector("social_name", weight="D")
-
-            vectors = first_name_vector + last_name_vector + username_vector + social_name_vector
-
-            qs = self.queryset.annotate(search=vectors).filter(search=query)
-            qs = qs.annotate(rank=SearchRank(vectors, query)).order_by("-rank")
-
-        return qs
+        return qs.order_by("username")
 
 
 class UserSingleViewSet(generics.RetrieveAPIView):
