@@ -7,6 +7,7 @@ from django.test import TestCase, override_settings
 from push_notifications.models import APNSDevice
 from rest_framework.test import APIClient
 from unittest import mock
+import uuid
 
 
 @override_settings(REMOTE_IMAGE_STORAGE=False,
@@ -131,6 +132,66 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
 
         self.assertEquals(request.status_code, 403)
+
+    def test_photo_single_comment_view_set_post_with_tagged_users(self):
+        """
+            Unit test to verify that providing a list of tagged users results in proper notifications being sent
+
+        :return: No return value
+        """
+        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        tagged_one = User.objects.create_user('test1@aov.com', 'testuser1', 'pass')
+        tagged_two = User.objects.create_user('test2@aov.com', 'testuser2', 'pass')
+        tagged_three = User.objects.create_user('test3@aov.com', 'testuser3', 'pass')
+        photo_owner = User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
+        device = APNSDevice.objects.create(
+            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=photo_owner)
+
+        tagged_one_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one)
+        tagged_two_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two)
+        tagged_three_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three)
+
+        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
+                                   user=photo_owner)
+        photo.save()
+
+        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+            client = APIClient()
+            client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
+
+            payload = {
+                'comment': 'Dude, sick photo! I dig it.',
+                'tagged': [tagged_one.username, tagged_two.username, tagged_three.username]
+            }
+
+            request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
+
+            self.assertEquals(request.status_code, 201)
+            calls = list()
+            calls.append(mock.call(
+                alert="{} has commented on your artwork, {}.".format(user.username, photo_owner.username),
+                registration_ids=[device.registration_id]))
+            calls.append(mock.call(
+                alert="{} tagged you in a comment, {}.".format(user.username, tagged_one.username),
+                registration_ids=[tagged_one_device.registration_id]))
+            calls.append(mock.call(
+                alert="{} tagged you in a comment, {}.".format(user.username, tagged_two.username),
+                registration_ids=[tagged_two_device.registration_id]))
+            calls.append(mock.call(
+                alert="{} tagged you in a comment, {}.".format(user.username, tagged_three.username),
+                registration_ids=[tagged_three_device.registration_id]))
+
+            p.assert_has_calls(calls=calls)
+
+        # Check db
+        new_comment = photo_models.PhotoComment.objects.first()
+
+        self.assertEqual(PushNotificationRecord.objects.count(), 4)
+        self.assertEqual(new_comment.comment, payload['comment'])
+        self.assertEqual(new_comment.user.email, user.email)
 
 
 @override_settings(REMOTE_IMAGE_STORAGE=False,

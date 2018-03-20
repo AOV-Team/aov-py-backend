@@ -13,7 +13,7 @@ import uuid
 @override_settings(REMOTE_IMAGE_STORAGE=False,
                    DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage',
                    CELERY_TASK_ALWAYS_EAGER=True)
-class TestPhotoSingleCommentViewSetPOST(TestCase):
+class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
     def setUp(self):
         """
             Sets up necessary base information for each test case
@@ -89,7 +89,8 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
 
         photo = photo_models.Photo.objects.get(user=user)
-        photo.save()
+
+        photo_comment = photo_models.PhotoComment.objects.get(photo=photo)
 
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
@@ -101,24 +102,82 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 400)
         self.assertEqual(request.data["userMessage"], "A comment string cannot be empty.")
         self.assertEqual(request.data["message"], "Missing required field 'comment' in request data.")
-    #
-    # def test_photo_single_comment_view_set_post_not_authorized(self):
-    #     """
-    #         Test that posting a new comment works
-    #
-    #     :return: None
-    #     """
-    #
-    #     user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
-    #
-    #     photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-    #                                user=user)
-    #     photo.save()
-    #
-    #     client = APIClient()
-    #
-    #     payload = {}
-    #
-    #     request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
-    #
-    #     self.assertEquals(request.status_code, 403)
+
+    def test_photo_single_comment_view_set_post_not_authorized(self):
+        """
+            Test that posting a new comment works
+
+        :return: None
+        """
+
+        user = User.objects.get(username='testuser')
+
+        photo = photo_models.Photo.objects.get(user=user)
+        photo_comment = photo_models.PhotoComment.objects.get(photo=photo)
+
+        client = APIClient()
+
+        payload = {}
+
+        request = client.post('/api/photos/{}/comments/{}/replies'.format(photo.id, photo_comment.id), payload)
+
+        self.assertEquals(request.status_code, 403)
+
+    def test_photo_single_comment_view_set_post_with_tagged_users(self):
+        """
+            Unit test to verify that providing a list of tagged users results in proper notifications being sent
+
+        :return: No return value
+        """
+        # Create the further users for purpose of testing tagging
+        user = User.objects.get(username="testuser")
+        tagged_one = User.objects.create_user('test1@aov.com', 'testuser1', 'pass')
+        tagged_two = User.objects.create_user('test2@aov.com', 'testuser2', 'pass')
+        tagged_three = User.objects.create_user('test3@aov.com', 'testuser3', 'pass')
+        photo_owner = User.objects.get(username="aov1")
+        device = APNSDevice.objects.get(user=photo_owner)
+
+        tagged_one_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one)
+        tagged_two_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two)
+        tagged_three_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three)
+
+        photo = photo_models.Photo.objects.get(user=photo_owner)
+        photo_comment = photo_models.PhotoComment.objects.get(photo=photo)
+
+        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+            client = APIClient()
+            client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
+
+            payload = {
+                'comment': 'Dude, sick photo! I dig it.',
+                'tagged': [tagged_one.username, tagged_two.username, tagged_three.username]
+            }
+
+            request = client.post('/api/photos/{}/comments/{}/replies'.format(photo.id, photo_comment.id), payload)
+
+            self.assertEquals(request.status_code, 201)
+            calls = list()
+            calls.append(mock.call(
+                alert="{} has commented on your artwork, {}.".format(user.username, photo_owner.username),
+                registration_ids=[device.registration_id]))
+            calls.append(mock.call(
+                alert="{} tagged you in a comment, {}.".format(user.username, tagged_one.username),
+                registration_ids=[tagged_one_device.registration_id]))
+            calls.append(mock.call(
+                alert="{} tagged you in a comment, {}.".format(user.username, tagged_two.username),
+                registration_ids=[tagged_two_device.registration_id]))
+            calls.append(mock.call(
+                alert="{} tagged you in a comment, {}.".format(user.username, tagged_three.username),
+                registration_ids=[tagged_three_device.registration_id]))
+
+            p.assert_has_calls(calls=calls)
+
+        # Check db
+        new_comment = photo_models.PhotoComment.objects.first()
+
+        self.assertEqual(PushNotificationRecord.objects.count(), 4)
+        self.assertEqual(new_comment.comment, payload['comment'])
+        self.assertEqual(new_comment.user.email, user.email)

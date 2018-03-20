@@ -800,6 +800,7 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
         photo_id = kwargs.get('pk', None)
         data = request.data
         comment = data.get('comment', None)
+        tagged = data.get('tagged', None)
 
         photo = photo_models.Photo.objects.filter(id=photo_id)
 
@@ -832,6 +833,25 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
                                                               content_object=photo.first(), sender=auth_user)
                     except APNSServerError:
                         pass
+
+            if tagged:
+                for tagged_user in tagged:
+                    tagged_user = account_models.User.objects.filter(username=tagged_user)
+                    tagged_device = APNSDevice.objects.filter(user=tagged_user)
+
+                    if tagged_device.exists() and (tagged_user.first().username != auth_user.username):
+                        tagged_device = APNSDevice.objects.filter(id=tagged_device.values_list("id", flat=True))
+                        message = "{} tagged you in a comment, {}.".format(auth_user.username, tagged_user.first().username)
+
+                        try:
+                            communication_tasks.send_push_notification(message,
+                                                                       tagged_device.values_list("id", flat=True))
+                            # Create the record of the notification being sent
+                            PushNotificationRecord.objects.create(message=message, receiver=tagged_device.first(),
+                                                                  action="T", content_object=photo.first(),
+                                                                  sender=auth_user)
+                        except APNSServerError:
+                            continue
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
             response = get_default_response('201')
@@ -869,6 +889,7 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
         comment_id = kwargs.get('comment_id', None)
         data = request.data
         reply = data.get('reply', None)
+        tagged = data.get('tagged', None)
 
 
         photo = photo_models.Photo.objects.filter(id=photo_id)
@@ -914,6 +935,25 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
                 # Create the record of the notification being sent
                 PushNotificationRecord.objects.create(message=message, receiver=original_commenter_apns.first(),
                                                       action="C", content_object=photo.first(), sender=auth_user)
+
+            if tagged:
+                for tagged_user in tagged:
+                    tagged_user = account_models.User.objects.filter(username=tagged_user)
+                    tagged_device = APNSDevice.objects.filter(user=tagged_user)
+
+                    if tagged_device.exists() and (tagged_user.first().username != auth_user.username):
+                        tagged_device = APNSDevice.objects.filter(id=tagged_device.values_list("id", flat=True))
+                        message = "{} tagged you in a comment, {}.".format(auth_user.username, tagged_user.first().username)
+
+                        try:
+                            communication_tasks.send_push_notification(message,
+                                                                       tagged_device.values_list("id", flat=True))
+                            # Create the record of the notification being sent
+                            PushNotificationRecord.objects.create(message=message, receiver=tagged_device.first(),
+                                                                  action="T", content_object=photo.first(),
+                                                                  sender=auth_user)
+                        except APNSServerError:
+                            continue
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
             response = get_default_response('201')
