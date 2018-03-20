@@ -10,23 +10,24 @@ class AOVAPNSDeviceSerializer(APNSDeviceSerializer):
 
 class PushNotificationRecordSerializer(serializers.ModelSerializer):
     action = serializers.SerializerMethodField()
-    sender_avatar = serializers.SerializerMethodField()
+    sender = serializers.SerializerMethodField()
 
     def get_action(self, obj):
         return obj.get_action_display()
 
-    def get_sender_avatar(self, obj):
+    def get_sender(self, obj):
         if obj.action == "A":
             return None
 
-        return PushNotificationSenderAvatarSerializer(obj.sender).data
+        return PushNotificationSenderSerializer(obj.sender).data
 
     class Meta:
         model = models.PushNotificationRecord
-        fields = ('id', 'message', 'sender_avatar', 'created_at', 'viewed', 'action', 'object_id')
+        fields = ('id', 'message', 'sender', 'created_at', 'viewed', 'action', 'object_id')
 
 
-class PushNotificationSenderAvatarSerializer(serializers.ModelSerializer):
+class PushNotificationSenderSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('avatar', )
+        fields = ('id', 'age', 'avatar', 'email', 'first_name', 'gear', 'last_name', 'location', 'social_name',
+                  'social_url', 'username', 'website_url')
