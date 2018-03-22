@@ -1,5 +1,7 @@
 from apps.account.models import User
 from apps.communication import models as models
+from apps.photo.models import Photo
+from apps.photo.serializers import PhotoSerializer
 from push_notifications.api.rest_framework import APNSDeviceSerializer
 from rest_framework import serializers
 
@@ -11,9 +13,18 @@ class AOVAPNSDeviceSerializer(APNSDeviceSerializer):
 class PushNotificationRecordSerializer(serializers.ModelSerializer):
     action = serializers.SerializerMethodField()
     sender = serializers.SerializerMethodField()
+    related_object = serializers.SerializerMethodField()
 
     def get_action(self, obj):
         return obj.get_action_display()
+
+    def get_related_object(self, obj):
+        if obj.action == "F":
+            return PushNotificationSenderSerializer(User.objects.filter(id=obj.object_id), many=True).data
+
+        elif obj.action in ["A", "C", "T", "U"]:
+            return PhotoSerializer(
+                Photo.objects.filter(id=obj.object_id), many=True, context={"request": self.context["request"]}).data
 
     def get_sender(self, obj):
         if obj.action == "A":
@@ -23,7 +34,7 @@ class PushNotificationRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.PushNotificationRecord
-        fields = ('id', 'message', 'sender', 'created_at', 'viewed', 'action', 'object_id')
+        fields = ('id', 'message', 'sender', 'created_at', 'viewed', 'action', 'related_object')
 
 
 class PushNotificationSenderSerializer(serializers.ModelSerializer):
