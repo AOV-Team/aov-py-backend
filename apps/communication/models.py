@@ -40,3 +40,9 @@ class PushNotificationRecord(EditMixin):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    def __str__(self):
+        return "ID: {} ACTION: {}".format(self.id, self.action)
+
+    class Meta:
+        verbose_name_plural = "Notification Records"
+

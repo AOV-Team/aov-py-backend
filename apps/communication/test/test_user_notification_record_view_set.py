@@ -89,9 +89,9 @@ class TestUserNotificationRecordViewSetGET(TestCase):
         # Simulate auth
         token = test_helpers.get_token_for_user(auth_user)
 
-        followed = PushNotificationRecord.objects.get(action="F")
-        followed.created_at = timezone.now() - timedelta(days=8)
-        followed.save()
+        upvoted = PushNotificationRecord.objects.get(action="U")
+        upvoted.created_at = timezone.now() - timedelta(days=8)
+        upvoted.save()
 
         # Get data from endpoint
         client = APIClient()
