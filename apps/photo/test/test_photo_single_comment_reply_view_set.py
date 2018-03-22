@@ -72,11 +72,11 @@ class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
                 registration_ids=[user_device.registration_id])
 
         # Check db
-        new_comment = photo_models.PhotoComment.objects.first()
+        new_comment = photo_models.PhotoComment.objects.filter(parent__isnull=False).first()
 
         self.assertEqual(PushNotificationRecord.objects.count(), 1)
         self.assertEqual(new_comment.comment, payload['reply'])
-        self.assertEqual(new_comment.parent, photo_comment.id)
+        self.assertEqual(new_comment.parent.id, photo_comment.id)
         self.assertEqual(new_comment.user.email, photo_owner.email)
 
     def test_photo_single_comment_view_set_post_no_comment_text(self):
@@ -86,9 +86,10 @@ class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
         :return: None
         """
 
-        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        user = User.objects.get(username='testuser')
+        photo_owner = User.objects.get(username='aov1')
 
-        photo = photo_models.Photo.objects.get(user=user)
+        photo = photo_models.Photo.objects.get(user=photo_owner)
 
         photo_comment = photo_models.PhotoComment.objects.get(photo=photo)
 
@@ -111,8 +112,9 @@ class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
         """
 
         user = User.objects.get(username='testuser')
+        photo_owner = User.objects.get(username='aov1')
 
-        photo = photo_models.Photo.objects.get(user=user)
+        photo = photo_models.Photo.objects.get(user=photo_owner)
         photo_comment = photo_models.PhotoComment.objects.get(photo=photo)
 
         client = APIClient()
@@ -135,7 +137,7 @@ class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
         tagged_two = User.objects.create_user('test2@aov.com', 'testuser2', 'pass')
         tagged_three = User.objects.create_user('test3@aov.com', 'testuser3', 'pass')
         photo_owner = User.objects.get(username="aov1")
-        device = APNSDevice.objects.get(user=photo_owner)
+        device = APNSDevice.objects.get(user=user)
 
         tagged_one_device = APNSDevice.objects.create(
             registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one)
@@ -149,10 +151,10 @@ class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
 
         with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
             client = APIClient()
-            client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
+            client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(photo_owner))
 
             payload = {
-                'comment': 'Dude, sick photo! I dig it.',
+                'reply': 'Thanks!',
                 'tagged': [tagged_one.username, tagged_two.username, tagged_three.username]
             }
 
@@ -161,23 +163,23 @@ class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
             self.assertEquals(request.status_code, 201)
             calls = list()
             calls.append(mock.call(
-                alert="{} has commented on your artwork, {}.".format(user.username, photo_owner.username),
+                alert="{} replied to your comment, {}.".format(photo_owner.username, user.username),
                 registration_ids=[device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(user.username, tagged_one.username),
+                alert="{} tagged you in a comment, {}.".format(photo_owner.username, tagged_one.username),
                 registration_ids=[tagged_one_device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(user.username, tagged_two.username),
+                alert="{} tagged you in a comment, {}.".format(photo_owner.username, tagged_two.username),
                 registration_ids=[tagged_two_device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(user.username, tagged_three.username),
+                alert="{} tagged you in a comment, {}.".format(photo_owner.username, tagged_three.username),
                 registration_ids=[tagged_three_device.registration_id]))
 
             p.assert_has_calls(calls=calls)
 
         # Check db
-        new_comment = photo_models.PhotoComment.objects.first()
+        new_comment = photo_models.PhotoComment.objects.filter(parent__isnull=False).first()
 
         self.assertEqual(PushNotificationRecord.objects.count(), 4)
-        self.assertEqual(new_comment.comment, payload['comment'])
-        self.assertEqual(new_comment.user.email, user.email)
+        self.assertEqual(new_comment.comment, payload['reply'])
+        self.assertEqual(new_comment.user.email, photo_owner.email)
