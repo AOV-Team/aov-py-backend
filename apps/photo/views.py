@@ -741,9 +741,21 @@ class PhotoSingleCaptionViewSet(generics.UpdateAPIView):
             photo = photo_models.Photo.objects.get(id=photo_id)
             existing_caption = photo.caption
             new_caption = request.data.get('caption', existing_caption)
+            tags = request.data.get("tags", None)
             payload = {
                 'caption': new_caption
             }
+
+            if tags:
+                tags_to_apply = list()
+                for tag in tags:
+                    new_tag = photo_models.PhotoClassification.objects.create_or_update(name=tag.replace("#", ""),
+                                                                                        classification_type="tag")
+                    tags_to_apply.append(new_tag.id)
+
+                payload.update({
+                    "tag": tags_to_apply
+                })
 
             serializer = photo_serializers.PhotoSerializer(
                 photo, data=payload, partial=True, context={"request": request})
