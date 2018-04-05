@@ -409,6 +409,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
         authenticated_user = TokenAuthentication().authenticate(request)[0]
         payload = request.data
         payload['user'] = authenticated_user.id
+        tags = payload.getlist("tags")
 
         # Image compression
         # Save original first
@@ -428,10 +429,26 @@ class PhotoViewSet(generics.ListCreateAPIView):
             except TypeError:
                 raise ValidationError('Image is not of type image')
 
+        if tags:
+            del payload["tags"]
+
         serializer = photo_serializers.PhotoSerializer(data=payload, context={"request": request})
 
         if serializer.is_valid():
             serializer.save()
+
+            if tags:
+                tags_to_apply = list()
+                for tag in tags:
+                    new_tag = photo_models.PhotoClassification.objects.create_or_update(name=tag.replace("#", ""),
+                                                                                        classification_type="tag")
+                    tags_to_apply.append(new_tag.id)
+
+                    new_photo = photo_models.Photo.objects.get(id=serializer.data.get("id"))
+                    new_photo.tag.add(*tags_to_apply)
+
+                    serializer = photo_serializers.PhotoSerializer(new_photo, context={"request": request})
+
 
             response = get_default_response('200')
             response.data = serializer.data
