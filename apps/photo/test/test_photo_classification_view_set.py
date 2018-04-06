@@ -10,15 +10,14 @@ class TestPhotoClassificationViewSetGET(TestCase):
     """
     Test /api/photo_classifications
     """
-    def test_photo_classification_view_set_get_successful(self):
-        """
-        Test that we can successfully get all classifications
 
-        :return: None
+    def setUp(self):
         """
-        # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+            Sets up the basic entries
 
+        :return: No return
+        """
+        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
         photo_models.PhotoClassification.objects.create_or_update(name='City',
                                                                   category_image=Photo(
                                                                       open('apps/common/test/data/photos/small.jpg',
@@ -32,6 +31,25 @@ class TestPhotoClassificationViewSetGET(TestCase):
         abstract.photo_feed = photo_feed
         abstract.save()
 
+    def tearDown(self):
+        """
+            Removes entries in database after each test for a clean slate
+
+        :return: No return
+        """
+        account_models.User.objects.all().delete()
+        photo_models.PhotoFeed.objects.all().delete()
+        photo_models.PhotoClassification.objects.filter(name__in=["Rural", "Abstract", "City"]).delete()
+        test_helpers.clear_directory('backend/media/', '*.jpg')
+
+    def test_photo_classification_view_set_get_successful(self):
+        """
+        Test that we can successfully get all classifications
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -56,11 +74,7 @@ class TestPhotoClassificationViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-
-        photo_models.PhotoClassification.objects.create_or_update(name='City')
-        photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
-        photo_models.PhotoClassification.objects.create_or_update(name='Urban', classification_type='category')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -81,11 +95,7 @@ class TestPhotoClassificationViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-
-        photo_models.PhotoClassification.objects.create_or_update(name='City')
-        photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
-        photo_models.PhotoClassification.objects.create_or_update(name='Urban', classification_type='category')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -104,11 +114,6 @@ class TestPhotoClassificationViewSetGET(TestCase):
 
         :return: None
         """
-        # Test data
-        photo_models.PhotoClassification.objects.create_or_update(name='City')
-        photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
-        photo_models.PhotoClassification.objects.create_or_update(name='Rural', classification_type='category')
-
         # Get data from endpoint
         client = APIClient()
 
@@ -126,11 +131,9 @@ class TestPhotoClassificationViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
         photo_models.PhotoClassification.objects.create_or_update(name='City', public=False)
-        photo_models.PhotoClassification.objects.create_or_update(name='Abstract')
-        photo_models.PhotoClassification.objects.create_or_update(name='Rural', classification_type='category')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -149,6 +152,23 @@ class TestPhotoClassificationViewSetPOST(TestCase):
     """
     Test POST /api/photo_classifications
     """
+    def setUp(self):
+        """
+            Method to set up necessary data that used in all test methods
+
+        :return: No return
+        """
+        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+    def tearDown(self):
+        """
+            Method to remove everything created during tests and setUp for a clean slate each test
+
+        :return: No return
+        """
+        account_models.User.objects.all().delete()
+
+
     def test_photo_classification_view_set_post_successful(self):
         """
         Test that we can create a tag
@@ -156,7 +176,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -188,8 +208,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI',
-                                                       username='aov1')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -219,8 +238,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI',
-                                                       username='aov1')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
         photo_models.PhotoClassification.objects.create_or_update(name='night', classification_type='category')
 
         # Simulate auth
@@ -251,8 +269,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI',
-                                                       username='aov1')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
         photo_models.PhotoClassification.objects.create_or_update(name='night', classification_type='category')
 
         # Simulate auth
@@ -307,7 +324,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -338,8 +355,7 @@ class TestPhotoClassificationViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI',
-                                                       username='aov1')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)

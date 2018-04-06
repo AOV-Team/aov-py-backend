@@ -361,7 +361,18 @@ class TestPhotoViewSetPOST(TestCase):
     """
     Test POST api/photos
     """
+    def setUp(self):
+        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        photo_models.PhotoClassification.objects.create_or_update(name='Landscape', classification_type='category')
+
+        # Gear
+        account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
     def tearDown(self):
+        account_models.User.objects.all().delete()
+        photo_models.PhotoClassification.objects.all().delete()
+        account_models.Gear.objects.all().delete()
         test_helpers.clear_directory('backend/media/', '*.jpg')
 
     @override_settings(REMOTE_IMAGE_STORAGE=False,
@@ -376,13 +387,12 @@ class TestPhotoViewSetPOST(TestCase):
         # Test data
         image = 'apps/common/test/data/photos/md-portrait.jpg'
 
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects\
-            .create_or_update(name='Landscape', classification_type='category')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
 
         # Gear
-        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+        gear_1 = account_models.Gear.objects.get(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.get(item_make='Sony', item_model='a99 II')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -396,7 +406,7 @@ class TestPhotoViewSetPOST(TestCase):
                 'category': category.id,
                 'gear': [gear_1.id, gear_2.id],
                 'geo_location': 'POINT ({} {})'.format(-116.2023436, 43.6169233),
-                'image': i
+                'image': i,
             }
 
             request = client.post('/api/photos', data=payload, format='multipart')
@@ -442,13 +452,12 @@ class TestPhotoViewSetPOST(TestCase):
         # Test data
         image = 'apps/common/test/data/photos/md-portrait.jpg'
 
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects \
-            .create_or_update(name='Landscape', classification_type='category')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
 
         # Gear
-        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+        gear_1 = account_models.Gear.objects.get(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.get(item_make='Sony', item_model='a99 II')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -489,9 +498,8 @@ class TestPhotoViewSetPOST(TestCase):
         # Test data
         image = 'apps/common/test/data/photos/md-portrait.jpg'
 
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects \
-            .create_or_update(name='Landscape', classification_type='category')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -536,9 +544,8 @@ class TestPhotoViewSetPOST(TestCase):
         # Test data
         image = 'apps/common/test/data/photos/cover.jpg'
 
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects \
-            .create_or_update(name='Landscape', classification_type='category')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -558,6 +565,8 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(request.status_code, 400)
 
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_view_set_post_bad_request_fields_missing(self):
         """
         Test that we get 400 if required fields are missing
@@ -565,7 +574,7 @@ class TestPhotoViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -583,6 +592,8 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(request.status_code, 400)
 
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_view_set_post_bad_request_image_missing(self):
         """
         Test that we get 400 if image missing
@@ -590,9 +601,8 @@ class TestPhotoViewSetPOST(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects \
-            .create_or_update(name='Landscape', classification_type='category')
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -609,3 +619,144 @@ class TestPhotoViewSetPOST(TestCase):
             request = client.post('/api/photos', data=payload, format='multipart')
 
         self.assertEquals(request.status_code, 400)
+
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+    def test_photo_view_set_post_with_tags_successful(self):
+        """
+            Unit test to verify posting an image with tags included works correctly
+
+        :return: No return
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
+
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
+
+        # Gear
+        gear_1 = account_models.Gear.objects.get(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.get(item_make='Sony', item_model='a99 II')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'gear': [gear_1.id, gear_2.id],
+                'geo_location': 'POINT ({} {})'.format(-116.2023436, 43.6169233),
+                'image': i,
+                'tags': ["#Pretty", "#Boise", "#Personal"]
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(result['user'], user.id)
+        self.assertEquals(len(result['gear']), 2)
+        self.assertEquals(result['latitude'], 43.6169233)
+        self.assertEquals(result['longitude'], -116.2023436)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
+        self.assertIsNotNone(photos[0].original_image_url)
+        self.assertEqual(photos[0].tag.count(), 3)
+
+        # Test that original uploaded image is saved (before resized and compressed)
+        matched_images = test_helpers.find_file_by_pattern(settings.MEDIA_ROOT, '*_md-portrait.jpg')
+        original_image = matched_images[0] if matched_images is not None else matched_images
+
+        if original_image is not None:
+            if not re.match('^u{}_'.format(user.id) + get_date_stamp_str().split('_')[
+                0] + '_[0-9]{6}_md-portrait\.jpg$',
+                            original_image):
+                self.fail('Original image not matched!')
+        else:
+            self.fail('Original image not found!')
+
+        # Sleep so other image-related unit tests don't get jacked up
+        time.sleep(1)
+
+        # Test that compression worked
+        self.assertGreater(getsize(image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
+
+
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+    def test_photo_view_set_post_with_tags_no_hash_successful(self):
+        """
+           Unit test to verify tags submitted with no hashtag work appropriately
+
+        :return: No return
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
+
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
+
+        # Gear
+        gear_1 = account_models.Gear.objects.get(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.get(item_make='Sony', item_model='a99 II')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'gear': [gear_1.id, gear_2.id],
+                'geo_location': 'POINT ({} {})'.format(-116.2023436, 43.6169233),
+                'image': i,
+                'tags': ["Pretty", "Boise", "Personal"]
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(result['user'], user.id)
+        self.assertEquals(len(result['gear']), 2)
+        self.assertEquals(result['latitude'], 43.6169233)
+        self.assertEquals(result['longitude'], -116.2023436)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
+        self.assertIsNotNone(photos[0].original_image_url)
+        self.assertEqual(photos[0].tag.count(), 3)
+
+        # Test that original uploaded image is saved (before resized and compressed)
+        matched_images = test_helpers.find_file_by_pattern(settings.MEDIA_ROOT, '*_md-portrait.jpg')
+        original_image = matched_images[0] if matched_images is not None else matched_images
+
+        if original_image is not None:
+            if not re.match('^u{}_'.format(user.id) + get_date_stamp_str().split('_')[
+                0] + '_[0-9]{6}_md-portrait\.jpg$',
+                            original_image):
+                self.fail('Original image not matched!')
+        else:
+            self.fail('Original image not found!')
+
+        # Sleep so other image-related unit tests don't get jacked up
+        time.sleep(1)
+
+        # Test that compression worked
+        self.assertGreater(getsize(image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
