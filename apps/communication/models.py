@@ -26,6 +26,7 @@ class PushNotificationRecord(EditMixin):
         ("A", "AoV Pick"),
         ("C", "Comment"),
         ("F", "Follower"),
+        ("T", "Tagged"),
         ("U", "Upvote")
     )
 
