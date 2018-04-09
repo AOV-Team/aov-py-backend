@@ -9,6 +9,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils import timezone
@@ -332,6 +333,7 @@ class PhotoComment(common_models.GeoEditMixin):
     parent = models.ForeignKey("self", null=True, related_name="replies")
     user = models.ForeignKey(account_models.User)
     votes = models.IntegerField(default=0)
+    mentions = ArrayField(base_field=models.CharField(max_length=255, blank=True), blank=True, null=True)
 
     objects = PhotoCommentManager()
 

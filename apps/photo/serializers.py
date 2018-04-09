@@ -94,7 +94,7 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.PhotoComment
-        fields = ('id', 'comment', 'user', 'photo', 'created_at', 'replies')
+        fields = ('id', 'comment', 'user', 'photo', 'created_at', 'replies', 'mentions')
         read_only_fields = ('user',)
 
 
