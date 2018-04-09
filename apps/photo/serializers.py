@@ -77,6 +77,11 @@ class PhotoCommentSerializer(serializers.ModelSerializer):
     replies = PhotoCommentReplySerializer(many=True)
     photo = serializers.CharField(source='photo.id', read_only=True)
     user = serializers.SerializerMethodField()
+    mentions = serializers.SerializerMethodField()
+
+    def get_mentions(self, obj):
+        mentioned_users = account_models.User.objects.filter(username__in=obj.mentions)
+        return UserPublicSerializer(mentioned_users, many=True).data
 
     def get_user(self, obj):
         """
