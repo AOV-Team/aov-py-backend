@@ -191,6 +191,7 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
 
         self.assertEqual(PushNotificationRecord.objects.count(), 4)
         self.assertEqual(new_comment.comment, payload['comment'])
+        self.assertEqual(len(new_comment.mentions), 3)
         self.assertEqual(new_comment.user.email, user.email)
 
 

@@ -864,6 +864,10 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
                         pass
 
             if tagged:
+                # Add the mentioned users list to the comment for easier tracking on front.
+                new_comment.mentions = tagged
+                new_comment.save()
+
                 for tagged_user in tagged:
                     tagged_user = account_models.User.objects.filter(username=tagged_user)
                     tagged_device = APNSDevice.objects.filter(user=tagged_user)
@@ -966,6 +970,9 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
                                                       action="C", content_object=photo.first(), sender=auth_user)
 
             if tagged:
+                new_comment.mentions = tagged
+                new_comment.save()
+
                 for tagged_user in tagged:
                     tagged_user = account_models.User.objects.filter(username=tagged_user)
                     tagged_device = APNSDevice.objects.filter(user=tagged_user)
