@@ -75,7 +75,8 @@ SITE_ID = 1
 MIDDLEWARE = list()
 
 if DEBUG:
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware',
+                   'customizable_django_profiler.cProfileMiddleware']
 
 MIDDLEWARE += [
     'django.middleware.security.SecurityMiddleware',
