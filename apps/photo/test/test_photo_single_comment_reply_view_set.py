@@ -155,7 +155,7 @@ class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
 
             payload = {
                 'reply': 'Thanks!',
-                'tagged': [tagged_one.username, tagged_two.username, tagged_three.username]
+                'mentions': [tagged_one.username, tagged_two.username, tagged_three.username]
             }
 
             request = client.post('/api/photos/{}/comments/{}/replies'.format(photo.id, photo_comment.id), payload)
@@ -166,13 +166,13 @@ class TestPhotoSingleCommentReplyViewSetPOST(TestCase):
                 alert="{} replied to your comment, {}.".format(photo_owner.username, user.username),
                 registration_ids=[device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(photo_owner.username, tagged_one.username),
+                alert="{} mentioned you in a comment, {}.".format(photo_owner.username, tagged_one.username),
                 registration_ids=[tagged_one_device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(photo_owner.username, tagged_two.username),
+                alert="{} mentioned you in a comment, {}.".format(photo_owner.username, tagged_two.username),
                 registration_ids=[tagged_two_device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(photo_owner.username, tagged_three.username),
+                alert="{} mentioned you in a comment, {}.".format(photo_owner.username, tagged_three.username),
                 registration_ids=[tagged_three_device.registration_id]))
 
             p.assert_has_calls(calls=calls)
