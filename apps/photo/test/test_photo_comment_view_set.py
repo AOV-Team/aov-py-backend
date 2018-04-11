@@ -164,7 +164,7 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
 
             payload = {
                 'comment': 'Dude, sick photo! I dig it.',
-                'tagged': [tagged_one.username, tagged_two.username, tagged_three.username]
+                'mentions': [tagged_one.username, tagged_two.username, tagged_three.username]
             }
 
             request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
@@ -175,13 +175,13 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
                 alert="{} has commented on your artwork, {}.".format(user.username, photo_owner.username),
                 registration_ids=[device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(user.username, tagged_one.username),
+                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_one.username),
                 registration_ids=[tagged_one_device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(user.username, tagged_two.username),
+                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_two.username),
                 registration_ids=[tagged_two_device.registration_id]))
             calls.append(mock.call(
-                alert="{} tagged you in a comment, {}.".format(user.username, tagged_three.username),
+                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_three.username),
                 registration_ids=[tagged_three_device.registration_id]))
 
             p.assert_has_calls(calls=calls)

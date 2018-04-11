@@ -829,7 +829,7 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
         photo_id = kwargs.get('pk', None)
         data = request.data
         comment = data.get('comment', None)
-        tagged = data.get('tagged', None)
+        mentioned = data.get('mentions', None)
 
         photo = photo_models.Photo.objects.filter(id=photo_id)
 
@@ -863,24 +863,24 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
                     except APNSServerError:
                         pass
 
-            if tagged:
+            if mentioned:
                 # Add the mentioned users list to the comment for easier tracking on front.
-                new_comment.mentions = tagged
+                new_comment.mentions = mentioned
                 new_comment.save()
 
-                for tagged_user in tagged:
-                    tagged_user = account_models.User.objects.filter(username=tagged_user)
-                    tagged_device = APNSDevice.objects.filter(user=tagged_user)
+                for mentioned_user in mentioned:
+                    mentioned_user = account_models.User.objects.filter(username=mentioned_user)
+                    mentioned_device = APNSDevice.objects.filter(user=mentioned_user)
 
-                    if tagged_device.exists() and (tagged_user.first().username != auth_user.username):
-                        tagged_device = APNSDevice.objects.filter(id=tagged_device.values_list("id", flat=True))
-                        message = "{} tagged you in a comment, {}.".format(auth_user.username, tagged_user.first().username)
+                    if mentioned_device.exists() and (mentioned_user.first().username != auth_user.username):
+                        mentioned_device = APNSDevice.objects.filter(id=mentioned_device.values_list("id", flat=True))
+                        message = "{} mentioned you in a comment, {}.".format(auth_user.username, mentioned_user.first().username)
 
                         try:
                             communication_tasks.send_push_notification(message,
-                                                                       tagged_device.values_list("id", flat=True))
+                                                                       mentioned_device.values_list("id", flat=True))
                             # Create the record of the notification being sent
-                            PushNotificationRecord.objects.create(message=message, receiver=tagged_device.first(),
+                            PushNotificationRecord.objects.create(message=message, receiver=mentioned_device.first(),
                                                                   action="T", content_object=photo.first(),
                                                                   sender=auth_user)
                         except APNSServerError:
@@ -922,7 +922,7 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
         comment_id = kwargs.get('comment_id', None)
         data = request.data
         reply = data.get('reply', None)
-        tagged = data.get('tagged', None)
+        mentioned = data.get('mentions', None)
 
 
         photo = photo_models.Photo.objects.filter(id=photo_id)
@@ -969,23 +969,23 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
                 PushNotificationRecord.objects.create(message=message, receiver=original_commenter_apns.first(),
                                                       action="C", content_object=photo.first(), sender=auth_user)
 
-            if tagged:
-                new_comment.mentions = tagged
+            if mentioned:
+                new_comment.mentions = mentioned
                 new_comment.save()
 
-                for tagged_user in tagged:
-                    tagged_user = account_models.User.objects.filter(username=tagged_user)
-                    tagged_device = APNSDevice.objects.filter(user=tagged_user)
+                for mentioned_user in mentioned:
+                    mentioned_user = account_models.User.objects.filter(username=mentioned_user)
+                    mentioned_device = APNSDevice.objects.filter(user=mentioned_user)
 
-                    if tagged_device.exists() and (tagged_user.first().username != auth_user.username):
-                        tagged_device = APNSDevice.objects.filter(id=tagged_device.values_list("id", flat=True))
-                        message = "{} tagged you in a comment, {}.".format(auth_user.username, tagged_user.first().username)
+                    if mentioned_device.exists() and (mentioned_user.first().username != auth_user.username):
+                        mentioned_device = APNSDevice.objects.filter(id=mentioned_device.values_list("id", flat=True))
+                        message = "{} mentioned you in a comment, {}.".format(auth_user.username, mentioned_user.first().username)
 
                         try:
                             communication_tasks.send_push_notification(message,
-                                                                       tagged_device.values_list("id", flat=True))
+                                                                       mentioned_device.values_list("id", flat=True))
                             # Create the record of the notification being sent
-                            PushNotificationRecord.objects.create(message=message, receiver=tagged_device.first(),
+                            PushNotificationRecord.objects.create(message=message, receiver=mentioned_device.first(),
                                                                   action="T", content_object=photo.first(),
                                                                   sender=auth_user)
                         except APNSServerError:
