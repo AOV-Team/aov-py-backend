@@ -26,6 +26,7 @@ from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework_tracking.mixins import LoggingMixin
 
 
 @staff_member_required
@@ -458,7 +459,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
         return response
 
 
-class PhotoAppTopPhotosViewSet(generics.ListAPIView):
+class PhotoAppTopPhotosViewSet(LoggingMixin, generics.ListAPIView):
     pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.AllowAny,)
     photo_feed = None
@@ -493,7 +494,7 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
         return top_photos
 
 
-class PhotoClassificationViewSet(generics.ListCreateAPIView):
+class PhotoClassificationViewSet(LoggingMixin, generics.ListCreateAPIView):
     permission_classes = (permissions.AllowAny,)
     pagination_class = MediumResultsSetPagination
     serializer_class = photo_serializers.PhotoClassificationSerializer
@@ -569,7 +570,7 @@ class PhotoClassificationViewSet(generics.ListCreateAPIView):
             raise ValidationError(serializer.errors)
 
 
-class PhotoClassificationPhotosViewSet(generics.ListAPIView):
+class PhotoClassificationPhotosViewSet(LoggingMixin, generics.ListAPIView):
     pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = photo_serializers.PhotoSerializer

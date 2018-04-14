@@ -28,6 +28,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.views import APIView
+from rest_framework_tracking.mixins import LoggingMixin
 from social.apps.django_app.utils import load_strategy
 from social.apps.django_app.utils import load_backend
 from social.exceptions import AuthAlreadyAssociated
@@ -304,7 +305,7 @@ class GearViewSet(generics.ListCreateAPIView):
         return response
 
 
-class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
+class MeViewSet(LoggingMixin, generics.RetrieveAPIView, generics.UpdateAPIView):
     """
     /api/me
     Endpoint for retrieving user info
@@ -503,7 +504,7 @@ class MeGearViewSet(APIView):
         return response
 
 
-class MeProfileViewSet(generics.RetrieveAPIView):
+class MeProfileViewSet(LoggingMixin, generics.RetrieveAPIView):
     """
     api/me/profile
     """

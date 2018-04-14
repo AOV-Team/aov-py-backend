@@ -13,9 +13,10 @@ from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_tracking.mixins import LoggingMixin
 
 
-class DevicesViewSet(generics.ListCreateAPIView):
+class DevicesViewSet(LoggingMixin, generics.ListCreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (IsAuthenticated,)
     serializer_class = AOVAPNSDeviceSerializer
