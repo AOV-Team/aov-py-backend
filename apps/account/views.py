@@ -906,7 +906,7 @@ class UserLocationViewSet(generics.GenericAPIView):
         return response
 
 
-class UserPhotosViewSet(generics.ListAPIView):
+class UserPhotosViewSet(LoggingMixin, generics.ListAPIView):
     """
     /api/users/{}/photos
     """

@@ -249,6 +249,7 @@ class PhotoSerializer(serializers.ModelSerializer):
                   'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes', 'user_voted',
                   'user_starred')
         # fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
+        #           'image_blurred', 'image_medium', 'image_small',
         #           'latitude', 'location', 'longitude', 'original_image_url', 'photo_data', 'public', 'photo_feed',
         #           'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes', 'user_voted',
         #           'user_starred')
@@ -258,5 +259,5 @@ class PhotoSerializer(serializers.ModelSerializer):
         ordering = ('-id',)
         read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
                             'image_tiny_272', 'photo_data', 'user_details', 'comments', 'user_voted', 'user_starred')
-        # read_only_fields = ('photo_data', 'user_details', 'comments', 'user_voted',
-        #                     'user_starred')
+        # read_only_fields = ('photo_data', 'user_details', 'comments', 'user_voted', 'user_starred', 'image_blurred',
+        #                     'image_medium', 'image_small',)

@@ -29,7 +29,8 @@ def run_classification_profile(url_base):
                 print("{} Classification photos received!".format(classifications.json()["results"][0]["name"]))
                 print("Profiling Complete!")
             else:
-                print("Failed to retrieve {} Classification photos.")
+                print("Failed to retrieve {} Classification photos.".format(
+                    classifications.json()["results"][0]["name"]))
                 print("Profiling Failed.")
         else:
             print("Failed to retrieve Classifications. Bailing out!")
