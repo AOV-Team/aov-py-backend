@@ -1,15 +1,12 @@
 from django.core.management import BaseCommand
 import requests
 
-def run_classification_profile():
+def run_classification_profile(url_base):
     """
         Method to profile the /api/photo_classifications/<id>/photos endpoint
 
     :return: No return value
     """
-
-    # Call sequence: auth, me, devices, me/profile, photos/top
-    url_base = "http://localhost:8000/api"
 
     # Gotta login
     print("Logging in...")
@@ -18,14 +15,6 @@ def run_classification_profile():
         auth_token = login_response.json()["token"]
         headers = {"authorization": "Token {}".format(auth_token)}
         print("Login complete!")
-
-        print("Retrieving profile data...")
-        requests.get(url_base + "/me", headers=headers)
-        profile = requests.get(url_base + "/me/profile", headers=headers)
-        if profile.status_code == 200:
-            print("Profile data received!")
-        else:
-            print("Could not retrieve Profile, continuing anyway.")
 
         print("Retrieving Photo Classifications...")
         classifications = requests.get(url_base + "/photo_classifications", headers=headers)
@@ -47,15 +36,12 @@ def run_classification_profile():
     else:
         print("Login Failed")
 
-def run_user_photos_profile():
+def run_user_photos_profile(url_base):
     """
         Method to profile the /api/users/<id>/photos endpoint
 
     :return: No return value
     """
-
-    # Call sequence: auth, me, devices, me/profile, photos/top
-    url_base = "http://localhost:8000/api"
 
     # Gotta login
     print("Logging in...")
@@ -69,7 +55,6 @@ def run_user_photos_profile():
         me = requests.get(url_base + "/me", headers=headers)
         profile = requests.get(url_base + "/me/profile", headers=headers)
         if profile.status_code == 200 and me.status_code == 200:
-            print(me.json())
             print("Profile data received!")
 
             print("Retrieving user Photos")
@@ -86,14 +71,12 @@ def run_user_photos_profile():
     else:
         print("Login Failed")
 
-def run_all_photos_profile():
+def run_all_photos_profile(url_base):
     """
         Method to profile the /api/photos endpoint
 
     :return: No return value
     """
-    # Call sequence: auth, me, devices, me/profile, photos/top
-    url_base = "http://localhost:8000/api"
 
     # Gotta login
     print("Logging in...")
@@ -103,42 +86,76 @@ def run_all_photos_profile():
         headers = {"authorization": "Token {}".format(auth_token)}
         print("Login complete!")
 
-        print("Retrieving profile data...")
-        me = requests.get(url_base + "/me", headers=headers)
-        profile = requests.get(url_base + "/me/profile", headers=headers)
-        if profile.status_code == 200 and me.status_code == 200:
-            print(me.json())
-            print("Profile data received!")
-
-            print("Retrieving all photos")
-            user_photos = requests.get(url_base + "/users/{}/photos".format(me.json()["id"]), headers=headers)
-            if user_photos.status_code == 200:
-                print("User photos received!")
-            else:
-                print("Failed to retrieve user photos.")
-                print("Profiling Failed")
+        print("Retrieving all photos")
+        all_photos = requests.get(url_base + "/api/photos", headers=headers)
+        if all_photos.status_code == 200:
+            print("All photos received!")
         else:
-            print("Could not retrieve Profile.")
+            print("Failed to retrieve photos.")
             print("Profiling Failed")
 
     else:
         print("Login Failed")
 
-def run_single_photo_profile():
+def run_single_photo_profile(url_base):
     """
         Method to profile the /api/photos/<id> endpoint
 
     :return: No return value
     """
-    print("Not currently implemented!")
 
-def run_top_photos_profile():
+    # Gotta login
+    print("Logging in...")
+    login_response = requests.post(url_base + "/auth", data={"email": "gallen@replypro.io", "password": "Mortific33"})
+    if login_response.status_code == 201:
+        auth_token = login_response.json()["token"]
+        headers = {"authorization": "Token {}".format(auth_token)}
+        print("Login complete!")
+
+        print("Retrieving all photos")
+        all_photos = requests.get(url_base + "/api/photos", headers=headers)
+        if all_photos.status_code == 200:
+            print("All photos received!")
+
+            print("Retrieving photo #{}...".format(all_photos.json()["results"][0]["id"]))
+            single_photo = requests.get(url_base + "/api/photos/{}".format(all_photos.json()["results"][0]["id"]),
+                                        headers=headers)
+            if single_photo.status_code == 200:
+                print("Photo #{} data received!".format(all_photos.json()["results"][0]["id"]))
+            else:
+                print("Failed to retrieve photo #{}".format(all_photos.json()["results"][0]["id"]))
+                print("Profiling Failed")
+        else:
+            print("Failed to retrieve photos.")
+            print("Profiling Failed")
+
+    else:
+        print("Login Failed")
+
+def run_top_photos_profile(url_base):
     """
         Method to profile the /api/photos/top endpoint
 
     :return: No return value
     """
-    print("Not currently implemented!")
+    # Gotta login
+    print("Logging in...")
+    login_response = requests.post(url_base + "/auth", data={"email": "gallen@replypro.io", "password": "Mortific33"})
+    if login_response.status_code == 201:
+        auth_token = login_response.json()["token"]
+        headers = {"authorization": "Token {}".format(auth_token)}
+        print("Login complete!")
+
+        print("Retrieving top photos")
+        top_photos = requests.get(url_base + "/api/photos/top?display_page=popular", headers=headers)
+        if top_photos.status_code == 200:
+            print("Top photos received!")
+        else:
+            print("Failed to retrieve top photos.")
+            print("Profiling Failed")
+
+    else:
+        print("Login Failed")
 
 
 class Command(BaseCommand):
@@ -148,13 +165,13 @@ class Command(BaseCommand):
         parser.add_argument('-p',
                             action='store',
                             dest='profile',
-                            default=False,
+                            default='all_photos',
                             help='Run a profile of the /api/photo_classifications/<id>/photos endpoint.')
-        # parser.add_argument('-e',
-        #                     action='store',
-        #                     dest='endpoint',
-        #                     default='photo',
-        #                     help='Endpoint (photo|), default "photo"')
+        parser.add_argument('-s',
+                            action='store',
+                            dest='server',
+                            default='local',
+                            help='Specify server to profile "(local | staging | production)"')
         # parser.add_argument('-p',
         #                     action='store',
         #                     dest='filename',
@@ -170,6 +187,12 @@ class Command(BaseCommand):
         :return:
         """
 
+        base_url_lut = {
+            "local": "http://localhost:8000/api",
+            "staging": "https://staging.artofvisuals.com/api",
+            "production": "http://data.artofvisuals.com/api"
+        }
+
         profile_method_lut = {
             "classification": run_classification_profile,
             "user_photos": run_user_photos_profile,
@@ -180,7 +203,7 @@ class Command(BaseCommand):
         }
 
         if options["profile"] in profile_method_lut:
-            profile_method_lut[options["profile"]]()
+            profile_method_lut[options["profile"]](base_url_lut[options["server"]])
         else:
-            print("{} profile not currently implemented.")
+            print("{} profile not currently implemented.".format(options["profile"]))
 
