@@ -1,5 +1,7 @@
 amqp==2.1.1
+appdirs==1.4.3
 Babel==2.3.4
+beautifulsoup4==4.6.0
 billiard==3.5.0.2
 boto3==1.4.2
 botocore==1.4.81
@@ -20,6 +22,7 @@ django-push-notifications==1.4.1
 django-storages==1.5.1
 djangorestframework==3.5.3
 docutils==0.12
+drf-tracking==1.4.0
 Flask==0.11.1
 flower==0.9.1
 freezegun==0.3.8
@@ -34,14 +37,17 @@ Jinja2==2.8
 jmespath==0.9.0
 kombu==4.0.0
 locustio==0.8a2
+lxml==4.1.1
 MarkupSafe==0.23
 mockredispy==2.9.3
 msgpack-python==0.4.8
 oauthlib==2.0.0
+packaging==16.8
 pilkit==1.1.13
 Pillow==3.4.2
 psycopg2==2.6.2
 PyJWT==1.4.2
+pyparsing==2.2.0
 python-dateutil==2.6.0
 python-social-auth==0.2.21
 python3-openid==3.0.10

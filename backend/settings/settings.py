@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'social.apps.django_app.default',
+    'rest_framework_tracking',
 ]
 
 if DEBUG:
@@ -105,6 +106,7 @@ JET_SIDE_MENU_CUSTOM_APPS = [
     ('communication', ['__all__']),
     ('dbmail', ['MailTemplate']),
     ('push_notifications', ['APNSDevice']),
+    ('rest_framework_tracking', ['APIRequestLog']),
 ]
 
 
