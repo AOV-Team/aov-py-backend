@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'social.apps.django_app.default',
+    'rest_framework_tracking',
 ]
 
 if DEBUG:
@@ -75,8 +76,7 @@ SITE_ID = 1
 MIDDLEWARE = list()
 
 if DEBUG:
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware',
-                   'customizable_django_profiler.cProfileMiddleware']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 MIDDLEWARE += [
     'django.middleware.security.SecurityMiddleware',
@@ -106,6 +106,7 @@ JET_SIDE_MENU_CUSTOM_APPS = [
     ('communication', ['__all__']),
     ('dbmail', ['MailTemplate']),
     ('push_notifications', ['APNSDevice']),
+    ('rest_framework_tracking', ['APIRequestLog']),
 ]
 
 

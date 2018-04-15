@@ -92,7 +92,37 @@ def run_all_photos_profile():
 
     :return: No return value
     """
-    print("Not currently implemented!")
+    # Call sequence: auth, me, devices, me/profile, photos/top
+    url_base = "http://localhost:8000/api"
+
+    # Gotta login
+    print("Logging in...")
+    login_response = requests.post(url_base + "/auth", data={"email": "gallen@replypro.io", "password": "Mortific33"})
+    if login_response.status_code == 201:
+        auth_token = login_response.json()["token"]
+        headers = {"authorization": "Token {}".format(auth_token)}
+        print("Login complete!")
+
+        print("Retrieving profile data...")
+        me = requests.get(url_base + "/me", headers=headers)
+        profile = requests.get(url_base + "/me/profile", headers=headers)
+        if profile.status_code == 200 and me.status_code == 200:
+            print(me.json())
+            print("Profile data received!")
+
+            print("Retrieving all photos")
+            user_photos = requests.get(url_base + "/users/{}/photos".format(me.json()["id"]), headers=headers)
+            if user_photos.status_code == 200:
+                print("User photos received!")
+            else:
+                print("Failed to retrieve user photos.")
+                print("Profiling Failed")
+        else:
+            print("Could not retrieve Profile.")
+            print("Profiling Failed")
+
+    else:
+        print("Login Failed")
 
 def run_single_photo_profile():
     """
