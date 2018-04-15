@@ -38,17 +38,20 @@ def send_push_notification(message, recipients, **kwargs):
                 devices = APNSDevice.objects.filter(id__in=devices.values_list("id", flat=True))
                 try:
                     devices.send_message(message, **kwargs)
-                except ConnectionError as e:
-                    print("ERROR: ", e)
+                except ConnectionError:
                     continue
-                except (APNSError, APNSServerError) as e:
-                    print("ERROR: ", e)
+                except (APNSError, APNSServerError):
                     continue
 
             return
     elif type(recipients) is list or type(recipients) is APNSDeviceQuerySet:
         devices = APNSDevice.objects.filter(id__in=recipients)
-    devices.send_message(message, **kwargs)
+    try:
+        devices.send_message(message, **kwargs)
+    except ConnectionError:
+        pass
+    except (APNSError, APNSServerError):
+        pass
 
 
 @shared_task(name='send_scheduled_push_notifications')
