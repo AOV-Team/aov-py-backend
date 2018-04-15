@@ -194,6 +194,75 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         self.assertEqual(len(new_comment.mentions), 3)
         self.assertEqual(new_comment.user.email, user.email)
 
+    def test_photo_single_comment_view_set_post_with_tagged_users_with_multiple_devices(self):
+        """
+            Unit test to verify that providing a list of tagged users results in proper notifications being sent
+
+            *NOTE* This will likely fail as the order of the id's in the endpoint has no order
+
+        :return: No return value
+        """
+        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        tagged_one = User.objects.create_user('test1@aov.com', 'testuser1', 'pass')
+        tagged_two = User.objects.create_user('test2@aov.com', 'testuser2', 'pass')
+        tagged_three = User.objects.create_user('test3@aov.com', 'testuser3', 'pass')
+        photo_owner = User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
+        device = APNSDevice.objects.create(
+            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=photo_owner)
+
+        tagged_one_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one)
+        tagged_one_device_two = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one)
+        tagged_two_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two)
+        tagged_two_device_two = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two)
+        tagged_three_device = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three)
+        tagged_three_device_two = APNSDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three)
+
+        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
+                                   user=photo_owner)
+        photo.save()
+
+        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+            client = APIClient()
+            client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
+
+            payload = {
+                'comment': 'Dude, sick photo! I dig it.',
+                'mentions': [tagged_one.username, tagged_two.username, tagged_three.username]
+            }
+
+            request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
+
+            self.assertEquals(request.status_code, 201)
+            calls = list()
+            calls.append(mock.call(
+                alert="{} has commented on your artwork, {}.".format(user.username, photo_owner.username),
+                registration_ids=[device.registration_id]))
+            calls.append(mock.call(
+                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_one.username),
+                registration_ids=[tagged_one_device_two.registration_id, tagged_one_device.registration_id]))
+            calls.append(mock.call(
+                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_two.username),
+                registration_ids=[tagged_two_device_two.registration_id, tagged_two_device.registration_id]))
+            calls.append(mock.call(
+                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_three.username),
+                registration_ids=[tagged_three_device_two.registration_id, tagged_three_device.registration_id]))
+
+            p.assert_has_calls(calls=calls)
+
+        # Check db
+        new_comment = photo_models.PhotoComment.objects.first()
+
+        self.assertEqual(PushNotificationRecord.objects.count(), 4)
+        self.assertEqual(new_comment.comment, payload['comment'])
+        self.assertEqual(len(new_comment.mentions), 3)
+        self.assertEqual(new_comment.user.email, user.email)
+
 
 @override_settings(REMOTE_IMAGE_STORAGE=False,
                    DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')

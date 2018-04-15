@@ -873,7 +873,7 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
                     mentioned_device = APNSDevice.objects.filter(user=mentioned_user)
 
                     if mentioned_device.exists() and (mentioned_user.first().username != auth_user.username):
-                        mentioned_device = APNSDevice.objects.filter(id=mentioned_device.values_list("id", flat=True))
+                        mentioned_device = APNSDevice.objects.filter(id__in=mentioned_device.values_list("id", flat=True))
                         message = "{} mentioned you in a comment, {}.".format(auth_user.username, mentioned_user.first().username)
 
                         try:
@@ -978,7 +978,7 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
                     mentioned_device = APNSDevice.objects.filter(user=mentioned_user)
 
                     if mentioned_device.exists() and (mentioned_user.first().username != auth_user.username):
-                        mentioned_device = APNSDevice.objects.filter(id=mentioned_device.values_list("id", flat=True))
+                        mentioned_device = APNSDevice.objects.filter(id__in=mentioned_device.values_list("id", flat=True))
                         message = "{} mentioned you in a comment, {}.".format(auth_user.username, mentioned_user.first().username)
 
                         try:
