@@ -91,6 +91,7 @@ urlpatterns = [
 
     # utils
     url(r'api/me/actions$', utils_views.MeActionsViewSet.as_view()),
+    url(r'api/utils/profiles$', utils_views.APIRequestLogViewSet.as_view()),
 
     # admin
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS

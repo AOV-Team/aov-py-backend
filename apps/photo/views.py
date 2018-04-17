@@ -575,6 +575,7 @@ class PhotoClassificationPhotosViewSet(LoggingMixin, generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = photo_serializers.PhotoSerializer
 
+    # @setup_eager_loading
     def get_queryset(self):
         """
         Return photos for a classification
