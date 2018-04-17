@@ -1,16 +1,43 @@
+from backend.settings.settings import PROFILE_USER, PROFILE_PASSWORD
 from django.core.management import BaseCommand
+from django.utils import timezone
 import requests
+
+def run_all_profiles(url_base):
+    """
+        Method to run all the profiles in sequence
+
+    :param url_base: Base url needed to make the request to the correct api
+    :return: No return
+    """
+
+    print("***CLASSIFICATION***")
+    run_classification_profile(url_base)
+    print('\n')
+    print("***ALL_PHOTOS***")
+    run_all_photos_profile(url_base)
+    print('\n')
+    print("***SINGLE_PHOTO***")
+    run_single_photo_profile(url_base)
+    print('\n')
+    print("***USER_PHOTOS***")
+    run_user_photos_profile(url_base)
+    print('\n')
+    print("***TOP_PHOTOS***")
+    run_top_photos_profile(url_base)
 
 def run_classification_profile(url_base):
     """
         Method to profile the /api/photo_classifications/<id>/photos endpoint
 
+    :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
+    start_time = timezone.now()
 
     # Gotta login
     print("Logging in...")
-    login_response = requests.post(url_base + "/auth", data={"email": "gallen@replypro.io", "password": "Mortific33"})
+    login_response = requests.post(url_base + "/auth", data={"email": PROFILE_USER, "password": PROFILE_PASSWORD})
     if login_response.status_code == 201:
         auth_token = login_response.json()["token"]
         headers = {"authorization": "Token {}".format(auth_token)}
@@ -27,7 +54,32 @@ def run_classification_profile(url_base):
                 headers=headers)
             if photos.status_code == 200:
                 print("{} Classification photos received!".format(classifications.json()["results"][0]["name"]))
-                print("Profiling Complete!")
+
+                params = {
+                    "user": PROFILE_USER,
+                    "paths": ["/api/photo_classifications/{}/photos".format(
+                        classifications.json()["results"][0]["id"])],
+                    "start_time": start_time.strftime("%Y-%m-%d")
+                }
+                # Retrieve the necessary data from the Profiling table
+                profile_result = requests.get(url_base + "/api/utils/profiles",
+                                              headers=headers, params=params)
+                profile_result_data = profile_result.json()["results"]
+                if len(profile_result_data) > 0:
+                    profile_result_data = profile_result_data[0]
+
+                    print("\n-----------RESULTS-----------")
+                    print("View Class: ", profile_result_data["view"])
+                    print("API Path: ", profile_result_data["path"])
+                    print("Response Time (ms): ", profile_result_data["response_ms"])
+                    print("-----------------------------\n")
+                    print("Profiling Complete!")
+                else:
+                    print("\n-----------RESULTS-----------")
+                    print(profile_result.json())
+                    print("-----------------------------\n")
+                    print("Profiling Complete!")
+
             else:
                 print("Failed to retrieve {} Classification photos.".format(
                     classifications.json()["results"][0]["name"]))
@@ -41,12 +93,14 @@ def run_user_photos_profile(url_base):
     """
         Method to profile the /api/users/<id>/photos endpoint
 
+    :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
+    start_time = timezone.now()
 
     # Gotta login
     print("Logging in...")
-    login_response = requests.post(url_base + "/auth", data={"email": "gallen@replypro.io", "password": "Mortific33"})
+    login_response = requests.post(url_base + "/auth", data={"email": PROFILE_USER, "password": PROFILE_PASSWORD})
     if login_response.status_code == 201:
         auth_token = login_response.json()["token"]
         headers = {"authorization": "Token {}".format(auth_token)}
@@ -62,6 +116,29 @@ def run_user_photos_profile(url_base):
             user_photos = requests.get(url_base + "/users/{}/photos".format(me.json()["id"]), headers=headers)
             if user_photos.status_code == 200:
                 print("User photos received!")
+                params = {
+                    "user": PROFILE_USER,
+                    "paths": ["/api/users/{}/photos".format(me.json()["id"])],
+                    "start_time": start_time.strftime("%Y-%m-%d")
+                }
+                # Retrieve the necessary data from the Profiling table
+                profile_result = requests.get(url_base + "/api/utils/profiles",
+                                              headers=headers, params=params)
+                profile_result_data = profile_result.json()["results"]
+                if len(profile_result_data) > 0:
+                    profile_result_data = profile_result_data[0]
+
+                    print("\n-----------RESULTS-----------")
+                    print("View Class: ", profile_result_data["view"])
+                    print("API Path: ", profile_result_data["path"])
+                    print("Response Time (ms): ", profile_result_data["response_ms"])
+                    print("-----------------------------\n")
+                    print("Profiling Complete!")
+                else:
+                    print("\n-----------RESULTS-----------")
+                    print(profile_result.json())
+                    print("-----------------------------\n")
+                    print("Profiling Complete!")
             else:
                 print("Failed to retrieve user photos.")
                 print("Profiling Failed")
@@ -76,21 +153,47 @@ def run_all_photos_profile(url_base):
     """
         Method to profile the /api/photos endpoint
 
+    :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
+    start_time = timezone.now()
 
     # Gotta login
     print("Logging in...")
-    login_response = requests.post(url_base + "/auth", data={"email": "gallen@replypro.io", "password": "Mortific33"})
+    login_response = requests.post(url_base + "/auth", data={"email": PROFILE_USER, "password": PROFILE_PASSWORD})
     if login_response.status_code == 201:
         auth_token = login_response.json()["token"]
         headers = {"authorization": "Token {}".format(auth_token)}
         print("Login complete!")
 
         print("Retrieving all photos")
-        all_photos = requests.get(url_base + "/api/photos", headers=headers)
+        all_photos = requests.get(url_base + "/photos", headers=headers)
         if all_photos.status_code == 200:
             print("All photos received!")
+
+            params = {
+                "user": PROFILE_USER,
+                "paths": ["/api/photos"],
+                "start_time": start_time.strftime("%Y-%m-%d")
+            }
+            # Retrieve the necessary data from the Profiling table
+            profile_result = requests.get(url_base + "/api/utils/profiles",
+                                          headers=headers, params=params)
+            profile_result_data = profile_result.json()["results"]
+            if len(profile_result_data) > 0:
+                profile_result_data = profile_result_data[0]
+
+                print("\n-----------RESULTS-----------")
+                print("View Class: ", profile_result_data["view"])
+                print("API Path: ", profile_result_data["path"])
+                print("Response Time (ms): ", profile_result_data["response_ms"])
+                print("-----------------------------\n")
+                print("Profiling Complete!")
+            else:
+                print("\n-----------RESULTS-----------")
+                print(profile_result.json())
+                print("-----------------------------\n")
+                print("Profiling Complete!")
         else:
             print("Failed to retrieve photos.")
             print("Profiling Failed")
@@ -102,27 +205,52 @@ def run_single_photo_profile(url_base):
     """
         Method to profile the /api/photos/<id> endpoint
 
+    :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
+    start_time = timezone.now()
 
     # Gotta login
     print("Logging in...")
-    login_response = requests.post(url_base + "/auth", data={"email": "gallen@replypro.io", "password": "Mortific33"})
+    login_response = requests.post(url_base + "/auth", data={"email": PROFILE_USER, "password": PROFILE_PASSWORD})
     if login_response.status_code == 201:
         auth_token = login_response.json()["token"]
         headers = {"authorization": "Token {}".format(auth_token)}
         print("Login complete!")
 
         print("Retrieving all photos")
-        all_photos = requests.get(url_base + "/api/photos", headers=headers)
+        all_photos = requests.get(url_base + "/photos", headers=headers)
         if all_photos.status_code == 200:
             print("All photos received!")
 
             print("Retrieving photo #{}...".format(all_photos.json()["results"][0]["id"]))
-            single_photo = requests.get(url_base + "/api/photos/{}".format(all_photos.json()["results"][0]["id"]),
+            single_photo = requests.get(url_base + "/photos/{}".format(all_photos.json()["results"][0]["id"]),
                                         headers=headers)
             if single_photo.status_code == 200:
                 print("Photo #{} data received!".format(all_photos.json()["results"][0]["id"]))
+
+                params = {
+                    "user": PROFILE_USER,
+                    "paths": ["/api/photos/{}".format(all_photos.json()["results"][0]["id"])],
+                    "start_time": start_time.strftime("%Y-%m-%d")
+                }
+                # Retrieve the necessary data from the Profiling table
+                profile_result = requests.get(url_base + "/api/utils/profiles",
+                                              headers=headers, params=params)
+                profile_result_data = profile_result.json()["results"]
+                if len(profile_result_data) > 0:
+                    profile_result_data = profile_result_data[0]
+                    print("\n-----------RESULTS-----------")
+                    print("View Class: ", profile_result_data["view"])
+                    print("API Path: ", profile_result_data["path"])
+                    print("Response Time (ms): ", profile_result_data["response_ms"])
+                    print("-----------------------------\n")
+                    print("Profiling Complete!")
+                else:
+                    print("\n-----------RESULTS-----------")
+                    print(profile_result.json())
+                    print("-----------------------------\n")
+                    print("Profiling Complete!")
             else:
                 print("Failed to retrieve photo #{}".format(all_photos.json()["results"][0]["id"]))
                 print("Profiling Failed")
@@ -137,20 +265,47 @@ def run_top_photos_profile(url_base):
     """
         Method to profile the /api/photos/top endpoint
 
+    :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
+    start_time = timezone.now()
+
     # Gotta login
     print("Logging in...")
-    login_response = requests.post(url_base + "/auth", data={"email": "gallen@replypro.io", "password": "Mortific33"})
+    login_response = requests.post(url_base + "/auth", data={"email": PROFILE_USER, "password": PROFILE_PASSWORD})
     if login_response.status_code == 201:
         auth_token = login_response.json()["token"]
         headers = {"authorization": "Token {}".format(auth_token)}
         print("Login complete!")
 
         print("Retrieving top photos")
-        top_photos = requests.get(url_base + "/api/photos/top?display_page=popular", headers=headers)
+        top_photos = requests.get(url_base + "/photos/top?display_page=popular", headers=headers)
         if top_photos.status_code == 200:
             print("Top photos received!")
+
+            params = {
+                "user": PROFILE_USER,
+                "paths": ["/api/photos/top?display_page=popular"],
+                "start_time": start_time.strftime("%Y-%m-%d")
+            }
+            # Retrieve the necessary data from the Profiling table
+            profile_result = requests.get(url_base + "/api/utils/profiles",
+                                          headers=headers, params=params)
+            profile_result_data = profile_result.json()["results"]
+            if len(profile_result_data) > 0:
+                profile_result_data = profile_result_data[0]
+
+                print("\n-----------RESULTS-----------")
+                print("View Class: ", profile_result_data["view"])
+                print("API Path: ", profile_result_data["path"])
+                print("Response Time (ms): ", profile_result_data["response_ms"])
+                print("-----------------------------\n")
+                print("Profiling Complete!")
+            else:
+                print("\n-----------RESULTS-----------")
+                print(profile_result.json())
+                print("-----------------------------\n")
+                print("Profiling Complete!")
         else:
             print("Failed to retrieve top photos.")
             print("Profiling Failed")
@@ -173,11 +328,10 @@ class Command(BaseCommand):
                             dest='server',
                             default='local',
                             help='Specify server to profile "(local | staging | production)"')
-        # parser.add_argument('-p',
-        #                     action='store',
-        #                     dest='filename',
-        #                     default=False,
-        #                     help='Path to photo')
+        parser.add_argument('-a',
+                            action='store_true',
+                            dest='all',
+                            help='Run all profiles')
 
     def handle(self, *args, **options):
         """
@@ -203,7 +357,10 @@ class Command(BaseCommand):
 
         }
 
-        if options["profile"] in profile_method_lut:
+        if options["all"]:
+            run_all_profiles(base_url_lut[options["server"]])
+
+        elif options["profile"] in profile_method_lut:
             profile_method_lut[options["profile"]](base_url_lut[options["server"]])
         else:
             print("{} profile not currently implemented.".format(options["profile"]))
