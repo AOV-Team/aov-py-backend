@@ -41,6 +41,9 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
 
+PROFILE_USER = ""
+PROFILE_PASSWORD = ""
+
 REDIS_DB = dict()
 
 REDIS_DB['PASSWORD_CODES'] = 1
@@ -96,6 +99,9 @@ EMAIL['EMAIL_HOST_PASSWORD'] = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL['EMAIL_HOST_USER'] = os.environ['EMAIL_HOST_USER']
 EMAIL['DEFAULT_FROM_EMAIL'] = os.environ['DEFAULT_FROM_EMAIL']
 EMAIL['SERVER_EMAIL'] = os.environ['EMAIL_HOST_USER']
+
+PROFILE_USER = ""
+PROFILE_PASSWORD = ""
 
 REDIS_DB = dict()
 
