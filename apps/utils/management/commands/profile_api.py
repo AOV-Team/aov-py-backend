@@ -1,6 +1,6 @@
 from backend.settings.settings import PROFILE_USER, PROFILE_PASSWORD
 from django.core.management import BaseCommand
-from django.utils import timezone
+import datetime
 import requests
 
 def run_all_profiles(url_base):
@@ -33,7 +33,7 @@ def run_classification_profile(url_base):
     :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
-    start_time = timezone.now()
+    start_time = datetime.datetime.now()
 
     # Gotta login
     print("Logging in...")
@@ -62,7 +62,7 @@ def run_classification_profile(url_base):
                     "start_time": start_time.strftime("%Y-%m-%d")
                 }
                 # Retrieve the necessary data from the Profiling table
-                profile_result = requests.get(url_base + "/api/utils/profiles",
+                profile_result = requests.get(url_base + "/utils/profiles",
                                               headers=headers, params=params)
                 profile_result_data = profile_result.json()["results"]
                 if len(profile_result_data) > 0:
@@ -96,7 +96,7 @@ def run_user_photos_profile(url_base):
     :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
-    start_time = timezone.now()
+    start_time = datetime.datetime.now()
 
     # Gotta login
     print("Logging in...")
@@ -122,7 +122,7 @@ def run_user_photos_profile(url_base):
                     "start_time": start_time.strftime("%Y-%m-%d")
                 }
                 # Retrieve the necessary data from the Profiling table
-                profile_result = requests.get(url_base + "/api/utils/profiles",
+                profile_result = requests.get(url_base + "/utils/profiles",
                                               headers=headers, params=params)
                 profile_result_data = profile_result.json()["results"]
                 if len(profile_result_data) > 0:
@@ -156,7 +156,7 @@ def run_all_photos_profile(url_base):
     :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
-    start_time = timezone.now()
+    start_time = datetime.datetime.now()
 
     # Gotta login
     print("Logging in...")
@@ -177,7 +177,7 @@ def run_all_photos_profile(url_base):
                 "start_time": start_time.strftime("%Y-%m-%d")
             }
             # Retrieve the necessary data from the Profiling table
-            profile_result = requests.get(url_base + "/api/utils/profiles",
+            profile_result = requests.get(url_base + "/utils/profiles",
                                           headers=headers, params=params)
             profile_result_data = profile_result.json()["results"]
             if len(profile_result_data) > 0:
@@ -208,7 +208,7 @@ def run_single_photo_profile(url_base):
     :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
-    start_time = timezone.now()
+    start_time = datetime.datetime.now()
 
     # Gotta login
     print("Logging in...")
@@ -235,7 +235,7 @@ def run_single_photo_profile(url_base):
                     "start_time": start_time.strftime("%Y-%m-%d")
                 }
                 # Retrieve the necessary data from the Profiling table
-                profile_result = requests.get(url_base + "/api/utils/profiles",
+                profile_result = requests.get(url_base + "/utils/profiles",
                                               headers=headers, params=params)
                 profile_result_data = profile_result.json()["results"]
                 if len(profile_result_data) > 0:
@@ -268,7 +268,7 @@ def run_top_photos_profile(url_base):
     :param url_base: Base url needed to make the request to the correct api
     :return: No return value
     """
-    start_time = timezone.now()
+    start_time = datetime.datetime.now()
 
     # Gotta login
     print("Logging in...")
@@ -285,11 +285,11 @@ def run_top_photos_profile(url_base):
 
             params = {
                 "user": PROFILE_USER,
-                "paths": ["/api/photos/top?display_page=popular"],
+                "paths": ["/api/photos/top"],
                 "start_time": start_time.strftime("%Y-%m-%d")
             }
             # Retrieve the necessary data from the Profiling table
-            profile_result = requests.get(url_base + "/api/utils/profiles",
+            profile_result = requests.get(url_base + "/utils/profiles",
                                           headers=headers, params=params)
             profile_result_data = profile_result.json()["results"]
             if len(profile_result_data) > 0:
@@ -345,7 +345,7 @@ class Command(BaseCommand):
         base_url_lut = {
             "local": "http://localhost:8000/api",
             "staging": "https://staging.artofvisuals.com/api",
-            "production": "http://data.artofvisuals.com/api"
+            "production": "https://data.artofvisuals.com/api"
         }
 
         profile_method_lut = {
