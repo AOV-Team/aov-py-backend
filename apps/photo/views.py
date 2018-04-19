@@ -336,7 +336,7 @@ class GalleryPhotoViewSet(generics.ListAPIView):
         return photo_models.Photo.objects.none()
 
 
-class PhotoViewSet(LoggingMixin, generics.ListCreateAPIView):
+class PhotoViewSet(generics.ListCreateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.IsAuthenticated,)
@@ -459,7 +459,7 @@ class PhotoViewSet(LoggingMixin, generics.ListCreateAPIView):
         return response
 
 
-class PhotoAppTopPhotosViewSet(LoggingMixin, generics.ListAPIView):
+class PhotoAppTopPhotosViewSet(generics.ListAPIView):
     pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.AllowAny,)
     photo_feed = None
@@ -494,7 +494,7 @@ class PhotoAppTopPhotosViewSet(LoggingMixin, generics.ListAPIView):
         return top_photos
 
 
-class PhotoClassificationViewSet(LoggingMixin, generics.ListCreateAPIView):
+class PhotoClassificationViewSet(generics.ListCreateAPIView):
     permission_classes = (permissions.AllowAny,)
     pagination_class = MediumResultsSetPagination
     serializer_class = photo_serializers.PhotoClassificationSerializer
@@ -570,7 +570,7 @@ class PhotoClassificationViewSet(LoggingMixin, generics.ListCreateAPIView):
             raise ValidationError(serializer.errors)
 
 
-class PhotoClassificationPhotosViewSet(LoggingMixin, generics.ListAPIView):
+class PhotoClassificationPhotosViewSet(generics.ListAPIView):
     pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = photo_serializers.PhotoSerializer
@@ -629,7 +629,7 @@ class PhotoFeedPhotosViewSet(generics.ListAPIView):
             raise NotFound
 
 
-class PhotoSingleViewSet(LoggingMixin, generics.RetrieveDestroyAPIView, generics.UpdateAPIView):
+class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = photo_serializers.PhotoSerializer
 
