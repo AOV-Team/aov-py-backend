@@ -351,9 +351,20 @@ class PhotoViewSet(generics.ListCreateAPIView):
         classification_param = self.request.query_params.get('classification')
         geo_location = self.request.query_params.get('geo_location')
         location = self.request.query_params.get('location')
+        data = self.request.query_params.get("data")
         query_params = {
             'public': True
         }
+
+        if data:
+            if data == "renders":
+                self.serializer_class = photo_serializers.PhotoRenderSerializer
+
+            elif data == "details":
+                self.serializer_class = photo_serializers.PhotoDetailsSerializer
+
+            else:
+                self.serializer_class = photo_serializers.PhotoSerializer
 
         if location:
             query_params['location__iexact'] = location

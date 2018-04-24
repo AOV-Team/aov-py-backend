@@ -356,6 +356,134 @@ class TestPhotoViewSetGET(TestCase):
 
         self.assertEquals(len(results), 1)
 
+    def test_photo_view_set_get_renders_only(self):
+        """
+        Test that we can get photos
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user.location = 'Boise'
+        user.social_name = '@theaov'
+        user.save()
+        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
+                                                                             classification_type='category')
+
+        # Create some gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
+        photo1 = photo_models \
+            .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                   user=user)
+        photo1.save()
+        photo1.gear.add(gear_1, gear_2)
+        photo1.category.add(category)
+        photo1.votes = 1
+        photo1.photo_feed.add(1)
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.save()
+        photo2.votes = 12
+        photo2.category.add(category)
+        photo2.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/photos?data=renders')
+        results = request.data['results']
+
+        self.assertIn('next', request.data)
+        self.assertEquals(len(results), 2)
+        self.assertTrue('gear' not in results[0])
+        self.assertTrue('latitude' not in results[0])
+        self.assertTrue('longitude' not in results[0])
+        self.assertTrue('votes' not in results[0])
+        self.assertTrue('votes_behind' not in results[0])
+        self.assertTrue('user' not in results[0])
+        self.assertTrue('user_details' not in results[0])
+        self.assertTrue('category' not in results[0])
+        self.assertTrue('comments' not in results[0])
+        self.assertTrue('image' in results[0])
+        self.assertTrue('image_blurred' in results[0])
+        self.assertTrue('image_medium' in results[0])
+        self.assertTrue('image_small' in results[0])
+        self.assertTrue('image_small_2' in results[0])
+        self.assertTrue('image_tiny_246' in results[0])
+        self.assertTrue('image_tiny_272' in results[0])
+
+    def test_photo_view_set_get_details_only(self):
+        """
+        Test that we can get photos
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user.location = 'Boise'
+        user.social_name = '@theaov'
+        user.save()
+        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
+                                                                             classification_type='category')
+
+        # Create some gear
+        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
+
+        photo1 = photo_models \
+            .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                   user=user)
+        photo1.save()
+        photo1.gear.add(gear_1, gear_2)
+        photo1.category.add(category)
+        photo1.votes = 1
+        photo1.photo_feed.add(1)
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.save()
+        photo2.votes = 12
+        photo2.category.add(category)
+        photo2.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get('/api/photos?data=details')
+        results = request.data['results']
+
+        self.assertIn('next', request.data)
+        self.assertEquals(len(results), 2)
+        self.assertTrue('gear' in results[0])
+        self.assertTrue('latitude' in results[0])
+        self.assertTrue('longitude' in results[0])
+        self.assertTrue('votes' in results[0])
+        self.assertTrue('votes_behind' in results[0])
+        self.assertTrue('user' in results[0])
+        self.assertTrue('user_details' in results[0])
+        self.assertTrue('category' in results[0])
+        self.assertTrue('comments' in results[0])
+        self.assertTrue('image' not in results[0])
+        self.assertTrue('image_blurred' not in results[0])
+        self.assertTrue('image_medium' not in results[0])
+        self.assertTrue('image_small' not in results[0])
+        self.assertTrue('image_small_2' not in results[0])
+        self.assertTrue('image_tiny_246' not in results[0])
+        self.assertTrue('image_tiny_272' not in results[0])
+
 
 class TestPhotoViewSetPOST(TestCase):
     """
