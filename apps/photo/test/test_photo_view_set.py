@@ -8,6 +8,7 @@ from django.contrib.gis.geos import Point
 from django.test import override_settings, TestCase
 from os.path import getsize
 from rest_framework.test import APIClient
+from rest_framework_tracking.models import APIRequestLog
 import re
 import time
 
@@ -498,6 +499,7 @@ class TestPhotoViewSetPOST(TestCase):
         account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
     def tearDown(self):
+        APIRequestLog.objects.all().delete()
         account_models.User.objects.all().delete()
         photo_models.PhotoClassification.objects.all().delete()
         account_models.Gear.objects.all().delete()

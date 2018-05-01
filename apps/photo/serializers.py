@@ -124,6 +124,10 @@ class PhotoRenderSerializer(serializers.ModelSerializer):
     image_tiny_246 = serializers.ImageField(required=False)
     image_tiny_272 = serializers.ImageField(required=False)
 
+    @staticmethod
+    def setup_eager_loading(queryset):
+        return queryset
+
     class Meta:
         model = models.Photo
         fields = ('id', 'image', 'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',

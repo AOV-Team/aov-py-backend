@@ -305,7 +305,7 @@ class GearViewSet(generics.ListCreateAPIView):
         return response
 
 
-class MeViewSet(LoggingMixin, generics.RetrieveAPIView, generics.UpdateAPIView):
+class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
     """
     /api/me
     Endpoint for retrieving user info
@@ -504,7 +504,7 @@ class MeGearViewSet(APIView):
         return response
 
 
-class MeProfileViewSet(LoggingMixin, generics.RetrieveAPIView):
+class MeProfileViewSet(generics.RetrieveAPIView):
     """
     api/me/profile
     """
@@ -931,17 +931,37 @@ class UserPhotosViewSet(generics.ListAPIView):
         except ObjectDoesNotExist:
             raise NotFound('User does not exist')
 
+        data = self.request.query_params.get("data", None)
+        if data:
+            if data == "renders":
+                self.serializer_class = photo_serializers.PhotoRenderSerializer
+
+            elif data == "details":
+                self.serializer_class = photo_serializers.PhotoDetailsSerializer
+
+            else:
+                self.serializer_class = photo_serializers.PhotoSerializer
+
         photos = photo_models.Photo.objects.filter(user=user, public=True).order_by('-id')
         paginated_photos = self.paginate_queryset(photos)
 
         serialized_items = list()
 
         for photo in paginated_photos:
-            serialized_items.append(photo_serializers.PhotoSerializer(photo, context={"request": request}).data)
+            serialized_items.append(self.serializer_class(photo, context={"request": request}).data)
 
         response = self.get_paginated_response(serialized_items)
 
         return response
+
+
+class LoggedUserPhotosViewSet(LoggingMixin, UserPhotosViewSet):
+    logging_methods = ['GET']
+
+    def should_log(self, request, response):
+        if not request.method in self.logging_methods:
+            return False
+        return response.status_code == 200
 
 
 class UserProfileViewSet(generics.RetrieveAPIView):
