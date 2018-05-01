@@ -111,7 +111,170 @@ class PhotoFeedSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class PhotoRenderSerializer(serializers.ModelSerializer):
+    """
+        Serializer used when only Renders are needed
+
+    :author: gallen
+    """
+    image_blurred = serializers.ImageField(required=False)
+    image_medium = serializers.ImageField(required=False)
+    image_small = serializers.ImageField(required=False)
+    image_small_2 = serializers.ImageField(required=False)
+    image_tiny_246 = serializers.ImageField(required=False)
+    image_tiny_272 = serializers.ImageField(required=False)
+
+    @staticmethod
+    def setup_eager_loading(queryset):
+        return queryset
+
+    class Meta:
+        model = models.Photo
+        fields = ('id', 'image', 'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
+                  'image_tiny_272',)
+        ordering_fields = ('id')
+        ordering = ('-id',)
+        read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
+                            'image_tiny_272')
+
+
+class PhotoDetailsSerializer(serializers.ModelSerializer):
+    """
+        Serializer to serialize all the metadata for a Photo
+
+    :author: gallen
+    """
+    comments = serializers.SerializerMethodField()
+    dimensions = serializers.SerializerMethodField()
+    gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)
+    geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
+    user_details = serializers.SerializerMethodField()
+    user_starred = serializers.SerializerMethodField()
+    user_voted = serializers.SerializerMethodField()
+    votes_behind = serializers.SerializerMethodField()
+
+    def get_comments(self, obj):
+        """
+            Get the number of comments currently on the photo
+
+        :param obj: Photo object
+        :return: Number of comments related to the photo
+        """
+        photo_comments = models.PhotoComment.objects.filter(photo=obj)
+        return photo_comments.count()
+
+    def get_dimensions(self, obj):
+        """
+        Get image dimensions
+
+        :param obj: Photo object
+        :return: dict containing image dimensions
+        """
+        return {'width': obj.image.width, 'height': obj.image.height}
+
+    def get_user_details(self, obj):
+        """
+        Get basic user details
+
+        :param obj: Photo object
+        :return: user info
+        """
+        user = obj.user
+
+        if user:
+            return UserBasicSerializer(obj.user).data
+
+        return None
+
+    def get_user_starred(self, obj):
+        """
+            Check if there is a UserInterest with type of 'star' for the accessing user on this photo
+
+        :param obj: Photo object
+        :return: Dict denoting whether a star has occurred
+        """
+
+        authenticate = TokenAuthentication().authenticate(self.context["request"])
+        if authenticate:
+            user = authenticate[0]
+        else:
+            user = self.context["request"].user
+        photo_type = ContentType.objects.get_for_model(obj)
+        star_interest = account_models.UserInterest.objects.filter(interest_type='star', user=user,
+                                                                   object_id=obj.id, content_type__pk=photo_type.id)
+        return {
+            "starred": star_interest.exists(),
+        }
+
+    def get_user_voted(self, obj):
+        """
+            Check if there is a PhotoVote object for the accessing user and set the necessary data
+
+        :param obj: Photo obj
+        :return: dict of data denoting type of vote a user gave
+        """
+        authenticate = TokenAuthentication().authenticate(self.context["request"])
+        if authenticate:
+            user = authenticate[0]
+        else:
+            user = self.context["request"].user
+        photo_vote = models.PhotoVote.objects.filter(photo=obj, user=user)
+        if photo_vote.exists():
+            return {
+                "voted": True,
+                "type": "upvote" if photo_vote.first().upvote else "downvote"
+            }
+
+        return {
+            "voted": photo_vote.exists(),
+        }
+
+    def get_votes_behind(self, obj):
+        """
+            Returns the difference between
+
+        :param obj: Photo object
+        :return: dict of the form - { "classification_name": number of votes behind top photo in category }
+        """
+
+        classifications = obj.category.all()
+        votes_behind_dict = {}
+
+        for classification_id, classification_name in classifications.values_list('id', 'name'):
+            category_photos = models.Photo.objects.filter(category=classification_id)
+            max_votes = category_photos.aggregate(Max('votes'))
+            votes_behind_dict.update({
+                classification_name: max_votes["votes__max"] - obj.votes
+            })
+
+        return votes_behind_dict
+
+    @staticmethod
+    def setup_eager_loading(queryset):
+        queryset = queryset\
+            .select_related('user')\
+            .prefetch_related('category')\
+            .prefetch_related('gear')\
+            .prefetch_related('tag')
+
+        return queryset
+
+    class Meta:
+        model = models.Photo
+        fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions',
+                  'latitude', 'location', 'longitude', 'photo_data', 'photo_feed',
+                  'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes', 'user_voted',
+                  'user_starred')
+        ordering_fields = ('id', 'location')
+        ordering = ('-id',)
+        read_only_fields = ('photo_data', 'user_details', 'comments', 'user_voted', 'user_starred')
+
+
 class PhotoSerializer(serializers.ModelSerializer):
+    """
+        Full Serializer, mostly used for single object serializations and creations.
+
+    """
     comments = serializers.SerializerMethodField()
     dimensions = serializers.SerializerMethodField()
     gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)

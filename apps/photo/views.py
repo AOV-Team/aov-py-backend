@@ -2,8 +2,8 @@ from apps.account import models as account_models
 from apps.account import serializers as account_serializers
 from apps.common import models as common_models
 from apps.common.serializers import setup_eager_loading
-from apps.common.views import DefaultResultsSetPagination, get_default_response, handle_jquery_empty_array, \
-    LargeResultsSetPagination, MediumResultsSetPagination, remove_pks_from_payload
+from apps.common.views import (DefaultResultsSetPagination, get_default_response, handle_jquery_empty_array,
+                               MediumResultsSetPagination, remove_pks_from_payload)
 from apps.communication.models import PushNotificationRecord
 from apps.communication import tasks as communication_tasks
 from apps.photo import models as photo_models
@@ -348,12 +348,24 @@ class PhotoViewSet(generics.ListCreateAPIView):
 
         :return: Queryset
         """
+
         classification_param = self.request.query_params.get('classification')
         geo_location = self.request.query_params.get('geo_location')
         location = self.request.query_params.get('location')
+        data = self.request.query_params.get("data")
         query_params = {
             'public': True
         }
+
+        if data:
+            if data == "renders":
+                self.serializer_class = photo_serializers.PhotoRenderSerializer
+
+            elif data == "details":
+                self.serializer_class = photo_serializers.PhotoDetailsSerializer
+
+            else:
+                self.serializer_class = photo_serializers.PhotoSerializer
 
         if location:
             query_params['location__iexact'] = location
@@ -459,6 +471,15 @@ class PhotoViewSet(generics.ListCreateAPIView):
         return response
 
 
+class LoggedPhotoViewSet(LoggingMixin, PhotoViewSet):
+    logging_methods = ['GET']
+
+    def should_log(self, request, response):
+        if not request.method in self.logging_methods:
+            return False
+        return response.status_code == 200
+
+
 class PhotoAppTopPhotosViewSet(generics.ListAPIView):
     pagination_class = DefaultResultsSetPagination
     permission_classes = (permissions.AllowAny,)
@@ -472,8 +493,19 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
 
         :return: Queryset
         """
+        data = self.request.query_params.get("data", None)
         page = self.request.query_params.get("display_page", None)
         cutoff = timezone.now() - timedelta(days=30)
+
+        if data:
+            if data == "renders":
+                self.serializer_class = photo_serializers.PhotoRenderSerializer
+
+            elif data == "details":
+                self.serializer_class = photo_serializers.PhotoDetailsSerializer
+
+            else:
+                self.serializer_class = photo_serializers.PhotoSerializer
 
         if page == "picks":
             picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks")
@@ -492,6 +524,15 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
         top_photos = photo_models.Photo.objects.filter(
             public=True, category__isnull=False, created_at__gte=cutoff).distinct().order_by("-votes")[:100]
         return top_photos
+
+
+class LoggedPhotoAppTopPhotosViewSet(LoggingMixin, PhotoAppTopPhotosViewSet):
+    logging_methods = ['GET']
+
+    def should_log(self, request, response):
+        if not request.method in self.logging_methods:
+            return False
+        return response.status_code == 200
 
 
 class PhotoClassificationViewSet(generics.ListCreateAPIView):
@@ -582,6 +623,7 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
 
         :return: Queryset
         """
+        data = self.request.query_params.get("data", None)
         # Determine if the request is for the Featured tab or the Recent Tab
         display_tab = self.request.query_params.get("display_tab", None)
         order_by = "-votes"
@@ -589,6 +631,17 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
         if display_tab == "recent":
             order_by = "-created_at"
             length = None
+
+        if data:
+            if data == "renders":
+                self.serializer_class = photo_serializers.PhotoRenderSerializer
+
+            elif data == "details":
+                self.serializer_class = photo_serializers.PhotoDetailsSerializer
+
+            else:
+                self.serializer_class = photo_serializers.PhotoSerializer
+
         try:
             photo_classification_id = self.kwargs.get('photo_classification_id')
             classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
@@ -598,6 +651,15 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
 
         except ObjectDoesNotExist:
             raise NotFound
+
+
+class LoggedPhotoClassificationPhotosViewSet(LoggingMixin, PhotoClassificationPhotosViewSet):
+    logging_methods = ['GET']
+
+    def should_log(self, request, response):
+        if not request.method in self.logging_methods:
+            return False
+        return response.status_code == 200
 
 
 class PhotoFeedViewSet(generics.ListAPIView):
@@ -739,6 +801,14 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
                 raise NotFound
         else:
             raise PermissionDenied
+
+class LoggedPhotoSingleViewSet(LoggingMixin, PhotoSingleViewSet):
+    logging_methods = ['GET']
+
+    def should_log(self, request, response):
+        if not request.method in self.logging_methods:
+            return False
+        return response.status_code == 200
 
 
 class PhotoSingleCaptionViewSet(generics.UpdateAPIView):

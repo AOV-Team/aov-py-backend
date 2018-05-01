@@ -93,6 +93,14 @@ urlpatterns = [
     url(r'api/me/actions$', utils_views.MeActionsViewSet.as_view()),
     url(r'api/utils/profiles$', utils_views.APIRequestLogViewSet.as_view()),
 
+    # logging
+    url(r'api/logging/classification/(?P<photo_classification_id>[0-9^/]+)$',
+        photo_views.LoggedPhotoClassificationPhotosViewSet.as_view()),
+    url(r'api/logging/all_photos$', photo_views.LoggedPhotoViewSet.as_view()),
+    url(r'api/logging/single_photo/(?P<pk>[0-9^/]+)$', photo_views.LoggedPhotoSingleViewSet.as_view()),
+    url(r'api/logging/top_photos$', photo_views.LoggedPhotoAppTopPhotosViewSet.as_view()),
+    url(r'api/logging/user_photos/(?P<user_id>[0-9^/]+)$', account_views.LoggedUserPhotosViewSet.as_view()),
+
     # admin
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS

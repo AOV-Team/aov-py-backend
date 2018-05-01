@@ -3,37 +3,49 @@ from django.core.management import BaseCommand
 import datetime
 import requests
 
-def run_all_profiles(url_base):
+def run_all_profiles(url_base, parameters):
     """
         Method to run all the profiles in sequence
 
     :param url_base: Base url needed to make the request to the correct api
+    :param parameters: String used to identify url parameter to specify whether to use full serialization, render only,
+                        or details only.
     :return: No return
     """
 
     print("***CLASSIFICATION***")
-    run_classification_profile(url_base)
+    run_classification_profile(url_base, parameters)
     print('\n')
     print("***ALL_PHOTOS***")
-    run_all_photos_profile(url_base)
+    run_all_photos_profile(url_base, parameters)
     print('\n')
     print("***SINGLE_PHOTO***")
-    run_single_photo_profile(url_base)
+    run_single_photo_profile(url_base, parameters)
     print('\n')
     print("***USER_PHOTOS***")
-    run_user_photos_profile(url_base)
+    run_user_photos_profile(url_base, parameters)
     print('\n')
     print("***TOP_PHOTOS***")
-    run_top_photos_profile(url_base)
+    run_top_photos_profile(url_base, parameters)
 
-def run_classification_profile(url_base):
+def run_classification_profile(url_base, parameters):
     """
         Method to profile the /api/photo_classifications/<id>/photos endpoint
 
     :param url_base: Base url needed to make the request to the correct api
+    :param parameters: String used to identify url parameter to specify whether to use full serialization, render only,
+                        or details only.
     :return: No return value
     """
     start_time = datetime.datetime.now()
+
+    # Set up the query parameter to specify the serialization required
+    if parameters == "renders":
+        q = "?data=renders"
+    elif parameters == "details":
+        q = "?data=details"
+    else:
+        q = ""
 
     # Gotta login
     print("Logging in...")
@@ -50,15 +62,14 @@ def run_classification_profile(url_base):
 
             print("Retrieving {} classification photos...".format(classifications.json()["results"][0]["name"]))
             photos = requests.get(
-                url_base + "/photo_classifications/{}/photos".format(classifications.json()["results"][0]["id"]),
+                url_base + "/logging/classification/{}{}".format(classifications.json()["results"][0]["id"], q),
                 headers=headers)
             if photos.status_code == 200:
                 print("{} Classification photos received!".format(classifications.json()["results"][0]["name"]))
 
                 params = {
                     "user": PROFILE_USER,
-                    "paths": ["/api/photo_classifications/{}/photos".format(
-                        classifications.json()["results"][0]["id"])],
+                    "paths": ["/api/logging/classification/{}{}".format(classifications.json()["results"][0]["id"], q)],
                     "start_time": start_time.strftime("%Y-%m-%d")
                 }
                 # Retrieve the necessary data from the Profiling table
@@ -89,14 +100,24 @@ def run_classification_profile(url_base):
     else:
         print("Login Failed")
 
-def run_user_photos_profile(url_base):
+def run_user_photos_profile(url_base, parameters):
     """
         Method to profile the /api/users/<id>/photos endpoint
 
     :param url_base: Base url needed to make the request to the correct api
+    :param parameters: String used to identify url parameter to specify whether to use full serialization, render only,
+                        or details only.
     :return: No return value
     """
     start_time = datetime.datetime.now()
+
+    # Set up the query parameter to specify the serialization required
+    if parameters == "renders":
+        q = "?data=renders"
+    elif parameters == "details":
+        q = "?data=details"
+    else:
+        q = ""
 
     # Gotta login
     print("Logging in...")
@@ -113,12 +134,12 @@ def run_user_photos_profile(url_base):
             print("Profile data received!")
 
             print("Retrieving user Photos")
-            user_photos = requests.get(url_base + "/users/{}/photos".format(me.json()["id"]), headers=headers)
+            user_photos = requests.get(url_base + "/logging/user_photos/{}{}".format(me.json()["id"], q), headers=headers)
             if user_photos.status_code == 200:
                 print("User photos received!")
                 params = {
                     "user": PROFILE_USER,
-                    "paths": ["/api/users/{}/photos".format(me.json()["id"])],
+                    "paths": ["/api/logging/user_photos/{}".format(me.json()["id"])],
                     "start_time": start_time.strftime("%Y-%m-%d")
                 }
                 # Retrieve the necessary data from the Profiling table
@@ -149,14 +170,24 @@ def run_user_photos_profile(url_base):
     else:
         print("Login Failed")
 
-def run_all_photos_profile(url_base):
+def run_all_photos_profile(url_base, parameters):
     """
         Method to profile the /api/photos endpoint
 
     :param url_base: Base url needed to make the request to the correct api
+    :param parameters: String used to identify url parameter to specify whether to use full serialization, render only,
+                        or details only.
     :return: No return value
     """
     start_time = datetime.datetime.now()
+
+    # Set up the query parameter to specify the serialization required
+    if parameters == "renders":
+        q = "?data=renders"
+    elif parameters == "details":
+        q = "?data=details"
+    else:
+        q = ""
 
     # Gotta login
     print("Logging in...")
@@ -167,13 +198,13 @@ def run_all_photos_profile(url_base):
         print("Login complete!")
 
         print("Retrieving all photos")
-        all_photos = requests.get(url_base + "/photos", headers=headers)
+        all_photos = requests.get(url_base + "/logging/all_photos{}".format(q), headers=headers)
         if all_photos.status_code == 200:
             print("All photos received!")
 
             params = {
                 "user": PROFILE_USER,
-                "paths": ["/api/photos"],
+                "paths": ["/api/logging/all_photos"],
                 "start_time": start_time.strftime("%Y-%m-%d")
             }
             # Retrieve the necessary data from the Profiling table
@@ -201,14 +232,24 @@ def run_all_photos_profile(url_base):
     else:
         print("Login Failed")
 
-def run_single_photo_profile(url_base):
+def run_single_photo_profile(url_base, parameters):
     """
         Method to profile the /api/photos/<id> endpoint
 
     :param url_base: Base url needed to make the request to the correct api
+    :param parameters: String used to identify url parameter to specify whether to use full serialization, render only,
+                        or details only.
     :return: No return value
     """
     start_time = datetime.datetime.now()
+
+    # Set up the query parameter to specify the serialization required
+    if parameters == "renders":
+        q = "?data=renders"
+    elif parameters == "details":
+        q = "?data=details"
+    else:
+        q = ""
 
     # Gotta login
     print("Logging in...")
@@ -224,14 +265,14 @@ def run_single_photo_profile(url_base):
             print("All photos received!")
 
             print("Retrieving photo #{}...".format(all_photos.json()["results"][0]["id"]))
-            single_photo = requests.get(url_base + "/photos/{}".format(all_photos.json()["results"][0]["id"]),
-                                        headers=headers)
+            single_photo = requests.get(url_base + "/logging/single_photo/{}{}".format(
+                all_photos.json()["results"][0]["id"], q), headers=headers)
             if single_photo.status_code == 200:
                 print("Photo #{} data received!".format(all_photos.json()["results"][0]["id"]))
 
                 params = {
                     "user": PROFILE_USER,
-                    "paths": ["/api/photos/{}".format(all_photos.json()["results"][0]["id"])],
+                    "paths": ["/api/logging/single_photo/{}{}".format(all_photos.json()["results"][0]["id"], q)],
                     "start_time": start_time.strftime("%Y-%m-%d")
                 }
                 # Retrieve the necessary data from the Profiling table
@@ -261,14 +302,24 @@ def run_single_photo_profile(url_base):
     else:
         print("Login Failed")
 
-def run_top_photos_profile(url_base):
+def run_top_photos_profile(url_base, parameters):
     """
         Method to profile the /api/photos/top endpoint
 
     :param url_base: Base url needed to make the request to the correct api
+    :param parameters: String used to identify url parameter to specify whether to use full serialization, render only,
+                        or details only.
     :return: No return value
     """
     start_time = datetime.datetime.now()
+
+    # Set up the query parameter to specify the serialization required
+    if parameters == "renders":
+        q = "&data=renders"
+    elif parameters == "details":
+        q = "&data=details"
+    else:
+        q = ""
 
     # Gotta login
     print("Logging in...")
@@ -279,13 +330,13 @@ def run_top_photos_profile(url_base):
         print("Login complete!")
 
         print("Retrieving top photos")
-        top_photos = requests.get(url_base + "/photos/top?display_page=popular", headers=headers)
+        top_photos = requests.get(url_base + "/logging/top_photos?display_page=popular{}".format(q), headers=headers)
         if top_photos.status_code == 200:
             print("Top photos received!")
 
             params = {
                 "user": PROFILE_USER,
-                "paths": ["/api/photos/top"],
+                "paths": ["/api/logging/top_photos?display_page=popular{}".format(q)],
                 "start_time": start_time.strftime("%Y-%m-%d")
             }
             # Retrieve the necessary data from the Profiling table
@@ -332,6 +383,12 @@ class Command(BaseCommand):
                             action='store_true',
                             dest='all',
                             help='Run all profiles')
+        parser.add_argument('-P',
+                            action='store',
+                            dest='parameters',
+                            default='both',
+                            help='Optional argument for specifying renders|details|both arguments for retrieval of images.'
+                                 'Default is both.')
 
     def handle(self, *args, **options):
         """
@@ -358,10 +415,10 @@ class Command(BaseCommand):
         }
 
         if options["all"]:
-            run_all_profiles(base_url_lut[options["server"]])
+            run_all_profiles(base_url_lut[options["server"]], options["parameters"])
 
         elif options["profile"] in profile_method_lut:
-            profile_method_lut[options["profile"]](base_url_lut[options["server"]])
+            profile_method_lut[options["profile"]](base_url_lut[options["server"]], options["parameters"])
         else:
             print("{} profile not currently implemented.".format(options["profile"]))
 
