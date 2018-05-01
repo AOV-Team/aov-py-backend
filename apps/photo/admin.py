@@ -239,7 +239,7 @@ class PhotoAdmin(GuardedModelAdmin):
         return qs
 
     def has_delete_permission(self, request, obj=None):
-        if settings.DEBUG:
+        if settings.DEBUG or request.user.is_superuser:
             return True
 
         return False
@@ -424,8 +424,10 @@ class StarredPhotoAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super(StarredPhotoAdmin, self).get_queryset(request)
+        if request.user.is_staff:
+            return queryset.filter(user_interest__interest_type='star')
 
-        return queryset.filter(user_interest__user=request.user, user_interest__interest_type='star')
+        return queryset.filter(user_interest__user=request.user,user_interest__interest_type='star')
 
     def has_add_permission(self, request):
         if settings.DEBUG:
