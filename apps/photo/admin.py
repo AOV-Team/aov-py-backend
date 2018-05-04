@@ -1,5 +1,4 @@
 from apps.account import models as account_models
-# from apps.common import forms
 from apps.photo import forms as photo_forms
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
