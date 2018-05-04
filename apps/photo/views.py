@@ -1188,12 +1188,36 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
             if not interest:
                 account_models.UserInterest.objects.create(content_object=photo,
                                                            user=authenticated_user, interest_type=user_interest)
+
+                # Send a push notification for a Star (saved photo) to the photo owning user
+                if user_interest == "star":
+                    owning_user = account_models.User.objects.filter(id=photo.user.id)
+                    owning_apns = APNSDevice.objects.filter(user=owning_user)
+
+                    message = "Your artwork has been saved by another user, {}.".format(owning_user.first().username)
+
+                    # This check is here to make sure the record is only created for devices that we have. No APNS means no
+                    # permission for notifications on the device.
+                    if owning_apns.exists():
+                        # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
+                        owning_apns = APNSDevice.objects.filter(id=owning_apns.first().id)
+
+                        try:
+                            communication_tasks.send_push_notification(message,
+                                                                       owning_apns.values_list("id", flat=True))
+                            # Create the record of the notification being sent
+                            PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(),
+                                                                  action="U",
+                                                                  content_object=photo, sender=authenticated_user)
+                        except APNSServerError:
+                            pass
+
                 response = get_default_response('201')
             else:
                 response = get_default_response('409')
         except ObjectDoesNotExist:
             response = get_default_response('404')
-            response.data['message'] = 'User you attempted to star does not exist'
+            response.data['message'] = 'Photo you attempted to star does not exist'
 
         return response
 
