@@ -51,7 +51,8 @@ class Photo(ImageFile):
         self.resize(max_width=max_width)
 
         mem_img = BytesIO()
-        self.pillow_image.save(fp=mem_img, format='JPEG', quality=quality)
+        self.pillow_image.save(fp=mem_img, format='JPEG', icc_profile=self.pillow_image.info.get('icc_profile'),
+                               quality=quality)
         content = ContentFile(mem_img.getvalue())
 
         return InMemoryUploadedFile(content, None, self.name, 'image/jpeg', content.tell, None)
