@@ -69,7 +69,7 @@ class Photo(ImageFile):
 
         return self.pillow_image
 
-    def save(self, filename, custom_bucket=False, quality=100):
+    def save(self, filename, custom_bucket=False, quality=95):
         """
         Save an image. Saves locally to media or remotely
 
@@ -90,7 +90,8 @@ class Photo(ImageFile):
 
         if settings.REMOTE_IMAGE_STORAGE:
             mem_img = BytesIO()
-            self.pillow_image.save(fp=mem_img, format=format, quality=quality)
+            self.pillow_image.save(fp=mem_img, format=format, quality=quality,
+                                   icc_profile=self.pillow_image.info.get('icc_profile'))
             content = ContentFile(mem_img.getvalue())
 
             if custom_bucket:
@@ -101,7 +102,8 @@ class Photo(ImageFile):
             return storage.save(filename, content)
         else:
             full_filename = '{}/{}'.format(settings.MEDIA_ROOT, filename)
-            self.pillow_image.save(full_filename, format='JPEG', quality=quality)
+            self.pillow_image.save(full_filename, format='JPEG', quality=quality,
+                                   icc_profile=self.pillow_image.info.get('icc_profile'))
 
             return full_filename
 
