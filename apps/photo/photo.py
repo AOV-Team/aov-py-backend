@@ -5,8 +5,11 @@ from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUpload
 from django.db.models.fields.files import ImageFieldFile
 from io import BufferedReader, BytesIO
 from PIL import Image as PillowImage
-from PIL import ImageFilter
+from PIL import ImageFilter, ImageCms
 from storages.backends.s3boto3 import S3Boto3Storage
+import io
+import tempfile
+import os
 
 
 class Photo(ImageFile):
@@ -34,10 +37,52 @@ class Photo(ImageFile):
                 or isinstance(file_object, ImageFieldFile)):
             super(Photo, self).__init__(file_object)
             self.obj = file_object
-            self.pillow_image = PillowImage.open(file_object)
+            self.pillow_image = self.convert()
         else:
             raise TypeError('File object not instance of BufferedReader, '
                             'InMemoryUploadedFile, ImageFieldFile or TemporaryUploadedFile')
+
+    @staticmethod
+    def needs_converted(image):
+        """
+            Return whether or not the image contains an icc_profile for ProPhoto RGB (ROMM) or AdobeRGB (1998)
+
+        :param image: Image instance
+        :return: Boolean
+        """
+        icc_profile = image.info.get("icc_profile")
+        icc_bytes = io.BytesIO(icc_profile)
+        profile = ImageCms.ImageCmsProfile(icc_bytes)
+        profile_name = ImageCms.getProfileName(profile)
+        return 'Adobe RGB' in profile_name or 'Reference Output Medium' in profile_name
+
+    def convert(self):
+        """
+            Convert an image from ProPhoto RGB/AdobeRGB (1998) color space to sRGB
+
+            References:
+            https://stackoverflow.com/a/41524153/1597697
+
+        :return: Image open with PIL.Image's open()
+        """
+        image = PillowImage.open(self.obj)
+
+        if self.needs_converted(image):
+            # If the image uses the AdobeRGB (1998) or ProPhoto RGB color space, it will be converted to sRGB
+            icc = tempfile.mkstemp(suffix='.icc')[1]
+            with open(icc, 'wb') as f:
+                f.write(image.info.get('icc_profile'))
+                icc_filename = f.name
+            srgb = ImageCms.createProfile('sRGB')
+            image = ImageCms.profileToProfile(image, icc, srgb)
+
+            try:
+                os.remove(icc_filename)
+            except OSError:
+                pass
+
+        # If the image is neither of the above, then just return the original image
+        return image
 
     def compress(self, quality=80, max_width=2048):
         """

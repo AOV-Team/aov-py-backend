@@ -62,55 +62,6 @@ class TestPhoto(TestCase):
 
         self.assertLess(getsize(file), getsize('{}/{}'.format(settings.MEDIA_ROOT, saved)))
 
-    @override_settings(REMOTE_IMAGE_STORAGE=False,
-                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
-    def test_photo_save_compressed_pro_photo_rgb_profile_local(self):
-        """
-            Test that we can save an image with the ProPhotoRGB profile as an image with the sRGB profile instead
-
-            :return: None
-            """
-        file = 'apps/common/test/data/photos/color_space_examples/RGB_profiles/IMG_6658-ProPhotoRGB.jpg'
-        saved = 'img.jpg'
-
-        photo = Photo(open(file, 'rb'))
-        photo.resize(max_width=2000)
-        photo.save(saved, quality=80)
-
-        self.assertLess(getsize('{}/{}'.format(settings.MEDIA_ROOT, saved)), getsize(file))
-
-        # Verify the icc_profile is maintained
-        updated_photo = Image.open('{}/{}'.format(settings.MEDIA_ROOT, saved))
-        icc = updated_photo.info.get('icc_profile')
-        f = io.BytesIO(icc)
-        prf = ImageCms.ImageCmsProfile(f)
-        self.assertEqual(ImageCms.getProfileName(prf).strip(" \n"), "Reference Output Medium Metric(ROMM)")
-
-    @override_settings(REMOTE_IMAGE_STORAGE=False,
-                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
-    def test_photo_save_compressed_adobe_rgb_profile_local(self):
-        """
-            Test that we can save an image with the ProPhotoRGB profile as an image with the sRGB profile instead
-
-            :return: None
-            """
-        file = 'apps/common/test/data/photos/color_space_examples/RGB_profiles/IMG_6658-AdobeRGB.jpg'
-        saved = 'img.jpg'
-
-        photo = Photo(open(file, 'rb'))
-        photo.resize(max_width=2000)
-        photo.save(saved, quality=80)
-
-        self.assertLess(getsize('{}/{}'.format(settings.MEDIA_ROOT, saved)), getsize(file))
-
-        # Verify the icc_profile is maintained
-        updated_photo = Image.open('{}/{}'.format(settings.MEDIA_ROOT, saved))
-        icc = updated_photo.info.get('icc_profile')
-        f = io.BytesIO(icc)
-        prf = ImageCms.ImageCmsProfile(f)
-
-        self.assertEqual(ImageCms.getProfileName(prf).strip(" \n"), "Adobe RGB (1998)")
-
     def test_photo_save_remote_custom_bucket(self):
         """
         Test that we can save to custom remote bucket
