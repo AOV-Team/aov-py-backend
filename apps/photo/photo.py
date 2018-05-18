@@ -52,9 +52,15 @@ class Photo(ImageFile):
         """
         icc_profile = image.info.get("icc_profile")
         icc_bytes = io.BytesIO(icc_profile)
-        profile = ImageCms.ImageCmsProfile(icc_bytes)
-        profile_name = ImageCms.getProfileName(profile)
-        return 'Adobe RGB' in profile_name or 'Reference Output Medium' in profile_name
+
+        try:
+            profile = ImageCms.ImageCmsProfile(icc_bytes)
+            profile_name = ImageCms.getProfileName(profile)
+            return 'Adobe RGB' in profile_name or 'Reference Output Medium' in profile_name
+
+        # Exception handling to capture the "cannot open profile from string" exception in the case of no icc_profile
+        except OSError:
+            return False
 
     def convert(self):
         """
