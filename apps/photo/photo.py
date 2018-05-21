@@ -6,6 +6,7 @@ from django.db.models.fields.files import ImageFieldFile
 from io import BufferedReader, BytesIO
 from PIL import Image as PillowImage
 from PIL import ImageFilter, ImageCms
+from PIL.ImageCms import PyCMSError
 from storages.backends.s3boto3 import S3Boto3Storage
 import io
 import tempfile
@@ -59,7 +60,7 @@ class Photo(ImageFile):
             return 'Adobe RGB' in profile_name or 'Reference Output Medium' in profile_name
 
         # Exception handling to capture the "cannot open profile from string" exception in the case of no icc_profile
-        except OSError:
+        except (OSError, PyCMSError):
             return False
 
     def convert(self):
