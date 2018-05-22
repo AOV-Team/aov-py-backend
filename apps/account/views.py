@@ -32,6 +32,7 @@ from rest_framework_tracking.mixins import LoggingMixin
 from social.apps.django_app.utils import load_strategy
 from social.apps.django_app.utils import load_backend
 from social.exceptions import AuthAlreadyAssociated
+from urllib.parse import quote_plus
 import json
 
 
@@ -277,11 +278,19 @@ class GearViewSet(generics.ListCreateAPIView):
         authenticated_user = authentication[0] if authentication else request.user
         payload = request.data
         response = get_default_response('400')
+        # Adorama base link
+        # base_gear_url = "https://www.adorama.com/l/?searchinfo="
+        # Amazon base link
+        base_gear_url = "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords="
 
         if 'item_make' in payload and 'item_model' in payload:
             # Only admins can add links or set reviewed=True
             if ('link' in payload or 'reviewed' in payload) and not authenticated_user.is_admin:
                 raise PermissionDenied('You must be an admin to set "link" or "reviewed"')
+
+            if ('link' not in payload) and not authenticated_user.is_admin:
+                # Generate the search link to use
+                payload["link"] = base_gear_url + quote_plus(payload["item_make"] + " " + payload["item_model"])
 
             # Check if existing
             existing = account_models.Gear.objects\

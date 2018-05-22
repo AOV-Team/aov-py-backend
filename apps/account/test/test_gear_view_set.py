@@ -200,7 +200,9 @@ class TestGearViewSetPOST(TestCase):
 
         gear = gear.get(item_make='Canon', item_model='EOS 5D Mark II Test')
 
-        self.assertIsNone(gear.link)
+        self.assertEquals(
+            gear.link,
+            "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=Canon+EOS+5D+Mark+II+Test")
         self.assertTrue(gear.public)
         self.assertFalse(gear.reviewed)
 
@@ -361,7 +363,7 @@ class TestGearViewSetPOST(TestCase):
 
     def test_gear_view_set_post_link_not_admin(self):
         """
-        Test that non-admin cannot add link
+        Test that non-admin cannot add link, but one is generated automatically instead
 
         :return: None
         """
@@ -415,7 +417,9 @@ class TestGearViewSetPOST(TestCase):
         request = client.post('/api/gear', data=payload)
         result = request.data
 
-        self.assertIsNone(result['link'])
+        self.assertEquals(
+            result['link'],
+            "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=Canon+EOS+5D+Mark+II+Test")
         self.assertEquals(result['item_make'], 'Canon')
         self.assertEquals(result['item_model'], 'EOS 5D Mark II Test')
         self.assertNotIn('public', result)
@@ -428,7 +432,9 @@ class TestGearViewSetPOST(TestCase):
 
         gear = gear.get(item_make='Canon', item_model='EOS 5D Mark II Test')
 
-        self.assertIsNone(gear.link)
+        self.assertEquals(
+            gear.link,
+            "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=Canon+EOS+5D+Mark+II+Test")
         self.assertEquals(gear.item_make, 'Canon')
         self.assertEquals(gear.item_model, 'EOS 5D Mark II Test')
         self.assertFalse(gear.public)
