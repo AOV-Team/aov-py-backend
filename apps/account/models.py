@@ -30,7 +30,7 @@ class GearManager(models.Manager):
 class Gear(models.Model):
     item_make = models.CharField(max_length=128)
     item_model = models.CharField(max_length=128)
-    link = models.URLField(blank=True, null=True)
+    link = models.URLField(max_length=2083, blank=True, null=True)
     public = models.BooleanField(default=True)
     reviewed = models.BooleanField(default=False)  # Set to true if added/approved by AOV
 
