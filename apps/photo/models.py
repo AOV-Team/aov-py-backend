@@ -192,10 +192,17 @@ class Photo(geo_models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
     magazine_authorized = models.BooleanField(default=True)
     original_image_url = models.URLField(blank=True, null=True)
-    photo_data = models.TextField(blank=True, null=True)
-    caption = models.TextField(blank=True, null=True)
     public = models.BooleanField(default=True)
     votes = models.IntegerField(default=0)
+
+    # Behind the Shot
+    bts_lens = models.CharField(blank=True, null=True, max_length=256)
+    bts_shutter = models.CharField(blank=True, null=True, max_length=256)
+    bts_iso = models.CharField(blank=True, null=True, max_length=256)
+    bts_aperture = models.CharField(blank=True, null=True, max_length=256)
+    bts_camera_settings = models.CharField(blank=True, null=True, max_length=256)
+    bts_time_of_day = models.CharField(blank=True, null=True, max_length=256)
+    caption = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         new_notification_sent = False

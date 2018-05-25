@@ -890,3 +890,66 @@ class TestPhotoViewSetPOST(TestCase):
 
         # Test that compression worked
         self.assertGreater(getsize(image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
+
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+    def test_photo_view_set_behind_the_shot_successful(self):
+        """
+            Unit test verifying serializer works correctly with new BTS fields
+
+        :return: None
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
+
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
+
+        # Gear
+        gear_1 = account_models.Gear.objects.get(item_make='Canon', item_model='EOS 5D Mark II')
+        gear_2 = account_models.Gear.objects.get(item_make='Sony', item_model='a99 II')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'gear': [gear_1.id, gear_2.id],
+                'geo_location': 'POINT ({} {})'.format(-116.2023436, 43.6169233),
+                'image': i,
+                'bts_lens': 'lens test',
+                'bts_shutter': 'shutter test',
+                'bts_iso': 'iso test',
+                'bts_aperture': 'aperture test',
+                'bts_camera_settings': 'camera settings test',
+                'bts_time_of_day': 'time of day test'
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(result['user'], user.id)
+        self.assertEquals(len(result['gear']), 2)
+        self.assertEquals(result['latitude'], 43.6169233)
+        self.assertEquals(result['longitude'], -116.2023436)
+        self.assertEquals(result['bts_lens'], 'lens test')
+        self.assertEquals(result['bts_shutter'], 'shutter test')
+        self.assertEquals(result['bts_iso'], 'iso test')
+        self.assertEquals(result['bts_aperture'], 'aperture test')
+        self.assertEquals(result['bts_camera_settings'], 'camera settings test')
+        self.assertEquals(result['bts_time_of_day'], 'time of day test')
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
+        self.assertIsNotNone(photos[0].original_image_url)
+
