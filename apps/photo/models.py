@@ -196,6 +196,7 @@ class Photo(geo_models.Model):
     votes = models.IntegerField(default=0)
 
     # Behind the Shot
+    photo_data = models.TextField(blank=True, null=True)
     bts_lens = models.CharField(blank=True, null=True, max_length=256)
     bts_shutter = models.CharField(blank=True, null=True, max_length=256)
     bts_iso = models.CharField(blank=True, null=True, max_length=256)
