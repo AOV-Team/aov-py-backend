@@ -277,7 +277,7 @@ class PhotoSerializer(serializers.ModelSerializer):
     """
     comments = serializers.SerializerMethodField()
     dimensions = serializers.SerializerMethodField()
-    gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)
+    # gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
     image_blurred = serializers.ImageField(required=False)
     image_medium = serializers.ImageField(required=False)
