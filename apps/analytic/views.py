@@ -5,10 +5,11 @@ from apps.photo import models as photo_models
 from apps.utils import models as utils_models
 from datetime import datetime
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count, Sum, Avg, Min, Max
+from django.db.models import Count, Avg, Min, Max
 from django.shortcuts import render
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
+from datetime import timedelta
 
 
 @staff_member_required
@@ -31,12 +32,21 @@ def statistics_admin(request):
         feed_photos = photo_models.Photo.objects.filter(photo_feed__id=feed.id)
         feed.votes = sum(feed_photos.values_list("votes", flat=True))
 
+    # Power Users
+    cutoff = datetime.now() - timedelta(days=7)
+    sessions = account_models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
+    power_users = account_models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
+    power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
+    power_users_display.order_by("-usersession__count")
+
     context = {
         'age_avg': round(age_stats["age__avg"], 2),
         'age_high': age_stats["age__max"],
         'age_low': age_stats["age__min"],
         'avg_photos': round(photos["photo__count__avg"], 2),
-        'feeds': feeds
+        'feeds': feeds,
+        'power_users': power_users_display,
+        'power_users_count': power_users_display.count()
     }
 
     return render(request, 'statistics.html', context)

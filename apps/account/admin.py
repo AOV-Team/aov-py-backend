@@ -1,5 +1,6 @@
 from apps.account import models
 from apps.photo import models as photo_models
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -133,6 +134,55 @@ class StarUserFilter(admin.SimpleListFilter):
             return queryset.exclude(id__in=unstarred_users).annotate(Count('photo'))
 
 
+class PowerUserFilter(admin.SimpleListFilter):
+    """
+        Filter to filter users based on their qualifications as power users
+    """
+    title = 'Power User'
+    parameter_name = 'power_user'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Power User'),
+            ('no', 'Standard User')
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            users = models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count('photo'))
+            cutoff = datetime.now() - timedelta(days=7)
+            sessions = models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
+            power_users = models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
+            power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
+            power_users_display.order_by("-usersession__count")
+            # q = models.User.objects.none()
+            # user_type = ContentType.objects.get_for_model(models.User)
+            # interests = models.UserInterest.objects.filter(user=request.user, interest_type='star',
+            #                                                content_type=user_type)
+            #
+            # for i in interests:
+            #     q = q | queryset.filter(id=i.object_id)
+
+            return power_users_display
+        elif self.value() == 'no':
+            # unstarred_users = list()
+            # user_type = ContentType.objects.get_for_model(models.User)
+            # interests = models.UserInterest.objects.filter(user=request.user, interest_type='star',
+            #                                                content_type=user_type)
+            #
+            # for i in interests:
+            #     unstarred_users.append(i.object_id)
+            #
+            # return queryset.exclude(id__in=unstarred_users).annotate(Count('photo'))
+            users = models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count('photo'))
+            cutoff = datetime.now() - timedelta(days=7)
+            sessions = models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
+            power_users = models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
+            power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
+
+            return users.exclude(id__in=power_users_display.values_list("user", flat=True))
+
+
 class UserAdmin(BaseUserAdmin):
     actions = ['download_csv']
     add_fieldsets = (
@@ -152,7 +202,7 @@ class UserAdmin(BaseUserAdmin):
 
     list_display = ('username', 'email', 'social_name', 'location', 'age', 'gender', 'followers_count', 'photo_count', 'id',
                     'created_at', 'action_buttons',)
-    list_filter = (StarUserFilter, 'is_active', 'is_superuser',)
+    list_filter = (StarUserFilter, PowerUserFilter, 'is_active', 'is_superuser',)
     list_per_page = 100
     ordering = ('-photo__count', '-follower__count', '-id', 'username',)
 
@@ -303,6 +353,12 @@ class UserLocationAdmin(admin.ModelAdmin):
         return super(UserLocationAdmin, self).render_change_form(request, context, args, kwargs)
 
 
+class UserSessionAdmin(admin.ModelAdmin):
+    list_display = ("user",)
+    readonly_fields = ("session_key", "user",)
+    search_fields = ("user",)
+
+
 admin.site.register(models.Gear, GearAdmin)
 admin.site.register(StarredUser, StarredUserAdmin)
 admin.site.register(models.User, UserAdmin)
@@ -312,3 +368,4 @@ admin.site.register(guardian.UserObjectPermission, UserObjectPermissionAdmin)
 admin.site.unregister(APNSDevice)
 admin.site.register(APNSDevice, APNSDeviceAdmin)
 admin.site.register(models.UserLocation, UserLocationAdmin)
+admin.site.register(models.UserSession, UserSessionAdmin)

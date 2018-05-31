@@ -3,6 +3,10 @@ from django.core.management import BaseCommand
 import datetime
 import requests
 
+from apps.account.models import User
+from rest_framework.authtoken.models import Token
+import sys
+
 def run_all_profiles(url_base, parameters):
     """
         Method to run all the profiles in sequence
@@ -365,6 +369,19 @@ def run_top_photos_profile(url_base, parameters):
         print("Login Failed")
 
 
+def run_sample_login(url_base, parameters):
+    users = User.objects.exclude(email__contains="Anonymous")
+    tokens = Token.objects.filter(user__in=users)
+    count = 0
+    for user_id, token in tokens.values_list("user", "key"):
+        headers = {"authorization": "Token {}".format(token)}
+        response = requests.post(url_base + "/api/{}/sample_login".format(user_id), headers=headers)
+        if response.status_code == 200:
+            count += 1
+        sys.stdout.write("Sessions created: {}  \r".format(count))
+        sys.stdout.flush()
+
+
 class Command(BaseCommand):
     help = 'Make API requests to test profiling packages'
 
@@ -410,8 +427,8 @@ class Command(BaseCommand):
             "user_photos": run_user_photos_profile,
             "all_photos": run_all_photos_profile,
             "single_photo": run_single_photo_profile,
-            "top_photos": run_top_photos_profile
-
+            "top_photos": run_top_photos_profile,
+            "login": run_sample_login
         }
 
         if options["all"]:
