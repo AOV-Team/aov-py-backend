@@ -14,8 +14,9 @@ from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ObjectDoesNotExist
@@ -113,6 +114,7 @@ class AuthenticateViewSet(APIView):
                     token = Token.objects.get_or_create(user=user)
                     response = get_default_response('201')
                     response.data['token'] = token[0].key
+                    user_logged_in.send(sender=AuthenticateViewSet, request=request, user=user)
                 else:
                     response = get_default_response('403')
                     response.data['message'] = 'User inactive'
@@ -1248,3 +1250,14 @@ class UserViewSet(generics.CreateAPIView):
                 raise ValidationError(serializer.errors)
 
         return response
+
+
+class SampleLoginViewSet(generics.GenericAPIView):
+    queryset = account_models.User.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, **kwargs):
+        user = account_models.User.objects.get(id=kwargs.get("user_id"))
+        user_logged_in.send(sender=AuthenticateViewSet, request=request, user=user)
+        return get_default_response('200')

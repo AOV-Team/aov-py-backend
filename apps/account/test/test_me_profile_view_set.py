@@ -1,10 +1,12 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
 from django.test import TestCase
+from django.contrib.sessions.models import Session
 from rest_framework.test import APIClient
+import datetime
 
 
-class TestMeProfileViewSetGET(TestCase):
+class TestMeProfileViewSetGET(test_helpers.SessionTestCase):
     """
     Test GET /api/me/profile
     """
@@ -19,11 +21,27 @@ class TestMeProfileViewSetGET(TestCase):
         account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
 
         # Simulate auth
-        token = test_helpers.get_token_for_user(user)
+        # token = test_helpers.get_token_for_user(user)
 
         # Get data from endpoint
         client = APIClient()
-        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+        payload = {
+            'email': 'mrtest@mypapaya.io',
+            'password': 'pass'
+        }
+
+        request = client.post('/api/auth', data=payload, format='json')
+        login = request.data
+        client.credentials(HTTP_AUTHORIZATION='Token ' + login["token"])
+
+        # Create the session
+        s = client.session
+        s.update({
+            "expire_date": '2018-05-29',
+            "session_key": s.session_key,
+            "last_activity": (datetime.datetime.now() - datetime.timedelta(minutes=95)).timestamp()
+        })
+        s.save()
 
         request = client.get('/api/me/profile')
         result = request.data

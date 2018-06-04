@@ -1,9 +1,12 @@
 from apps.common import models as common_models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.signals import user_logged_in
+from django.contrib.sessions.models import Session
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.geos import GEOSGeometry
+from django.dispatch import receiver
 from django.db import models
 from django.utils import timezone
 
@@ -142,6 +145,11 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
         return '{},\t{},\tID{}'.format(self.username, self.email, self.id)
 
 
+class UserSession(common_models.EditMixin):
+    user = models.ForeignKey(User)
+    session_key = models.CharField(max_length=128)
+
+
 class ProfileManager(models.Manager):
     def create_or_update(self, **kwargs):
         """
@@ -229,3 +237,10 @@ class UserLocation(common_models.GeoEditMixin):
     @property
     def longitude(self):
         return self.coordinates.x if self.coordinates else None
+
+
+@receiver(user_logged_in)
+def user_logged_in_handler(sender, request, user, **kwargs):
+    if not request.session.session_key:
+        request.session.save()
+    UserSession.objects.get_or_create(user=user, session_key=request.session.session_key)

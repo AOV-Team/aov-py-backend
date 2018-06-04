@@ -1,8 +1,22 @@
+from django.test import TestCase
+from django.conf import settings
+from django.utils.module_loading import import_module
 from rest_framework.authtoken.models import Token
 import fnmatch
 import glob
 import os
 import shutil
+
+
+class SessionTestCase(TestCase):
+    def setUp(self):
+        # http://code.djangoproject.com/ticket/10899
+        settings.SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+        engine = import_module(settings.SESSION_ENGINE)
+        store = engine.SessionStore()
+        store.save()
+        self.session = store
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 
 
 def clear_directory(path, pattern='*'):
