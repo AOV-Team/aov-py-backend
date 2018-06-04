@@ -148,39 +148,23 @@ class PowerUserFilter(admin.SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
+        users = queryset.filter(
+            is_active=True, age__isnull=False, age__gte=1)
+        cutoff = datetime.now() - timedelta(days=7)
+        sessions = models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
+        power_users = models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
+        power_users = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
+
         if self.value() == 'yes':
-            users = models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count('photo'))
-            cutoff = datetime.now() - timedelta(days=7)
-            sessions = models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
-            power_users = models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
-            power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
-            power_users_display.order_by("-usersession__count")
-            # q = models.User.objects.none()
-            # user_type = ContentType.objects.get_for_model(models.User)
-            # interests = models.UserInterest.objects.filter(user=request.user, interest_type='star',
-            #                                                content_type=user_type)
-            #
-            # for i in interests:
-            #     q = q | queryset.filter(id=i.object_id)
+            if power_users.count() == 0:
+                return models.User.objects.none().annotate(Count('photo')).annotate(Count('follower'))
+            return power_users.annotate(Count('photo')).annotate(Count('follower'))
 
-            return power_users_display
         elif self.value() == 'no':
-            # unstarred_users = list()
-            # user_type = ContentType.objects.get_for_model(models.User)
-            # interests = models.UserInterest.objects.filter(user=request.user, interest_type='star',
-            #                                                content_type=user_type)
-            #
-            # for i in interests:
-            #     unstarred_users.append(i.object_id)
-            #
-            # return queryset.exclude(id__in=unstarred_users).annotate(Count('photo'))
-            users = models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count('photo'))
-            cutoff = datetime.now() - timedelta(days=7)
-            sessions = models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
-            power_users = models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
-            power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
+            power_user_ids = power_users.values_list("id", flat=True)
+            q = users.exclude(id__in=power_user_ids)
 
-            return users.exclude(id__in=power_users_display.values_list("user", flat=True))
+            return q.annotate(Count('photo')).annotate(Count('follower'))
 
 
 class UserAdmin(BaseUserAdmin):

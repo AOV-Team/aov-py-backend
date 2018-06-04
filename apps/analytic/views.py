@@ -2,7 +2,6 @@ from apps.account import models as account_models
 from apps.analytic import dates
 from apps.common.views import get_default_response
 from apps.photo import models as photo_models
-from apps.utils import models as utils_models
 from datetime import datetime
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Avg, Min, Max
@@ -37,7 +36,7 @@ def statistics_admin(request):
     sessions = account_models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
     power_users = account_models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
     power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
-    power_users_display.order_by("-usersession__count")
+    power_users_display = power_users_display.order_by("-usersession__count")[:25]
 
     context = {
         'age_avg': round(age_stats["age__avg"], 2),
