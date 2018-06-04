@@ -110,7 +110,7 @@ urlpatterns = [
     url(r'^admin/push/$', communication_views.push_notification_manager),
     url(r'^admin/statistics/$', analytic_views.statistics_admin),
 
-    url(r'api/(?P<user_id>[0-9^/]+)/sample_login$', account_views.SampleLoginViewSet.as_view()),
+    # url(r'api/(?P<user_id>[0-9^/]+)/sample_login$', account_views.SampleLoginViewSet.as_view()),
 ]
 
 # DEBUG URLs
