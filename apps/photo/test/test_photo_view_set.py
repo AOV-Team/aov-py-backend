@@ -893,6 +893,134 @@ class TestPhotoViewSetPOST(TestCase):
 
     @override_settings(REMOTE_IMAGE_STORAGE=False,
                        DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+    def test_photo_view_set_post_with_new_tag_name_successful(self):
+        """
+            Unit test to verify that if a Tag Classification doesn't exist, it gets created.
+        :return: None
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
+
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        self.assertFalse(photo_models.PhotoClassification.objects.filter(name="Random Tag That Can't Exist Yet",
+                                                                         classification_type="tag").exists())
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'image': i,
+                'tags': ["Random Tag That Can't Exist Yet"]
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], category.id)
+        self.assertEquals(result['user'], user.id)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
+        self.assertIsNotNone(photos[0].original_image_url)
+        self.assertEqual(photos[0].tag.count(), 1)
+        self.assertTrue(photo_models.PhotoClassification.objects.filter(name="Random Tag That Can't Exist Yet",
+                                                                         classification_type="tag").exists())
+
+        # Test that original uploaded image is saved (before resized and compressed)
+        matched_images = test_helpers.find_file_by_pattern(settings.MEDIA_ROOT, '*_md-portrait.jpg')
+        original_image = matched_images[0] if matched_images is not None else matched_images
+
+        if original_image is not None:
+            if not re.match('^u{}_'.format(user.id) + get_date_stamp_str().split('_')[
+                0] + '_[0-9]{6}_md-portrait\.jpg$',
+                            original_image):
+                self.fail('Original image not matched!')
+        else:
+            self.fail('Original image not found!')
+
+        # Sleep so other image-related unit tests don't get jacked up
+        time.sleep(1)
+
+        # Test that compression worked
+        self.assertGreater(getsize(image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
+
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+    def test_photo_view_set_post_app_request_example_successful(self):
+        """
+            Unit test to verify that if a Tag Classification doesn't exist, it gets created.
+        :return: None
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/md-portrait.jpg'
+
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.create(name='Landscape', classification_type='category', pk=17)
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': 17,
+                'image': i,
+                'tags': ["#Nature", "#People"],
+                "magazine_authorized": "true",
+                "public": "true"
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertEquals(result['category'][0], 17)
+        self.assertEquals(result['user'], user.id)
+
+        # Query for entry
+        photos = photo_models.Photo.objects.all()
+
+        self.assertEquals(len(photos), 1)
+        self.assertTrue(photos[0].public)
+        self.assertIsNotNone(photos[0].original_image_url)
+        self.assertEqual(photos[0].tag.count(), 2)
+
+        # Test that original uploaded image is saved (before resized and compressed)
+        matched_images = test_helpers.find_file_by_pattern(settings.MEDIA_ROOT, '*_md-portrait.jpg')
+        original_image = matched_images[0] if matched_images is not None else matched_images
+
+        if original_image is not None:
+            if not re.match('^u{}_'.format(user.id) + get_date_stamp_str().split('_')[
+                0] + '_[0-9]{6}_md-portrait\.jpg$',
+                            original_image):
+                self.fail('Original image not matched!')
+        else:
+            self.fail('Original image not found!')
+
+        # Sleep so other image-related unit tests don't get jacked up
+        time.sleep(1)
+
+        # Test that compression worked
+        self.assertGreater(getsize(image), getsize('{}/{}'.format(settings.MEDIA_ROOT, str(photos[0].image))))
+
+
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_view_set_behind_the_shot_successful(self):
         """
             Unit test verifying serializer works correctly with new BTS fields

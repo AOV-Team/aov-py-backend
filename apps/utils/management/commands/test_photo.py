@@ -47,8 +47,10 @@ def test_photo(access_token, filename, server_prefix):
                 result = request.json()
                 print(TermColor.OKBLUE + json.dumps(result) + TermColor.ENDC)
         else:
-            result = subprocess.call(["curl", "-F", "category=8", "-F", "image=@{}".format(filename), "-H",
-                             "Authorization: Token {}".format(access_token), "{}/api/photos".format(server_prefix)])
+            result = subprocess.call(["curl", "-F", "category=8", "-F", "tags=#Nature", "-F", "tags=#People", "-F",
+                                      "image=@{}".format(filename), "-H",
+                                      "Authorization: Token {}".format(access_token),
+                                      "{}/api/photos".format(server_prefix)])
 
             print(TermColor.OKBLUE + str(result) + TermColor.ENDC)
     else:
