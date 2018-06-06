@@ -1,0 +1,42 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Power Users{% endblock %}
+
+{% block extrahead %}
+{% load static %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-responsive-min.css">
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block content %}
+<div class="pure-g">
+    <div class="pure-u-1">
+        <h2>Power Users ({{ users_count }})</h2>
+    </div>
+    <div class="pure-u-1">
+        <table class="pure-table" align="center" width="100%">
+            <thead>
+                <tr>
+                    <th width="60%">User</th>
+                    <th width="15%">Photos</th>
+                    <th width="10%">Age</th>
+                    <th width="15%">Last Login</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <th>{{ user.email }}</th>
+                    <th>{{ user.photo__count }}</th>
+                    <th>{{ user.age }}</th>
+                    <th>{{ user.last_session | date:"D, d M, Y" }}</th>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
