@@ -422,7 +422,8 @@ class PhotoViewSet(generics.ListCreateAPIView):
         authenticated_user = TokenAuthentication().authenticate(request)[0]
         payload = request.data
         payload['user'] = authenticated_user.id
-        tags = payload.getlist("tags")
+        # tags = payload.getlist("tags")
+        tags = payload.get("tags")
 
         # Image compression
         # Save original first
@@ -451,6 +452,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
             serializer.save()
 
             if tags:
+                tags = tags.split(" ")
                 tags_to_apply = list()
                 for tag in tags:
                     new_tag = photo_models.PhotoClassification.objects.create_or_update(name=tag.replace("#", ""),

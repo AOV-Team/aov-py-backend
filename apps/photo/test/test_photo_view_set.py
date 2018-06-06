@@ -781,7 +781,7 @@ class TestPhotoViewSetPOST(TestCase):
                 'gear': [gear_1.id, gear_2.id],
                 'geo_location': 'POINT ({} {})'.format(-116.2023436, 43.6169233),
                 'image': i,
-                'tags': ["#Pretty", "#Boise", "#Personal"]
+                'tags': "#Pretty #Boise #Personal"
             }
 
             request = client.post('/api/photos', data=payload, format='multipart')
@@ -852,7 +852,7 @@ class TestPhotoViewSetPOST(TestCase):
                 'gear': [gear_1.id, gear_2.id],
                 'geo_location': 'POINT ({} {})'.format(-116.2023436, 43.6169233),
                 'image': i,
-                'tags': ["Pretty", "Boise", "Personal"]
+                'tags': "Pretty Boise Personal"
             }
 
             request = client.post('/api/photos', data=payload, format='multipart')
@@ -911,14 +911,14 @@ class TestPhotoViewSetPOST(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        self.assertFalse(photo_models.PhotoClassification.objects.filter(name="Random Tag That Can't Exist Yet",
+        self.assertFalse(photo_models.PhotoClassification.objects.filter(name="RandomTagThatCan'tExistYet",
                                                                          classification_type="tag").exists())
 
         with open(image, 'rb') as i:
             payload = {
                 'category': category.id,
                 'image': i,
-                'tags': ["Random Tag That Can't Exist Yet"]
+                'tags': "RandomTagThatCan'tExistYet"
             }
 
             request = client.post('/api/photos', data=payload, format='multipart')
@@ -935,7 +935,7 @@ class TestPhotoViewSetPOST(TestCase):
         self.assertTrue(photos[0].public)
         self.assertIsNotNone(photos[0].original_image_url)
         self.assertEqual(photos[0].tag.count(), 1)
-        self.assertTrue(photo_models.PhotoClassification.objects.filter(name="Random Tag That Can't Exist Yet",
+        self.assertTrue(photo_models.PhotoClassification.objects.filter(name="RandomTagThatCan'tExistYet",
                                                                          classification_type="tag").exists())
 
         # Test that original uploaded image is saved (before resized and compressed)
@@ -980,7 +980,7 @@ class TestPhotoViewSetPOST(TestCase):
             payload = {
                 'category': 17,
                 'image': i,
-                'tags': ["#Nature", "#People"],
+                'tags': "#Nature #People",
                 "magazine_authorized": "true",
                 "public": "true"
             }
