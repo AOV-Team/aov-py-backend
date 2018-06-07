@@ -13,14 +13,18 @@ from apps.communication.tasks import send_push_notification
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
+from datetime import datetime, timedelta
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q, Count
+from django.shortcuts import render
 from json.decoder import JSONDecodeError
 from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
@@ -973,6 +977,65 @@ class LoggedUserPhotosViewSet(LoggingMixin, UserPhotosViewSet):
         if not request.method in self.logging_methods:
             return False
         return response.status_code == 200
+
+
+@staff_member_required
+def power_users_admin(request):
+    """
+    Advanced power user stats
+
+    :param request: Request object
+    :return: render()
+    """
+
+    date = request.GET.get('date')
+
+    # Power Users
+    users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count("photo"))
+    sessions = account_models.UserSession.objects.none()
+    if date:
+        dates = date.split(' - ')
+
+        if len(dates) == 2:
+            start = datetime.strptime(dates[0], '%Y-%m-%d')
+            end = datetime.strptime(dates[1], '%Y-%m-%d') + timedelta(days=1)
+
+            sessions = sessions | account_models.UserSession.objects.filter(
+                user__in=users, modified_at__gte=start, modified_at__lte=end)
+
+    else:
+        cutoff = datetime.now() - timedelta(days=7)
+        sessions = sessions | account_models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
+
+    power_users = account_models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
+    power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
+    power_users_display = power_users_display.order_by("-usersession__count")
+    count = power_users_display.count()
+
+    # Pagination
+    paginator = Paginator(power_users_display, 30)
+    page = request.GET.get('page')
+
+    try:
+        power_users_display = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        power_users_display = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        power_users_display = paginator.page(paginator.num_pages)
+
+    # Ensure we retain query string even when paginating
+    get_copy = request.GET.copy()
+    parameters = get_copy.pop('page', True) and get_copy.urlencode()
+
+    context = {
+        'parameters': parameters,
+        'users': power_users_display,
+        'users_count': count
+    }
+
+    return render(request, 'power_users.html', context)
 
 
 class UserProfileViewSet(generics.RetrieveAPIView):
