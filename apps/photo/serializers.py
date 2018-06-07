@@ -148,6 +148,7 @@ class PhotoDetailsSerializer(serializers.ModelSerializer):
     dimensions = serializers.SerializerMethodField()
     gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
+    tag = serializers.SerializerMethodField()
     user_details = serializers.SerializerMethodField()
     user_starred = serializers.SerializerMethodField()
     user_voted = serializers.SerializerMethodField()
@@ -171,6 +172,15 @@ class PhotoDetailsSerializer(serializers.ModelSerializer):
         :return: dict containing image dimensions
         """
         return {'width': obj.image.width, 'height': obj.image.height}
+
+    def get_tag(self, obj):
+        """
+            Returns a list of tag names
+
+        :param obj: Photo object
+        :return: List of Tag names
+        """
+        return list(obj.tag.values_list("name", flat=True))
 
     def get_user_details(self, obj):
         """
@@ -284,6 +294,7 @@ class PhotoSerializer(serializers.ModelSerializer):
     image_small_2 = serializers.ImageField(required=False)
     image_tiny_246 = serializers.ImageField(required=False)
     image_tiny_272 = serializers.ImageField(required=False)
+    tag = serializers.SerializerMethodField()
     user_details = serializers.SerializerMethodField()
     user_starred = serializers.SerializerMethodField()
     user_voted = serializers.SerializerMethodField()
@@ -307,6 +318,15 @@ class PhotoSerializer(serializers.ModelSerializer):
         :return: dict containing image dimensions
         """
         return {'width': obj.image.width, 'height': obj.image.height}
+
+    def get_tag(self, obj):
+        """
+            Returns a list of tag names
+
+        :param obj: Photo object
+        :return: List of Tag names
+        """
+        return list(obj.tag.values_list("name", flat=True))
 
     def get_user_details(self, obj):
         """
