@@ -5,13 +5,26 @@
 {% load static %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-responsive-min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
+<link rel="stylesheet" href="{% static "css/photos.css" %}">
+
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
   crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="{% static "js/common.js" %}"></script>
+<script src="{% static "js/power_users.js" %}"></script>
 {% endblock %}
 
 {% block content %}
+<div class="initialized" id="toolbar">
+    <input name="date-picker" placeholder="Date" type="text" value="" onchange="javascript:setDate(this.value);">
+    <input type="submit" value="Search">
+</div>
+
 <div class="pure-g">
     <div class="pure-u-1">
         <h2>Power Users ({{ users_count }})</h2>
@@ -38,5 +51,20 @@
             </tbody>
         </table>
     </div>
+</div>
+<div class="pagination">
+    <span class="step-links">
+        {% if users.has_previous %}
+            <a href="?page={{ users.previous_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-left"></span></a>
+        {% endif %}
+
+        <span class="current">
+            Page <strong>{{ users.number }}</strong> of {{ users.paginator.num_pages }}
+        </span>
+
+        {% if users.has_next %}
+            <a href="?page={{ users.next_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-right"></span></a>
+        {% endif %}
+    </span>
 </div>
 {% endblock %}

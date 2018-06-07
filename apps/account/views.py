@@ -22,6 +22,7 @@ from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Count
 from django.shortcuts import render
 from json.decoder import JSONDecodeError
@@ -987,18 +988,50 @@ def power_users_admin(request):
     :return: render()
     """
 
+    date = request.GET.get('date')
+
     # Power Users
     users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count("photo"))
-    cutoff = datetime.now() - timedelta(days=7)
-    sessions = account_models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
+    if date:
+        date_split = date.split(" - ")
+        start = date_split[0]
+        end = date_split[1]
+        sessions = account_models.UserSession.objects.filter(
+            user__in=users, modified_at__gte=start, modified_at__lte=end)
+    else:
+        cutoff = datetime.now() - timedelta(days=7)
+        sessions = account_models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
     power_users = account_models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
     power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
     power_users_display = power_users_display.order_by("-usersession__count")[:25]
+    count = users.count()
+
+    # Pagination
+    power_users_display = users.annotate(Count("usersession"))
+    paginator = Paginator(power_users_display, 30)
+    page = request.GET.get('page')
+    print(page, date)
+
+    try:
+        power_users_display = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        power_users_display = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        power_users_display = paginator.page(paginator.num_pages)
+
+    # Ensure we retain query string even when paginating
+    get_copy = request.GET.copy()
+    parameters = get_copy.pop('page', True) and get_copy.urlencode()
+    # print(get_copy)
 
     context = {
+        'parameters': parameters,
+        'users': power_users_display,
         # 'users': power_users_display,
-        'users': users[:25],
-        'users_count': power_users_display.count(),
+        # 'users_count': power_users_display.count(),
+        'users_count': count
     }
 
     return render(request, 'power_users.html', context)
