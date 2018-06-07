@@ -109,9 +109,9 @@ urlpatterns = [
     url(r'^admin/photos/map/$', photo_views.photo_map_admin),
     url(r'^admin/push/$', communication_views.push_notification_manager),
     url(r'^admin/statistics/$', analytic_views.statistics_admin),
-    url(r'admin/power_users/$', account_views.power_users_admin),
+    url(r'^admin/power_users/$', account_views.power_users_admin),
 
-    # url(r'api/(?P<user_id>[0-9^/]+)/sample_login$', account_views.SampleLoginViewSet.as_view()),
+    url(r'api/(?P<user_id>[0-9^/]+)/sample_login$', account_views.SampleLoginViewSet.as_view()),
 ]
 
 # DEBUG URLs

@@ -6,23 +6,32 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.1/grids-responsive-min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
-<link rel="stylesheet" href="{% static "css/photos.css" %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/daterangepicker.min.css">
+<link rel="stylesheet" href="{% static "css/power_users.css" %}">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
   crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script src="{% static "js/common.js" %}"></script>
-<script src="{% static "js/power_users.js" %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.14.2/jquery.daterangepicker.min.js"></script>
+
+<script>
+$( document ).ready(function() {
+    $('#datesearchbar').dateRangePicker({
+        separator: ' - '
+    });
+});
+</script>
 {% endblock %}
 
 {% block content %}
 <div class="initialized" id="toolbar">
-    <input name="date-picker" placeholder="Date" type="text" value="" onchange="javascript:setDate(this.value);">
-    <input type="submit" value="Search">
+    <form id="date-picker" method="get">
+        <input type="text" name="date" id="datesearchbar" placeholder="Date" value="">
+        <input type="submit" value="Search">
+    </form>
 </div>
 
 <div class="pure-g">

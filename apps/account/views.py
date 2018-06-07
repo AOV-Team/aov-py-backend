@@ -992,25 +992,29 @@ def power_users_admin(request):
 
     # Power Users
     users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count("photo"))
+    sessions = account_models.UserSession.objects.none()
     if date:
-        date_split = date.split(" - ")
-        start = date_split[0]
-        end = date_split[1]
-        sessions = account_models.UserSession.objects.filter(
-            user__in=users, modified_at__gte=start, modified_at__lte=end)
+        dates = date.split(' - ')
+
+        if len(dates) == 2:
+            start = datetime.strptime(dates[0], '%Y-%m-%d')
+            end = datetime.strptime(dates[1], '%Y-%m-%d') + timedelta(days=1)
+
+            sessions = sessions | account_models.UserSession.objects.filter(
+                user__in=users, modified_at__gte=start, modified_at__lte=end)
+
     else:
         cutoff = datetime.now() - timedelta(days=7)
-        sessions = account_models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
+        sessions = sessions | account_models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
+
     power_users = account_models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
     power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
-    power_users_display = power_users_display.order_by("-usersession__count")[:25]
-    count = users.count()
+    power_users_display = power_users_display.order_by("-usersession__count")
+    count = power_users_display.count()
 
     # Pagination
-    power_users_display = users.annotate(Count("usersession"))
     paginator = Paginator(power_users_display, 30)
     page = request.GET.get('page')
-    print(page, date)
 
     try:
         power_users_display = paginator.page(page)
@@ -1024,13 +1028,10 @@ def power_users_admin(request):
     # Ensure we retain query string even when paginating
     get_copy = request.GET.copy()
     parameters = get_copy.pop('page', True) and get_copy.urlencode()
-    # print(get_copy)
 
     context = {
         'parameters': parameters,
         'users': power_users_display,
-        # 'users': power_users_display,
-        # 'users_count': power_users_display.count(),
         'users_count': count
     }
 
