@@ -40,6 +40,12 @@ class PhotoClassificationSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'classification_type', 'icon', 'category_image', 'feed_id')
 
 
+class PhotoClassificationSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PhotoClassification
+        fields = ('id', 'name', 'classification_type')
+
+
 class PhotoCommentReplySerializer(serializers.ModelSerializer):
     """
         Serializer for Comment Replies

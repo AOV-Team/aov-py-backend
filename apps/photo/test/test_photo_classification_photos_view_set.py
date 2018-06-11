@@ -10,6 +10,94 @@ class TestPhotoClassificationPhotosViewSetGET(TestCase):
     """
     Test GET /api/photo_classifications/{}/photos
     """
+    def test_photo_classification_photos_view_set_get_tag_excludes_category_successful(self):
+        """
+        Test to make sure a query for photos by tag only returns photos with a tag of that id and not a classification
+
+        :return: None
+        """
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        classification = photo_models.PhotoClassification.objects \
+            .create_or_update(name='night', classification_type='category')
+
+        photo1 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo1.save()
+        photo1.category.add(classification)
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.save()
+        photo2.category.add(classification)
+        photo2.votes = 1
+        photo2.save()
+
+        access_user = account_models.User.objects \
+            .create_user(email='mr@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov2')
+        photo_models.PhotoVote.objects.create_or_update(photo=photo2, upvote=True, user=access_user)
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(access_user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get(
+            '/api/photo_classifications/{}/photos?display_tab=recent&classification=tag'.format(classification.id))
+        results = request.data['results']
+
+        self.assertEquals(len(results), 0)
+
+
+    def test_photo_classification_photos_view_set_get_tag_successful(self):
+        """
+        Test that we can get photos for a classification
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+
+        classification = photo_models.PhotoClassification.objects\
+            .create_or_update(name='night', classification_type='tag')
+
+        photo1 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo1.save()
+        photo1.tag.add(classification)
+        photo1.save()
+
+        photo2 = photo_models \
+            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2.save()
+        photo2.tag.add(classification)
+        photo2.votes = 1
+        photo2.save()
+
+        access_user = account_models.User.objects \
+            .create_user(email='mr@mypapaya.io', password='WhoWantsToBeAMillionaire?', username='aov2')
+        photo_models.PhotoVote.objects.create_or_update(photo=photo2, upvote=True, user=access_user)
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(access_user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.get(
+            '/api/photo_classifications/{}/photos?display_tab=recent&classification=tag'.format(classification.id))
+        results = request.data['results']
+
+        self.assertEquals(len(results), 2)
+        self.assertEqual(results[0]["id"], photo2.id)
+        self.assertTrue(results[0]["user_voted"]["voted"])
+        self.assertEqual(results[0]["user_voted"]["type"], "upvote")
+
+
     def test_photo_classification_photos_view_set_get_recent_successful(self):
         """
         Test that we can get photos for a classification
