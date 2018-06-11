@@ -239,7 +239,10 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
-### `/api/photo_classifications/{}/photos`, `/api/photo_classifications/{}/photos?display_tab={recent | featured}`, `/api/photo_classifications/{}/photos?length=`
+### `/api/photo_classifications/{}/photos`, `/api/photo_classifications/{}/photos?display_tab={recent | featured}`, `/api/photo_classifications/{}/photos?length=`, `/api/photo_classifications/{}/photos?classification={category | tag}`
+* GET
+
+### `/api/photo_classifications/search?q=`
 * GET
 
 ### `/api/photo_feeds`

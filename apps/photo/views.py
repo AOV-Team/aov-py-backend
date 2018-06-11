@@ -630,6 +630,7 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
         display_tab = self.request.query_params.get("display_tab", None)
         order_by = "-votes"
         length = self.request.query_params.get("length", 100)
+        classification_type = self.request.query_params.get("classification", None)
         if display_tab == "recent":
             order_by = "-created_at"
             length = None
@@ -646,10 +647,23 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
 
         try:
             photo_classification_id = self.kwargs.get('photo_classification_id')
-            classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
 
-            return photo_models.Photo.objects.filter(
-                Q(category=classification) | Q(tag=classification), public=True).distinct().order_by(order_by)[:length]
+            if classification_type and classification_type == "tag":
+                classification = photo_models.PhotoClassification.objects.filter(id=photo_classification_id,
+                                                                              classification_type=classification_type)
+                return photo_models.Photo.objects.filter(
+                    tag=classification, public=True).distinct().order_by(order_by)[:length]
+
+            elif classification_type and classification_type == "category":
+                classification = photo_models.PhotoClassification.objects.filter(id=photo_classification_id,
+                                                                              classification_type=classification_type)
+                return photo_models.Photo.objects.filter(
+                    category=classification, public=True).distinct().order_by(order_by)[:length]
+
+            else:
+                classification = photo_models.PhotoClassification.objects.get(id=photo_classification_id)
+                return photo_models.Photo.objects.filter(
+                    Q(category=classification) | Q(tag=classification), public=True).distinct().order_by(order_by)[:length]
 
         except ObjectDoesNotExist:
             raise NotFound
@@ -1307,6 +1321,41 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
 
         except ObjectDoesNotExist:
             raise NotFound('Photo does not exist')
+
+
+class TagSearchViewSet(generics.ListAPIView):
+    """
+        /api/photo_classifications/search
+
+        Endpoint to allow searching for photo hashtags
+    """
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = photo_models.PhotoClassification.objects.filter(classification_type="tag")
+    serializer_class = photo_serializers.PhotoClassificationSearchSerializer
+
+    def get_queryset(self):
+        """
+            GET method to return PhotoClassification Tags based on query values
+
+        :param request: HTTP request object with the query parameters
+        :param kwargs: Additional keyword arguments
+        :return:
+        """
+        query_params = self.request.query_params
+        keywords = query_params.get("q", None)
+        qs = photo_models.PhotoClassification.objects.none()
+        if keywords:
+            qs = self.queryset.filter(name__icontains=keywords)
+
+        return qs.order_by("name")
+
+
+# class TagPhotoViewSet(generics.ListAPIView):
+#     """
+#         /api/tags/<id>/photos
+#
+#     """
 
 
 class UserFollowingPhotoViewSet(generics.ListAPIView):
