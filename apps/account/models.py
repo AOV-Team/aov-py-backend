@@ -1,16 +1,10 @@
 from apps.common import models as common_models
-from datetime import datetime
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.contrib.auth.signals import user_logged_in
-from django.contrib.sessions.models import Session
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models as geo_models
 from django.contrib.gis.geos import GEOSGeometry
-from django.core.signals import request_finished
-from django.dispatch import receiver
 from django.db import models
-from django.db.models.signals import post_save
 from django.utils import timezone
 
 
