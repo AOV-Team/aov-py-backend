@@ -80,6 +80,7 @@ if DEBUG:
 
 MIDDLEWARE += [
     'django.middleware.security.SecurityMiddleware',
+    'apps.common.middleware.UserSessionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

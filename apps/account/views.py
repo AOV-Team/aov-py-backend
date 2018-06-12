@@ -118,7 +118,6 @@ class AuthenticateViewSet(APIView):
                     token = Token.objects.get_or_create(user=user)
                     response = get_default_response('201')
                     response.data['token'] = token[0].key
-                    user_logged_in.send(sender=AuthenticateViewSet, request=request, user=user)
                 else:
                     response = get_default_response('403')
                     response.data['message'] = 'User inactive'
@@ -1322,5 +1321,4 @@ class SampleLoginViewSet(generics.GenericAPIView):
 
     def post(self, request, **kwargs):
         user = account_models.User.objects.get(id=kwargs.get("user_id"))
-        user_logged_in.send(sender=AuthenticateViewSet, request=request, user=user)
         return get_default_response('200')
