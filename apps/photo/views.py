@@ -348,7 +348,6 @@ class PhotoViewSet(generics.ListCreateAPIView):
 
         :return: Queryset
         """
-
         classification_param = self.request.query_params.get('classification')
         geo_location = self.request.query_params.get('geo_location')
         location = self.request.query_params.get('location')
@@ -420,6 +419,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
         :return: Response object
         """
         authenticated_user = TokenAuthentication().authenticate(request)[0]
+        # user_logged_in.send(sender=self, request=request, user=user)
         payload = request.data
         payload['user'] = authenticated_user.id
         # tags = payload.getlist("tags")

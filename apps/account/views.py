@@ -16,9 +16,8 @@ from apps.photo.photo import Photo
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ObjectDoesNotExist
@@ -118,7 +117,6 @@ class AuthenticateViewSet(APIView):
                     token = Token.objects.get_or_create(user=user)
                     response = get_default_response('201')
                     response.data['token'] = token[0].key
-                    user_logged_in.send(sender=AuthenticateViewSet, request=request, user=user)
                 else:
                     response = get_default_response('403')
                     response.data['message'] = 'User inactive'
@@ -991,7 +989,7 @@ def power_users_admin(request):
     date = request.GET.get('date')
 
     # Power Users
-    users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count("photo"))
+    users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1)
     sessions = account_models.UserSession.objects.none()
     if date:
         dates = date.split(' - ')
@@ -1008,8 +1006,14 @@ def power_users_admin(request):
         sessions = sessions | account_models.UserSession.objects.filter(user__in=users, modified_at__gte=cutoff)
 
     power_users = account_models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
-    power_users_display = power_users.annotate(Count("usersession")).filter(usersession__count__gte=3)
+    power_users_display = power_users.annotate(
+        Count("usersession", distinct=True)).annotate(Count("photo", distinct=True)).filter(usersession__count__gte=3)
     power_users_display = power_users_display.order_by("-usersession__count")
+    for user in power_users_display:
+        user.photovote__count = photo_models.PhotoVote.objects.filter(user=user).count()
+        user.photocomment__count = photo_models.PhotoComment.objects.filter(user=user).count()
+        user.total_actions = user.photocomment__count + user.photovote__count + user.photo__count
+
     count = power_users_display.count()
 
     # Pagination
@@ -1322,5 +1326,4 @@ class SampleLoginViewSet(generics.GenericAPIView):
 
     def post(self, request, **kwargs):
         user = account_models.User.objects.get(id=kwargs.get("user_id"))
-        user_logged_in.send(sender=AuthenticateViewSet, request=request, user=user)
         return get_default_response('200')
