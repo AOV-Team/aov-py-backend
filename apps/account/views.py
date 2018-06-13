@@ -564,7 +564,7 @@ class MeProfileViewSet(generics.RetrieveAPIView):
         # Look for profile and update entry if profile exists
         # ELSE return 404
         try:
-            profile = account_models.Profile.objects.get(user=authenticated_user)
+            profile = account_models.Profile.objects.filter(user=authenticated_user).first()
 
             # Remove PKs that cannot be updated via API
             payload = remove_pks_from_payload('profile', payload)
