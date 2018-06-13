@@ -8,7 +8,7 @@ class UserSessionMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         ignored_path_list = ["admin", "logging", "jet"]
         path = request.get_full_path()
-        user = request.user
+        user = getattr(request, "user", None)
 
         # Type check to avoid dealing with AnonymousUser requests
         if type(user) != AnonymousUser and all([ignored not in path for ignored in ignored_path_list]):
