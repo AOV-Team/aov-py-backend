@@ -70,6 +70,7 @@ $( document ).ready(function() {
 <div class="pagination">
     <span class="step-links">
         {% if users.has_previous %}
+            <a href="?{{ parameters }}"><span class="fa fa-angle-double-left"></span></a>
             <a href="?page={{ users.previous_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-left"></span></a>
         {% endif %}
 
@@ -79,6 +80,7 @@ $( document ).ready(function() {
 
         {% if users.has_next %}
             <a href="?page={{ users.next_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-right"></span></a>
+            <a href="?page={{ users.paginator.num_pages }}&{{ parameters }}"><span class="fa fa-angle-double-right"></span></a>
         {% endif %}
     </span>
 </div>
