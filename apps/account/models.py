@@ -148,6 +148,7 @@ class UserSessionManager(models.Manager):
         existing = UserSession.objects.filter(user=new_session.user, session_key=new_session.session_key).first()
 
         if existing:
+            new_session.created_at = existing.created_at
             new_session.pk = existing.pk
             new_session.id = existing.id
 
