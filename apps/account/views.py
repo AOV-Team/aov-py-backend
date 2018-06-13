@@ -1059,7 +1059,7 @@ class UserProfileViewSet(generics.RetrieveAPIView):
         """
         try:
             user = account_models.User.objects.get(id=kwargs.get('pk'))
-            profile = account_models.Profile.objects.get(user=user)
+            profile = account_models.Profile.objects.filter(user=user).first()
 
             response = get_default_response('200')
             response.data = account_serializers.ProfileSerializer(profile).data
