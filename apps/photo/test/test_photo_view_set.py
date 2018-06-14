@@ -927,7 +927,7 @@ class TestPhotoViewSetPOST(TestCase):
 
         self.assertEquals(result['category'][0], category.id)
         self.assertEquals(result['user'], user.id)
-        self.assertEquals(result['tag'][0], "RandomTagThatCan'tExistYet")
+        self.assertEquals(result['tag'][0]["name"], "RandomTagThatCan'tExistYet")
 
         # Query for entry
         photos = photo_models.Photo.objects.all()
