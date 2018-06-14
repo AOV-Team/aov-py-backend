@@ -126,7 +126,7 @@ class TestPhotoSingleViewSetGET(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        request = client.get('/api/photos/{}'.format(photo.id))
+        request = client.get('/api/photos/{}?height=1280&width=1060'.format(photo.id))
         result = request.data
 
         self.assertIn('dimensions', result)
