@@ -332,7 +332,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         :param obj: Photo object
         :return: List of Tag names
         """
-        return list(obj.tag.values("name","id"))
+        return list(obj.tag.values("name", "id", "classification_type"))
 
     def get_user_details(self, obj):
         """
