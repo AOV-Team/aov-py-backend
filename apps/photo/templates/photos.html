@@ -234,6 +234,9 @@ $( document ).ready(function() {
     <span class="step-links">
         {% if photos.has_previous %}
             <a href="?{{ parameters }}"><span class="fa fa-angle-double-left"></span></a>
+            {% if photos.number >= 10 %}
+                <a href="?page={{ photos.number|add:'-10' }}&{{ parameters }}"><span class="fa fa-angle-left"></span></a>
+            {% endif %}
             <a href="?page={{ photos.previous_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-left"></span></a>
         {% endif %}
 
@@ -243,6 +246,9 @@ $( document ).ready(function() {
 
         {% if photos.has_next %}
             <a href="?page={{ photos.next_page_number }}&{{ parameters }}"><span class="fa fa-arrow-circle-right"></span></a>
+            {% if photos.paginator.num_pages >= 10 %}
+                <a href="?page={{ photos.number|add:'10' }}&{{ parameters }}"><span class="fa fa-angle-right"></span></a>
+            {% endif %}
             <a href="?page={{ photos.paginator.num_pages }}&{{ parameters }}"><span class="fa fa-angle-double-right"></span></a>
         {% endif %}
     </span>
