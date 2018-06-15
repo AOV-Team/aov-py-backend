@@ -13,8 +13,13 @@ class UserSessionMiddleware(MiddlewareMixin):
         # Type check to avoid dealing with AnonymousUser requests
         if type(user) != AnonymousUser and all([ignored not in path for ignored in ignored_path_list]):
             current_date = datetime.now().date()
-            user.last_login = current_date
-            user.save()
+            try:
+                user.last_login = current_date
+                user.save()
+            # NotImplementedError raised when .save() called on AnonymousUser. Somehow makes it past if, this catches it
+            except NotImplementedError:
+                return response
+
             if not request.session.session_key:
                 request.session.save()
             existing_session = UserSession.objects.filter(user=user).order_by("-created_at").first()
