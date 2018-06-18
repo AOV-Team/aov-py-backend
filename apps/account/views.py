@@ -986,11 +986,13 @@ def power_users_admin(request):
     :return: render()
     """
 
-    date = request.GET.get('date')
+    date = request.GET.get("date")
 
     # Power Users
     users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1)
     sessions = account_models.UserSession.objects.none()
+    start = None
+    end = None
     if date:
         dates = date.split(' - ')
 
@@ -1007,14 +1009,30 @@ def power_users_admin(request):
 
     power_users = account_models.User.objects.filter(id__in=sessions.values_list("user", flat=True))
     power_users_display = power_users.annotate(
-        Count("usersession", distinct=True)).annotate(Count("photo", distinct=True)).filter(usersession__count__gte=3)
+        Count("usersession", distinct=True)).filter(usersession__count__gte=3)
     power_users_display = power_users_display.order_by("-usersession__count")
+
+    # Set up the query object for action types
+    if start and end:
+        filter_options = {
+            "created_at__gte": start,
+            "created_at__lte": end,
+            "user": None
+        }
+    else:
+        filter_options = {
+            "user": None
+        }
+
     for user in power_users_display:
-        user.photovote__count = photo_models.PhotoVote.objects.filter(user=user).count()
-        user.photocomment__count = photo_models.PhotoComment.objects.filter(user=user).count()
+        filter_options.update({"user": user})
+        user.photo__count = photo_models.Photo.objects.filter(**filter_options).count()
+        user.photovote__count = photo_models.PhotoVote.objects.filter(**filter_options).count()
+        user.photocomment__count = photo_models.PhotoComment.objects.filter(**filter_options).count()
         user.total_actions = user.photocomment__count + user.photovote__count + user.photo__count
 
     count = power_users_display.count()
+    power_users_display = list(sorted(power_users_display, key=lambda user: user.total_actions))
 
     # Pagination
     paginator = Paginator(power_users_display, 30)
