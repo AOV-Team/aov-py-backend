@@ -46,7 +46,6 @@ class AuthenticateViewSet(APIView):
     """
     permission_classes = (permissions.AllowAny,)
     queryset = account_models.User.objects.all()
-    serializer_class = photo_serializers.PhotoSerializer
 
     def delete(self, request):
         """

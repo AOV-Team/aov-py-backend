@@ -126,11 +126,11 @@ class TestPhotoSingleViewSetGET(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        request = client.get('/api/photos/{}?height=1280&width=1060'.format(photo.id))
+        request = client.get('/api/photos/{}?width=1280&height=1060'.format(photo.id))
         result = request.data
 
         self.assertIn('dimensions', result)
-        self.assertIn('image', result)
+        self.assertNotIn('image', result)
         self.assertEquals(len(result['gear']), 2)
         self.assertIsInstance(result['gear'][0], int)
         self.assertEquals(result['user'], user.id)
@@ -212,7 +212,7 @@ class TestPhotoSingleViewSetGET(TestCase):
         result = request.data
 
         self.assertIn('dimensions', result)
-        self.assertIn('image', result)
+        self.assertNotIn('image', result)
         self.assertEquals(len(result['gear']), 2)
         self.assertIsInstance(result['gear'][0], int)
         self.assertEquals(result['user'], user.id)
