@@ -852,6 +852,7 @@ class PhotoSingleCaptionViewSet(generics.UpdateAPIView):
             }
 
             if tags:
+                tags = tags.split(" ")
                 tags_to_apply = list()
                 for tag in tags:
                     new_tag = photo_models.PhotoClassification.objects.create_or_update(name=tag.replace("#", ""),
@@ -868,6 +869,16 @@ class PhotoSingleCaptionViewSet(generics.UpdateAPIView):
             if serializer.is_valid():
                 serializer.save()
 
+            # After saving, have to update the tags
+            if "tag" in payload:
+                photo = photo_models.Photo.objects.get(id=photo_id)
+                photo.tag.add(*payload["tag"])
+                photo.save()
+
+                serializer = photo_serializers.PhotoSerializer(
+                    photo, data=payload, partial=True, context={"request": request})
+
+            if serializer.is_valid():
                 response = get_default_response('200')
                 response.data = serializer.data
                 return response
