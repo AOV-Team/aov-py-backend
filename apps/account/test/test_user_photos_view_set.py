@@ -49,7 +49,8 @@ class TestUsersPhotosViewSetPOST(TestCase):
         self.assertEquals(len(result), 2)
         self.assertEquals(result[0]['id'], photo2.id)  # newest first
         self.assertIn('dimensions', result[0])
-        self.assertIn('image', result[0])
+        self.assertIn('image_blurred', result[0])
+        self.assertNotIn('image', result[0])
 
     def test_users_photos_view_set_get_no_photos(self):
         """
@@ -133,4 +134,5 @@ class TestUsersPhotosViewSetPOST(TestCase):
         self.assertEquals(len(result), 2)
         self.assertEquals(result[0]['id'], photo2.id)  # newest first
         self.assertIn('dimensions', result[0])
-        self.assertIn('image', result[0])
+        self.assertIn('image_blurred', result[0])
+        self.assertNotIn('image', result[0])

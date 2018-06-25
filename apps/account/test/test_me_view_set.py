@@ -1,5 +1,6 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
+from django.contrib.auth import get_user_model
 from apps.photo.photo import Photo
 from django.test import TestCase
 from rest_framework.test import APIClient
@@ -372,7 +373,8 @@ class TestMeViewSetPATCH(TestCase):
         self.assertEquals(result['username'], 'hola')
 
         # Also check entry
-        updated_user = account_models.User.objects.get(id=user.id)
+        user_model = get_user_model()
+        updated_user = user_model.objects.get(id=result['id'])
 
         self.assertEquals(updated_user.age, 22)
         self.assertEquals(updated_user.username, 'hola')

@@ -1,6 +1,6 @@
 from apps.account import models as account_models
 from apps.account.serializers import UserBasicSerializer, UserPublicSerializer
-from apps.common.serializers import DateTimeFieldWithTZ
+from apps.common.serializers import DateTimeFieldWithTZ, determine_render
 from apps.photo import models
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Max
@@ -295,11 +295,7 @@ class PhotoSerializer(serializers.ModelSerializer):
     dimensions = serializers.SerializerMethodField()
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
     image_blurred = serializers.ImageField(required=False)
-    image_medium = serializers.ImageField(required=False)
-    image_small = serializers.ImageField(required=False)
-    image_small_2 = serializers.ImageField(required=False)
-    image_tiny_246 = serializers.ImageField(required=False)
-    image_tiny_272 = serializers.ImageField(required=False)
+    scaled_render = serializers.SerializerMethodField()
     tag = serializers.SerializerMethodField()
     user_details = serializers.SerializerMethodField()
     user_starred = serializers.SerializerMethodField()
@@ -324,6 +320,14 @@ class PhotoSerializer(serializers.ModelSerializer):
         :return: dict containing image dimensions
         """
         return {'width': obj.image.width, 'height': obj.image.height}
+
+    def get_scaled_render(self, obj):
+        if "width" in self.context["request"].query_params and "height" in self.context["request"].query_params:
+            render_string = determine_render(self.context)
+            render_field = getattr(obj, render_string)
+            return self.context["request"].build_absolute_uri(render_field.url)
+
+        return {}
 
     def get_tag(self, obj):
         """
@@ -432,14 +436,12 @@ class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Photo
         fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
-                  'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246', 'image_tiny_272',
-                  'latitude', 'location', 'longitude', 'photo_data', 'original_image_url', 'public', 'photo_feed',
-                  'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes', 'user_voted',
-                  'user_starred', 'bts_lens', 'bts_shutter', 'bts_iso', 'bts_aperture', 'bts_camera_settings',
-                  'bts_time_of_day')
+                  'image_blurred', 'latitude', 'location', 'longitude', 'photo_data', 'original_image_url', 'public',
+                  'photo_feed', 'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes',
+                  'user_voted', 'user_starred', 'bts_lens', 'bts_shutter', 'bts_iso', 'bts_aperture',
+                  'bts_camera_settings', 'bts_time_of_day', 'scaled_render')
         extra_kwargs = {'original_image_url':  {'write_only': True},
-                        'public': {'default': True, 'write_only': True}}
+                        'public': {'default': True, 'write_only': True}, 'image': {'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
-        read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
-                            'image_tiny_272', 'user_details', 'comments', 'photo_data', 'user_voted', 'user_starred')
+        read_only_fields = ('image_blurred', 'scaled_render')

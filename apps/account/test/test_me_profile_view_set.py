@@ -75,15 +75,22 @@ class TestMeProfileViewSetPATCH(TestCase):
     """
     Test PATCH /api/me/profile
     """
+    def setUp(self):
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
+
+    def tearDown(self):
+        account_models.User.objects.all().delete()
+        account_models.Profile.objects.all().delete()
+
     def test_me_profile_view_set_patch_successful(self):
         """
         Test that we can update user's profile
 
         :return: None
         """
-        # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
-        account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
+        # Retrieve the user
+        user = account_models.User.objects.get(username="aov_hov")
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -117,9 +124,8 @@ class TestMeProfileViewSetPATCH(TestCase):
 
         :return: None
         """
-        # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
-        account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
+        # Retrieve the user
+        user = account_models.User.objects.get(username="aov_hov")
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -151,9 +157,8 @@ class TestMeProfileViewSetPATCH(TestCase):
 
         :return: None
         """
-        # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
-        account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
+        # Retrieve the user
+        user = account_models.User.objects.get(username="aov_hov")
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -177,8 +182,8 @@ class TestMeProfileViewSetPATCH(TestCase):
 
         :return: None
         """
-        # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        # Retrieve the user
+        user = account_models.User.objects.get(username="aov_hov")
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -205,8 +210,11 @@ class TestMeProfileViewSetPATCH(TestCase):
 
         :return: None
         """
-        # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        # Retrieve the user
+        user = account_models.User.objects.get(username="aov_hov")
+
+        # Delete the profile
+        account_models.Profile.objects.all().delete()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -230,9 +238,9 @@ class TestMeProfileViewSetPATCH(TestCase):
 
         :return: None
         """
-        # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
-        profile1 = account_models.Profile.objects.create_or_update(user=user, bio='I am a tester.')
+        # Retrieve the user
+        user = account_models.User.objects.get(username="aov_hov")
+        profile1 = account_models.Profile.objects.get(user=user, bio='I am a tester.')
 
         user2 = account_models.User.objects.create_user(email='mr@mypapaya.io', password='pass', username='aov_hovy')
         profile2 = account_models.Profile.objects.create_or_update(user=user2, bio='Haha')

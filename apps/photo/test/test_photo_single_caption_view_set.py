@@ -68,7 +68,7 @@ class TestPhotoSingleCaptionViewSetPATCH(TestCase):
 
         payload = {
             'caption': 'Adding a caption.',
-            'tags': ["#Pretty", "#Boise", "#Personal"]
+            'tags': "#Pretty #Boise #Personal"
         }
 
         request = client.patch('/api/photos/{}/caption'.format(photo.id), payload)
@@ -94,7 +94,7 @@ class TestPhotoSingleCaptionViewSetPATCH(TestCase):
 
         payload = {
             'caption': 'Adding a caption.',
-            'tags': ["Pretty", "Boise", "Personal"]
+            'tags': "#Pretty #Boise #Personal"
         }
 
         request = client.patch('/api/photos/{}/caption'.format(photo.id), payload)
@@ -121,7 +121,7 @@ class TestPhotoSingleCaptionViewSetPATCH(TestCase):
 
         payload = {
             'caption': 'Adding a caption.',
-            'tags': ["Pretty", "Boise", "Personal", "Pretty Good", "Boise"]
+            'tags': "Pretty Boise Personal PrettyGood Boise"
         }
 
         request = client.patch('/api/photos/{}/caption'.format(photo.id), payload)

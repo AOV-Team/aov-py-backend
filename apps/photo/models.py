@@ -207,9 +207,13 @@ class Photo(geo_models.Model):
 
     def save(self, *args, **kwargs):
         new_notification_sent = False
-        owning_user = account_models.User.objects.filter(id=self.user.id)
-        owning_apns = APNSDevice.objects.filter(user=owning_user)
-        message = "Your artwork has been featured in the AOV Picks gallery, {}!".format(owning_user.first().username)
+        if hasattr(self.user, "id"):
+            owning_user = account_models.User.objects.filter(id=self.user.id)
+            owning_apns = APNSDevice.objects.filter(user=owning_user)
+            message = "Your artwork has been featured in the AOV Picks gallery, {}!".format(owning_user.first().username)
+        else:
+            owning_apns = APNSDevice.objects.none()
+            message = ""
 
         try:
             # AOV Picks is the name of the feed that is curated by Prince. Set the add_date field for proper ordering

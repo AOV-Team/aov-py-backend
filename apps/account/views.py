@@ -46,7 +46,6 @@ class AuthenticateViewSet(APIView):
     """
     permission_classes = (permissions.AllowAny,)
     queryset = account_models.User.objects.all()
-    serializer_class = photo_serializers.PhotoSerializer
 
     def delete(self, request):
         """
@@ -318,7 +317,8 @@ class GearViewSet(generics.ListCreateAPIView):
         return response
 
 
-class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
+# class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
+class MeViewSet(generics.GenericAPIView):
     """
     /api/me
     Endpoint for retrieving user info
@@ -355,10 +355,13 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         # Remove PKs and other fields that cannot be updated via API
         payload = remove_pks_from_payload('user', payload)
 
+        user_model = get_user_model()
+        user = user_model.objects.filter(email__iexact=authenticated_user.email).first()
+
         # If user wants to change their username, ensure that no other user has it already
         if 'username' in payload:
-            already_existing = account_models.User.objects.filter(username=payload['username'])\
-                .exclude(id=authenticated_user.id)
+            already_existing = account_models.User.objects.filter(
+                username=payload['username']).exclude(id=authenticated_user.id).exists()
 
             if already_existing:
                 response = get_default_response('409')
@@ -391,22 +394,19 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
         if 'is_superuser' in payload:
             del payload['is_superuser']
 
-        updated_user = account_models.User.objects.get(id=authenticated_user.id)
+        # updated_user = account_models.User.objects.get(id=authenticated_user.id)
 
         # Password
         if 'password' in payload:
             if 'existing_password' in payload:
                 # We have to do this manually due to case insensitive email
                 existing = False
-                user_model = get_user_model()
-                user = user_model.objects\
-                    .filter(email__iexact=authenticated_user.email).first()
 
                 if user and user.check_password(payload['existing_password']):
                     existing = True
 
                 if existing:
-                    updated_user.set_password(payload['password'])
+                    user.set_password(payload['password'])
                     del payload['existing_password']
                 else:
                     raise PermissionDenied('Old password is not correct')
@@ -417,12 +417,15 @@ class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
             del payload['password']
 
         # Update user
-        for key in payload:
-            setattr(updated_user, key, payload[key])
 
-        updated_user.save()
+        serializer = account_serializers.UserSerializer(user, data=payload, partial=True)
 
-        response.data = account_serializers.UserSerializer(updated_user).data
+        if serializer.is_valid():
+            serializer.save()
+
+            response.data = serializer.data
+        else:
+            raise ValidationError(serializer.errors)
 
         return response
 
@@ -517,7 +520,7 @@ class MeGearViewSet(APIView):
         return response
 
 
-class MeProfileViewSet(generics.RetrieveAPIView):
+class MeProfileViewSet(generics.GenericAPIView):
     """
     api/me/profile
     """
@@ -563,42 +566,42 @@ class MeProfileViewSet(generics.RetrieveAPIView):
 
         # Look for profile and update entry if profile exists
         # ELSE return 404
-        try:
-            profile = account_models.Profile.objects.filter(user=authenticated_user).first()
-
-            # Remove PKs that cannot be updated via API
-            payload = remove_pks_from_payload('profile', payload)
-            payload = remove_pks_from_payload('user', payload)
-            payload['user'] = authenticated_user.id
-
-            # Image compression
-            # Save original first
-            if 'cover_image' in payload:
-                # Save original photo to media
-                try:
-                    photo = Photo(payload['cover_image'])
-                    photo.save('COVER_u{}_{}_{}'
-                               .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
-                               custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
-
-                    # Process image to save
-                    payload['cover_image'] = photo.compress()
-                except TypeError:
-                    raise ValidationError('Cover image is not of type image')
-
-            serializer = account_serializers.ProfileSerializer(data=payload, partial=True)
-
-            if serializer.is_valid():
-                serializer.update(profile, serializer.validated_data)
-
-                response = get_default_response('200')
-                response.data = serializer.data
-            else:
-                response = get_default_response('400')
-                response['message'] = serializer.errors
-        except ObjectDoesNotExist:
+        profile = account_models.Profile.objects.filter(user=authenticated_user).first()
+        if not profile:
             response.data['message'] = 'Profile does not exist.'
             response.data['userMessage'] = 'You do not have a profile.'
+            return response
+
+        # Remove PKs that cannot be updated via API
+        payload = remove_pks_from_payload('profile', payload)
+        payload = remove_pks_from_payload('user', payload)
+        payload['user'] = authenticated_user.id
+
+        # Image compression
+        # Save original first
+        if 'cover_image' in payload:
+            # Save original photo to media
+            try:
+                photo = Photo(payload['cover_image'])
+                photo.save('COVER_u{}_{}_{}'
+                           .format(authenticated_user.id, common_models.get_date_stamp_str(), photo.name),
+                           custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
+
+                # Process image to save
+                payload['cover_image'] = photo.compress()
+            except TypeError:
+                raise ValidationError('Cover image is not of type image')
+
+        serializer = account_serializers.ProfileSerializer(profile, data=payload, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            response = get_default_response('200')
+            response.data = serializer.data
+        else:
+            response = get_default_response('400')
+            response['message'] = serializer.errors
 
         return response
 
@@ -1075,15 +1078,19 @@ class UserProfileViewSet(generics.RetrieveAPIView):
         :param kwargs:
         :return: Response object
         """
-        try:
-            user = account_models.User.objects.get(id=kwargs.get('pk'))
-            profile = account_models.Profile.objects.filter(user=user).first()
+        user = account_models.User.objects.filter(id=kwargs.get('pk'))
+        profile = account_models.Profile.objects.filter(user=user).first()
 
+        if profile and user:
             response = get_default_response('200')
             response.data = account_serializers.ProfileSerializer(profile).data
-            return response
-        except ObjectDoesNotExist:
-            raise NotFound('User does not exist')
+
+        else:
+            response = get_default_response('404')
+            response.data['message'] = 'User does not exist.'
+            response.data['userMessage'] = 'User does not exist.'
+
+        return response
 
 
 class UserSearchViewSet(generics.ListAPIView):

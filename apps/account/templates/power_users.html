@@ -55,7 +55,7 @@ $( document ).ready(function() {
             <tbody>
                 {% for user in users %}
                 <tr>
-                    <th>{{ user.email }}</th>
+                    <th>{{ user.username }} - {{ user.email }}</th>
                     <th>{{ user.photo__count }}</th>
                     <th>{{ user.photovote__count }}</th>
                     <th>{{ user.photocomment__count }}</th>
