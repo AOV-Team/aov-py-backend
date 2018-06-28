@@ -441,7 +441,7 @@ class PhotoSerializer(serializers.ModelSerializer):
                   'user_voted', 'user_starred', 'bts_lens', 'bts_shutter', 'bts_iso', 'bts_aperture',
                   'bts_camera_settings', 'bts_time_of_day', 'scaled_render')
         extra_kwargs = {'original_image_url':  {'write_only': True},
-                        'public': {'default': True, 'write_only': True}, 'image': {'write_only': True}}
+                        'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
         read_only_fields = ('image_blurred', 'scaled_render')
