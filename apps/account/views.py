@@ -24,6 +24,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Count
 from django.shortcuts import render
+from django.utils import timezone
 from json.decoder import JSONDecodeError
 from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
@@ -38,6 +39,7 @@ from social.apps.django_app.utils import load_backend
 from social.exceptions import AuthAlreadyAssociated
 from urllib.parse import quote_plus
 import json
+
 
 
 class AuthenticateViewSet(APIView):
@@ -341,6 +343,7 @@ class MeViewSet(generics.GenericAPIView):
 
         return response
 
+
     def patch(self, request):
         """
         Update user
@@ -355,8 +358,10 @@ class MeViewSet(generics.GenericAPIView):
         # Remove PKs and other fields that cannot be updated via API
         payload = remove_pks_from_payload('user', payload)
 
-        user_model = get_user_model()
-        user = user_model.objects.filter(email__iexact=authenticated_user.email).first()
+        # Add the last_login update here, as the middleware ignores it, or this endpoint fails to update the object
+        payload.update({"last_login": timezone.now()})
+
+        user = account_models.User.objects.filter(email__iexact=authenticated_user.email).first()
 
         # If user wants to change their username, ensure that no other user has it already
         if 'username' in payload:
@@ -417,15 +422,12 @@ class MeViewSet(generics.GenericAPIView):
             del payload['password']
 
         # Update user
+        for item in payload:
+            setattr(user, item, payload[item])
+        user.save()
 
-        serializer = account_serializers.UserSerializer(user, data=payload, partial=True)
-
-        if serializer.is_valid():
-            serializer.save()
-
-            response.data = serializer.data
-        else:
-            raise ValidationError(serializer.errors)
+        serializer = account_serializers.UserSerializer(user)
+        response.data = serializer.data
 
         return response
 
@@ -527,6 +529,7 @@ class MeProfileViewSet(generics.GenericAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     queryset = account_models.Profile.objects.all()
+    serializer_class = account_serializers.ProfileSerializer
 
     def get(self, request):
         """
