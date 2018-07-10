@@ -327,7 +327,7 @@ class PhotoSerializer(serializers.ModelSerializer):
             render_field = getattr(obj, render_string)
             return self.context["request"].build_absolute_uri(render_field.url)
 
-        return {}
+        return ""
 
     def get_tag(self, obj):
         """
