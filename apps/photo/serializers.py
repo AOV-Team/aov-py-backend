@@ -445,7 +445,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         model = models.Photo
         fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
                   'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
-                  'image_tiny_272''latitude', 'location', 'longitude', 'photo_data', 'original_image_url', 'public',
+                  'image_tiny_272', 'latitude', 'location', 'longitude', 'photo_data', 'original_image_url', 'public',
                   'photo_feed', 'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes',
                   'user_voted', 'user_starred', 'bts_lens', 'bts_shutter', 'bts_iso', 'bts_aperture',
                   'bts_camera_settings', 'bts_time_of_day', 'scaled_render')
