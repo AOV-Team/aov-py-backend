@@ -295,6 +295,14 @@ class PhotoSerializer(serializers.ModelSerializer):
     dimensions = serializers.SerializerMethodField()
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
     image_blurred = serializers.ImageField(required=False)
+
+    #TODO Remove the following block when optimizations are done on Frontend
+    image_medium = serializers.ImageField(required=False)
+    image_small = serializers.ImageField(required=False)
+    image_small_2 = serializers.ImageField(required=False)
+    image_tiny_246 = serializers.ImageField(required=False)
+    image_tiny_272 = serializers.ImageField(required=False)
+
     scaled_render = serializers.SerializerMethodField()
     tag = serializers.SerializerMethodField()
     user_details = serializers.SerializerMethodField()
@@ -436,7 +444,8 @@ class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Photo
         fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
-                  'image_blurred', 'latitude', 'location', 'longitude', 'photo_data', 'original_image_url', 'public',
+                  'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
+                  'image_tiny_272''latitude', 'location', 'longitude', 'photo_data', 'original_image_url', 'public',
                   'photo_feed', 'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes',
                   'user_voted', 'user_starred', 'bts_lens', 'bts_shutter', 'bts_iso', 'bts_aperture',
                   'bts_camera_settings', 'bts_time_of_day', 'scaled_render')
@@ -444,4 +453,5 @@ class PhotoSerializer(serializers.ModelSerializer):
                         'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
         ordering = ('-id',)
-        read_only_fields = ('image_blurred', 'scaled_render')
+        read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
+                            'image_tiny_272', 'scaled_render')
