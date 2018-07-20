@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'social.apps.django_app.default',
     'rest_framework_tracking',
+    'fcm-django',
 ]
 
 if DEBUG:
