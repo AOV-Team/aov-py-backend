@@ -264,7 +264,17 @@ Make sure the following files are in the project directory before running the pr
     "geo_location": "POINT (long lat)",
     "image": [file],
     "location": "",
-    "caption": ""
+    "caption": "",
+    "photo_data": "",
+    "bts_lens": "",
+    "bts_shutter": "",
+    "bts_iso": "",
+    "bts_aperture": "",
+    "bts_camera_settings": "",
+    "bts_time_of_day": "",
+    "bts_photo_editor": "",
+    "bts_camera_make": "",
+    "bts_camera_model": "",
 }
 ```
 
