@@ -448,7 +448,8 @@ class PhotoSerializer(serializers.ModelSerializer):
                   'image_tiny_272', 'latitude', 'location', 'longitude', 'photo_data', 'original_image_url', 'public',
                   'photo_feed', 'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes',
                   'user_voted', 'user_starred', 'bts_lens', 'bts_shutter', 'bts_iso', 'bts_aperture',
-                  'bts_camera_settings', 'bts_time_of_day', 'scaled_render')
+                  'bts_camera_settings', 'bts_time_of_day', 'bts_camera_make', 'bts_camera_model',
+                  'bts_photo_editor', 'scaled_render')
         extra_kwargs = {'original_image_url':  {'write_only': True},
                         'public': {'default': True, 'write_only': True}}
         ordering_fields = ('id', 'location')
