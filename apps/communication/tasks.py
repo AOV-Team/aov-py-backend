@@ -1,9 +1,12 @@
 from apps.communication import models as communication_models
 from celery import shared_task
-from django.db.models import QuerySet
+from django.conf import settings
 from django.utils import timezone
+from fcm_django.models import FCMDevice, FCMDeviceQuerySet
+from fcm_django.fcm import FCMError
 from push_notifications.apns import APNSError, APNSServerError
 from push_notifications.models import APNSDevice, APNSDeviceQuerySet
+from requests import post
 
 
 def chunk_devices(queryset, size: int):
@@ -28,29 +31,29 @@ def send_push_notification(message, recipients, **kwargs):
     :param kwargs: keyword arguments to pass into send_message()
     :return: None
     """
-    devices = APNSDevice.objects.none()
+    devices = FCMDevice.objects.none()
     if type(recipients) is str:
         if recipients == 'all':
             # To prevent ConnectionErrors,
             # the queryset is passed off to a generator function to return smaller querysets
-            all_devices = APNSDevice.objects.all()
+            all_devices = FCMDevice.objects.all()
             for devices in chunk_devices(all_devices, 100):
-                devices = APNSDevice.objects.filter(id__in=devices.values_list("id", flat=True))
+                devices = FCMDevice.objects.filter(id__in=devices.values_list("id", flat=True))
                 try:
-                    devices.send_message(message, **kwargs)
+                    devices.send_message(body=message, **kwargs)
                 except ConnectionError:
                     continue
-                except (APNSError, APNSServerError):
+                except (FCMError, APNSServerError):
                     continue
 
             return
-    elif type(recipients) is list or type(recipients) is APNSDeviceQuerySet:
-        devices = APNSDevice.objects.filter(id__in=recipients)
+    elif type(recipients) is list or type(recipients) is FCMDeviceQuerySet:
+        devices = FCMDevice.objects.filter(id__in=recipients)
     try:
-        devices.send_message(message, **kwargs)
+        devices.send_message(body=message, **kwargs)
     except ConnectionError:
         pass
-    except (APNSError, APNSServerError):
+    except FCMError:
         pass
 
 
@@ -70,3 +73,20 @@ def send_scheduled_push_notifications():
         send_push_notification.delay(message.message, list(message.device.all().values_list('id', flat=True)))
 
     return messages
+
+
+def update_device(apns_devices):
+    headers = {"authorization": "key={}".format(settings.FCM_DJANGO_SETTINGS["FCM_SERVER_KEY"]),
+               "content-type": "application/json"}
+    data = {
+        "application": "com.artvisual.photoapp",
+        "sandbox": False,
+        "apns_tokens": list(apns_devices.values_list("registration_id", flat=True))
+    }
+    response = post("https://iid.googleapis.com/iid/v1:batchImport", headers=headers, json=data)
+    if response.status_code == 200:
+        for item in response.json()["results"]:
+            if item["status"] == "OK":
+                return item["registration_token"]
+
+    return False

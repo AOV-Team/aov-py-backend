@@ -2,12 +2,22 @@ from apps.account.models import User
 from apps.communication import models as models
 from apps.photo.models import Photo
 from apps.photo.serializers import PhotoSerializer
+from fcm_django.api.rest_framework import FCMDeviceSerializer
 from push_notifications.api.rest_framework import APNSDeviceSerializer
 from rest_framework import serializers
 
 class AOVAPNSDeviceSerializer(APNSDeviceSerializer):
     class Meta(APNSDeviceSerializer.Meta):
         fields = ('id', 'name', 'registration_id', 'device_id', 'active', 'date_created', 'user',)
+
+
+class AOVFCMDeviceSerializer(FCMDeviceSerializer):
+    class Meta(FCMDeviceSerializer.Meta):
+        fields = (
+            "id", "name", "registration_id", "device_id", "active",
+            "date_created", "type", "user"
+        )
+        extra_kwargs = {"user": {"read_only": True, "required": True}}
 
 
 class PushNotificationRecordSerializer(serializers.ModelSerializer):

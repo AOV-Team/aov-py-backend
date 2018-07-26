@@ -59,7 +59,7 @@ urlpatterns = [
     url(r'api/statistics/(?P<resource>[a-z^/]+)$', analytic_views.StatisticsViewSet.as_view()),
 
     # communication
-    url(r'api/devices$', communication_views.DevicesViewSet.as_view()),
+    url(r'api/devices$', communication_views.DevicesViewSet.as_view({"get": "list", "post": "post"})),
 
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),

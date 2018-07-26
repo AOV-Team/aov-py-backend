@@ -1,6 +1,7 @@
 from apps.account.models import User
 from apps.common.test import helpers as test_helpers
 from django.test import TestCase
+from fcm_django.models import FCMDevice
 from push_notifications.models import APNSDevice
 from rest_framework.test import APIClient
 
@@ -15,8 +16,8 @@ class TestDevicesViewSetGET(TestCase):
         # Test data
         user = User.objects.create_superuser('aov@aov.com', 'pass')
 
-        APNSDevice.objects.create(registration_id='ARESTNAIERSNTEARNSTEIARNSTINSREATNAERISNTEARIST')
-        APNSDevice.objects.create(registration_id='TNAIERSNTEATINSREATNAERISNEARSNTEI3EIN3EINENEEN')
+        FCMDevice.objects.create(registration_id='ARESTNAIERSNTEARNSTEIARNSTINSREATNAERISNTEARIST')
+        FCMDevice.objects.create(registration_id='TNAIERSNTEATINSREATNAERISNEARSNTEI3EIN3EINENEEN')
 
         client = APIClient()
         client.force_login(user)
@@ -37,8 +38,8 @@ class TestDevicesViewSetGET(TestCase):
         """
         # Test data
         user = User.objects.create_user('aov@aov.com', 'pass')
-        APNSDevice.objects.create(registration_id='ARESTNAIERSNTEARNSTEIARNSTINSREATNAERISNTEARIST')
-        APNSDevice.objects.create(registration_id='TNAIERSNTEATINSREATNAERISNEARSNTEI3EIN3EINENEEN')
+        FCMDevice.objects.create(registration_id='ARESTNAIERSNTEARNSTEIARNSTINSREATNAERISNTEARIST')
+        FCMDevice.objects.create(registration_id='TNAIERSNTEATINSREATNAERISNEARSNTEI3EIN3EINENEEN')
 
         token = test_helpers.get_token_for_user(user)
 
@@ -67,8 +68,8 @@ class TestDevicesViewSetGET(TestCase):
         user2.last_name = 'Person'
         user2.save()
 
-        d1 = APNSDevice.objects.create(user=user, registration_id='ARESTNAIERSNTEARNSTEIARNSTINSREATNAERISNTEARIST')
-        d2 = APNSDevice.objects.create(user=user2, registration_id='TNAIERSNTEATINSREATNAERISNEARSNTEI3EIN3EINENEEN')
+        d1 = FCMDevice.objects.create(user=user, registration_id='ARESTNAIERSNTEARNSTEIARNSTINSREATNAERISNTEARIST')
+        d2 = FCMDevice.objects.create(user=user2, registration_id='TNAIERSNTEATINSREATNAERISNEARSNTEI3EIN3EINENEEN')
 
         client = APIClient()
         client.force_login(superuser)
@@ -133,7 +134,7 @@ class TestDevicesViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 201)
 
         # query db
-        tokens = APNSDevice.objects.all()
+        tokens = FCMDevice.objects.all()
 
         self.assertEquals(tokens.count(), 1)
 
@@ -161,6 +162,6 @@ class TestDevicesViewSetPOST(TestCase):
         self.assertEquals(request.status_code, 400)
 
         # query db
-        tokens = APNSDevice.objects.all()
+        tokens = FCMDevice.objects.all()
 
         self.assertEquals(tokens.count(), 0)
