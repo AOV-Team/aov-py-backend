@@ -37,7 +37,7 @@ EMAIL['DEFAULT_FROM_EMAIL'] = 'info@artofvisuals.com'
 EMAIL['SERVER_EMAIL'] = 'ronquillo.m@gmail.com'
 
 FCM_DJANGO_SETTINGS = {
-    "FCM_SERVER_KEY": 'AIzaSyDUZTiz8kkycYYCdVyH54seJbKzW3ra9Eg',
+    "FCM_SERVER_KEY": os.environ.get('FCM_SERVER_KEY'),
     "ONE_DEVICE_PER_USER": True
 }
 
