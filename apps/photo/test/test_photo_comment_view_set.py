@@ -5,6 +5,7 @@ from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from django.test import TestCase, override_settings
 from push_notifications.models import APNSDevice
+from fcm_django.models import FCMDevice
 from rest_framework.test import APIClient
 from unittest import mock
 import uuid
@@ -14,6 +15,35 @@ import uuid
                    DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage',
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestPhotoSingleCommentViewSetPOST(TestCase):
+    def setUp(self):
+        """
+            Set up reused components of test cases
+
+        :return: None
+        """
+
+        User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        photo_owner = User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
+        FCMDevice.objects.create(
+            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=photo_owner,
+            type="ios")
+        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
+                                   user=photo_owner)
+        photo.save()
+
+
+    def tearDown(self):
+        """
+            Clean up data after each test case to create clean environment
+
+        :return: None
+        """
+
+        User.objects.all().delete()
+        FCMDevice.objects.all().delete()
+        photo_models.Photo.objects.all().delete()
+        test_helpers.clear_directory('backend/media/', '*.jpg')
+
     def test_photo_single_comment_view_set_post_successful(self):
         """
             Test that posting a new comment works
@@ -21,16 +51,13 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         :return: None
         """
 
-        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
-        photo_owner = User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
-        device = APNSDevice.objects.create(
-            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=photo_owner)
+        user = User.objects.get(username="testuser")
+        photo_owner = User.objects.get(username="aov1")
+        device = FCMDevice.objects.get(user=photo_owner)
 
-        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-                                   user=photo_owner)
-        photo.save()
+        photo = photo_models.Photo.objects.get(user=photo_owner)
 
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
 
@@ -41,9 +68,11 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
             request = client.post('/api/photos/{}/comments'.format(photo.id), payload)
 
             self.assertEquals(request.status_code, 201)
-            p.assert_called_with(
-                alert="{} has commented on your artwork, {}.".format(user.username, photo_owner.username),
-                registration_ids=[device.registration_id])
+            p.assert_called_with(api_key=None, badge=None,
+                data=None, icon=None,
+                registration_ids=[device.registration_id], sound=None,
+                title=None,
+                body="{} has commented on your artwork, {}.".format(user.username, photo_owner.username))
 
         # Check db
         new_comment = photo_models.PhotoComment.objects.first()
@@ -53,21 +82,20 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         self.assertEqual(new_comment.user.email, user.email)
 
 
-    def test_photo_single_comment_view_set_post_no_apns_device(self):
+    def test_photo_single_comment_view_set_post_no_device(self):
         """
             Unit test to make sure the endpoint still functions correctly even if push notifications fail
 
         :return: No return
         """
 
-        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
-        photo_owner = User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
+        user = User.objects.get(username='testuser')
+        photo_owner = User.objects.get(username="aov1")
+        FCMDevice.objects.get(user=photo_owner).delete()
 
-        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-                                   user=photo_owner)
-        photo.save()
+        photo = photo_models.Photo.objects.get(user=photo_owner)
 
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
 
@@ -95,11 +123,9 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         :return: None
         """
 
-        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        user = User.objects.get(username='aov1')
 
-        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-                                   user=user)
-        photo.save()
+        photo = photo_models.Photo.objects.get(user=user)
 
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
@@ -119,11 +145,9 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
         :return: None
         """
 
-        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        user = User.objects.get(username='aov1')
 
-        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-                                   user=user)
-        photo.save()
+        photo = photo_models.Photo.objects.get(user=user)
 
         client = APIClient()
 
@@ -139,26 +163,23 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
 
         :return: No return value
         """
-        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        user = User.objects.get(username='testuser')
         tagged_one = User.objects.create_user('test1@aov.com', 'testuser1', 'pass')
         tagged_two = User.objects.create_user('test2@aov.com', 'testuser2', 'pass')
         tagged_three = User.objects.create_user('test3@aov.com', 'testuser3', 'pass')
-        photo_owner = User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
-        device = APNSDevice.objects.create(
-            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=photo_owner)
+        photo_owner = User.objects.get(username="aov1")
+        device = FCMDevice.objects.get(user=photo_owner)
 
-        tagged_one_device = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one)
-        tagged_two_device = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two)
-        tagged_three_device = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three)
+        tagged_one_device = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one, type="ios")
+        tagged_two_device = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two, type="ios")
+        tagged_three_device = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three, type="ios")
 
-        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-                                   user=photo_owner)
-        photo.save()
+        photo = photo_models.Photo.objects.get(user=photo_owner)
 
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
 
@@ -171,20 +192,24 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
 
             self.assertEquals(request.status_code, 201)
             calls = list()
-            calls.append(mock.call(
-                alert="{} has commented on your artwork, {}.".format(user.username, photo_owner.username),
-                registration_ids=[device.registration_id]))
-            calls.append(mock.call(
-                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_one.username),
-                registration_ids=[tagged_one_device.registration_id]))
-            calls.append(mock.call(
-                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_two.username),
-                registration_ids=[tagged_two_device.registration_id]))
-            calls.append(mock.call(
-                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_three.username),
-                registration_ids=[tagged_three_device.registration_id]))
+            calls.append(mock.call(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                   registration_ids=[device.registration_id],
+                                   body="{} has commented on your artwork, {}.".format(user.username,
+                                                                                       photo_owner.username)))
+            calls.append(mock.call(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                   body="{} mentioned you in a comment, {}.".format(user.username,
+                                                                                     tagged_one.username),
+                                   registration_ids=[tagged_one_device.registration_id]))
+            calls.append(mock.call(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                   body="{} mentioned you in a comment, {}.".format(user.username,
+                                                                                     tagged_two.username),
+                                   registration_ids=[tagged_two_device.registration_id]))
+            calls.append(mock.call(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                   body="{} mentioned you in a comment, {}.".format(user.username,
+                                                                                     tagged_three.username),
+                                   registration_ids=[tagged_three_device.registration_id]))
 
-            p.assert_has_calls(calls=calls)
+            p.assert_has_calls(calls=calls, any_order=True)
 
         # Check db
         new_comment = photo_models.PhotoComment.objects.first()
@@ -202,32 +227,30 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
 
         :return: No return value
         """
-        user = User.objects.create_user('test@aov.com', 'testuser', 'pass')
+        user = User.objects.get(username='testuser')
         tagged_one = User.objects.create_user('test1@aov.com', 'testuser1', 'pass')
         tagged_two = User.objects.create_user('test2@aov.com', 'testuser2', 'pass')
         tagged_three = User.objects.create_user('test3@aov.com', 'testuser3', 'pass')
-        photo_owner = User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
-        device = APNSDevice.objects.create(
+        photo_owner = User.objects.get(username="aov1")
+        device = FCMDevice.objects.get(
             registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=photo_owner)
 
-        tagged_one_device = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one)
-        tagged_one_device_two = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one)
-        tagged_two_device = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two)
-        tagged_two_device_two = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two)
-        tagged_three_device = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three)
-        tagged_three_device_two = APNSDevice.objects.create(
-            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three)
+        tagged_one_device = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one, type="ios")
+        tagged_one_device_two = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_one, type="ios")
+        tagged_two_device = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two, type="ios")
+        tagged_two_device_two = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_two, type="ios")
+        tagged_three_device = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three, type="ios")
+        tagged_three_device_two = FCMDevice.objects.create(
+            registration_id=str(uuid.uuid4()).replace("-", ""), user=tagged_three, type="ios")
 
-        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-                                   user=photo_owner)
-        photo.save()
+        photo = photo_models.Photo.objects.get(user=photo_owner)
 
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
 
@@ -240,20 +263,27 @@ class TestPhotoSingleCommentViewSetPOST(TestCase):
 
             self.assertEquals(request.status_code, 201)
             calls = list()
-            calls.append(mock.call(
-                alert="{} has commented on your artwork, {}.".format(user.username, photo_owner.username),
-                registration_ids=[device.registration_id]))
-            calls.append(mock.call(
-                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_one.username),
-                registration_ids=[tagged_one_device_two.registration_id, tagged_one_device.registration_id]))
-            calls.append(mock.call(
-                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_two.username),
-                registration_ids=[tagged_two_device_two.registration_id, tagged_two_device.registration_id]))
-            calls.append(mock.call(
-                alert="{} mentioned you in a comment, {}.".format(user.username, tagged_three.username),
-                registration_ids=[tagged_three_device_two.registration_id, tagged_three_device.registration_id]))
+            calls.append(mock.call(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                   body="{} has commented on your artwork, {}.".format(user.username,
+                                                                                        photo_owner.username),
+                                   registration_ids=[device.registration_id]))
+            calls.append(mock.call(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                   body="{} mentioned you in a comment, {}.".format(user.username,
+                                                                                     tagged_one.username),
+                                   registration_ids=[tagged_one_device_two.registration_id,
+                                                     tagged_one_device.registration_id]))
+            calls.append(mock.call(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                   body="{} mentioned you in a comment, {}.".format(user.username,
+                                                                                     tagged_two.username),
+                                   registration_ids=[tagged_two_device_two.registration_id,
+                                                     tagged_two_device.registration_id]))
+            calls.append(mock.call(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                   body="{} mentioned you in a comment, {}.".format(user.username,
+                                                                                     tagged_three.username),
+                                   registration_ids=[tagged_three_device_two.registration_id,
+                                                     tagged_three_device.registration_id]))
 
-            p.assert_has_calls(calls=calls)
+            p.assert_has_calls(calls=calls, any_order=True)
 
         # Check db
         new_comment = photo_models.PhotoComment.objects.first()

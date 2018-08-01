@@ -1,6 +1,6 @@
 from apps.common.views import get_default_response
 from apps.communication.models import PushNotificationRecord
-from apps.communication.serializers import AOVAPNSDeviceSerializer, PushNotificationRecordSerializer
+from apps.communication.serializers import AOVFCMDeviceSerializer, PushNotificationRecordSerializer
 from apps.communication.tasks import send_push_notification
 from datetime import timedelta
 from django.contrib.admin.views.decorators import staff_member_required
@@ -8,7 +8,8 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
-from push_notifications.models import APNSDevice
+from fcm_django.models import FCMDevice
+from fcm_django.api.rest_framework import FCMDeviceViewSet
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -16,10 +17,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_tracking.mixins import LoggingMixin
 
 
-class DevicesViewSet(LoggingMixin, generics.ListCreateAPIView):
+class DevicesViewSet(LoggingMixin, FCMDeviceViewSet):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (IsAuthenticated,)
-    serializer_class = AOVAPNSDeviceSerializer
+    serializer_class = AOVFCMDeviceSerializer
 
     def get_queryset(self):
         """
@@ -32,7 +33,7 @@ class DevicesViewSet(LoggingMixin, generics.ListCreateAPIView):
             raise PermissionDenied('You must be an admin to access this data')
 
         query = self.request.query_params.get('q')
-        queryset = APNSDevice.objects.all()
+        queryset = FCMDevice.objects.all()
 
         # If searching by user
         if query:
@@ -41,11 +42,11 @@ class DevicesViewSet(LoggingMixin, generics.ListCreateAPIView):
                 Q(user__last_name__icontains=query) | Q(user__social_name__icontains=query) |
                 Q(user__username__icontains=query))
 
-        return queryset.order_by('-date_created')
+        return queryset
 
     def post(self, request):
         """
-        Create an APNS Device
+        Create an FCM Device
 
         :param request: Request object
         :return: Response object
@@ -60,10 +61,13 @@ class DevicesViewSet(LoggingMixin, generics.ListCreateAPIView):
                 'registration_id': payload['registration_id']
             }
 
-            serializer = AOVAPNSDeviceSerializer(data=data)
+            if "type" not in payload:
+                data.update({"type": "ios"})
+
+            serializer = AOVFCMDeviceSerializer(data=data, context={"request": request})
 
             if serializer.is_valid():
-                serializer.save()
+                self.perform_create(serializer)
 
                 return get_default_response('201')
             else:
@@ -92,9 +96,13 @@ class UserNotificationRecordViewSet(generics.ListCreateAPIView):
 
         auth_user = TokenAuthentication().authenticate(self.request)[0]
         cutoff = timezone.now() - timedelta(days=7)
+        queryset = PushNotificationRecord.objects.none()
+        queryset = (queryset | PushNotificationRecord.objects.filter(
+            receiver__user=auth_user, created_at__gte=cutoff).order_by("-created_at") |
+                    PushNotificationRecord.objects.filter(fcm_receiver__user=auth_user,
+                                                          created_at__gte=cutoff).order_by("-created_at"))
 
-        return PushNotificationRecord.objects.filter(
-            receiver__user=auth_user, created_at__gte=cutoff).order_by("-created_at")
+        return queryset
 
     def post(self, request, **kwargs):
         """
@@ -108,8 +116,10 @@ class UserNotificationRecordViewSet(generics.ListCreateAPIView):
         auth_user = TokenAuthentication().authenticate(request)[0]
         record_id = kwargs.get("record_id")
         response = get_default_response('404')
+        record_entry = PushNotificationRecord.objects.none()
 
-        record_entry = PushNotificationRecord.objects.filter(receiver__user=auth_user, id=record_id)
+        record_entry = (record_entry | PushNotificationRecord.objects.filter(receiver__user=auth_user, id=record_id) |
+                        PushNotificationRecord.objects.filter(fcm_receiver__user=auth_user, id=record_id))
 
         if record_entry.exists():
             record_entry = record_entry.first()
@@ -142,6 +152,7 @@ def push_notification_manager(request):
         recipients = post.getlist('recipient-list[]')
         # schedule = post['schedule']
 
+        print(recipients)
         if len(message) > 0:
             if len(recipients) > 0:
                 send_push_notification(message, recipients)

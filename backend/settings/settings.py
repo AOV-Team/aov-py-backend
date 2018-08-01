@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'social.apps.django_app.default',
     'rest_framework_tracking',
+    'fcm_django',
 ]
 
 if DEBUG:
@@ -107,6 +108,7 @@ JET_SIDE_MENU_CUSTOM_APPS = [
     ('communication', ['__all__']),
     ('dbmail', ['MailTemplate']),
     ('push_notifications', ['APNSDevice']),
+    ('fcm_django', ['FCMDevice']),
     ('rest_framework_tracking', ['APIRequestLog']),
 ]
 
@@ -190,6 +192,8 @@ EMAIL_HOST_PASSWORD = EMAIL['EMAIL_HOST_PASSWORD']
 EMAIL_HOST_USER = EMAIL['EMAIL_HOST_USER']
 DEFAULT_FROM_EMAIL = EMAIL['DEFAULT_FROM_EMAIL']
 SERVER_EMAIL = EMAIL['SERVER_EMAIL']
+
+FCM_DJANGO_SETTINGS = FCM_DJANGO_SETTINGS
 
 PUSH_NOTIFICATIONS_SETTINGS = {
     'APNS_CERTIFICATE': APNS_CERTIFICATE,

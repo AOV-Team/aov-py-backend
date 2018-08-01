@@ -1,9 +1,9 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
-from apps.communication.models import APNSDevice, PushNotificationRecord
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from django.test import TestCase, override_settings
+from fcm_django.models import FCMDevice
 from rest_framework.test import APIClient
 from unittest import mock
 
@@ -120,6 +120,45 @@ class TestPhotoSingleStarsViewSetPOST(TestCase):
     """
     Test POST /api/photos/{}/interests
     """
+    def setUp(self):
+        """
+            Method to create reused items for unit tests
+
+        :return: None
+        """
+        # Create test data
+        account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        photo_owner = account_models.User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
+        FCMDevice.objects.create(registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50',
+                                  user=photo_owner, type="ios")
+        category = photo_models.PhotoClassification.objects.create_or_update(
+            name='Test', classification_type='category')
+
+        photo1 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                                    user=photo_owner)
+        photo1.save()
+        photo1.category = [category]
+        photo1.save()
+
+        photo2 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
+                                    user=photo_owner)
+        photo2.save()
+        photo2.category = [category]
+        photo2.save()
+
+    def tearDown(self):
+        """
+            Method to remove test data after each test case runs
+
+        :return: None
+        """
+        account_models.User.objects.all().delete()
+        account_models.UserInterest.objects.all().delete()
+        photo_models.PhotoClassification.objects.all().delete()
+        photo_models.Photo.objects.all().delete()
+        test_helpers.clear_directory('backend/media/', '*.jpg')
+        FCMDevice.objects.all().delete()
+
     def test_photo_single_stars_view_set_post_successful(self):
         """
         Test that we can create a "star" for a photo
@@ -127,30 +166,16 @@ class TestPhotoSingleStarsViewSetPOST(TestCase):
         :return: None
         """
         # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
-        photo_owner = account_models.User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
-        device = APNSDevice.objects.create(
-            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=photo_owner)
-        category = photo_models.PhotoClassification.objects \
-            .create_or_update(name='Test', classification_type='category')
+        user = account_models.User.objects.get(username='aov_hov')
+        photo_owner = account_models.User.objects.get(username="aov1")
+        device = FCMDevice.objects.get(user=photo_owner)
 
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=photo_owner)
-        photo1.save()
-        photo1.category = [category]
-        photo1.save()
-
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=photo_owner)
-        photo2.save()
-        photo2.category = [category]
-        photo2.save()
+        photo1 = photo_models.Photo.objects.filter(user=photo_owner).first()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
 
-
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             # Get data from endpoint
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -158,9 +183,9 @@ class TestPhotoSingleStarsViewSetPOST(TestCase):
             request = client.post('/api/photos/{}/stars'.format(photo1.id), format='json')
 
             self.assertEquals(request.status_code, 201)
-            p.assert_called_with(
-                alert="Your artwork has been saved by another user, {}.".format(photo_owner.username),
-                registration_ids=[device.registration_id])
+            p.assert_called_with(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                 body="Your artwork has been saved by another user, {}.".format(photo_owner.username),
+                                 registration_ids=[device.registration_id])
 
         # Check for entry
         interests = account_models.UserInterest.objects.all()
@@ -172,21 +197,20 @@ class TestPhotoSingleStarsViewSetPOST(TestCase):
 
         self.assertTrue(photos.data["user_starred"]["starred"])
 
-    def test_photo_single_stars_view_set_post_no_apns_device(self):
+    def test_photo_single_stars_view_set_post_no_device(self):
         """
             Unit test to make sure the endpoint still functions correctly even if push notifications fail
 
         :return: No return
         """
 
-        user = account_models.User.objects.create_user('test@aov.com', 'testuser', 'pass')
-        photo_owner = account_models.User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
+        user = account_models.User.objects.get(username='aov_hov')
+        photo_owner = account_models.User.objects.get(username="aov1")
+        FCMDevice.objects.all().delete()
 
-        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-                                   user=photo_owner)
-        photo.save()
+        photo = photo_models.Photo.objects.filter(user=photo_owner).first()
 
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + test_helpers.get_token_for_user(user))
 
@@ -212,23 +236,15 @@ class TestPhotoSingleStarsViewSetPOST(TestCase):
         :return: None
         """
         # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
-        photo_owner = account_models.User.objects.create_user(email="mr@aov.com", password="pass", username="aov1")
-        device = APNSDevice.objects.create(
-            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=photo_owner)
-        category = photo_models.PhotoClassification.objects \
-            .create_or_update(name='Test', classification_type='category')
-
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=photo_owner)
-        photo1.save()
-        photo1.category = [category]
-        photo1.save()
+        user = account_models.User.objects.get(username='aov_hov')
+        photo_owner = account_models.User.objects.get(username="aov1")
+        device = FCMDevice.objects.get(user=photo_owner)
+        photo1 = photo_models.Photo.objects.filter(user=photo_owner).first()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
 
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             # Get data from endpoint
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -236,17 +252,18 @@ class TestPhotoSingleStarsViewSetPOST(TestCase):
             request = client.post('/api/photos/{}/stars'.format(photo1.id), format='json')
 
             self.assertEquals(request.status_code, 201)
-            p.assert_called_with(
-                alert="Your artwork has been saved by another user, {}.".format(photo_owner.username),
-                registration_ids=[device.registration_id])
+            p.assert_called_with(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                 body="Your artwork has been saved by another user, {}.".format(photo_owner.username),
+                                 registration_ids=[device.registration_id])
 
             # Second request
             request = client.post('/api/photos/{}/stars'.format(photo1.id), format='json')
 
             self.assertEquals(request.status_code, 409)
-            p.assert_called_once_with(
-                alert="Your artwork has been saved by another user, {}.".format(photo_owner.username),
-                registration_ids=[device.registration_id])
+            p.assert_called_once_with(api_key=None, badge=None, data=None, icon=None, sound=None, title=None,
+                                      body="Your artwork has been saved by another user, {}.".format(
+                                          photo_owner.username),
+                                      registration_ids=[device.registration_id])
 
         # Check for entry
         interests = account_models.UserInterest.objects.all()
@@ -261,7 +278,7 @@ class TestPhotoSingleStarsViewSetPOST(TestCase):
         :return: None
         """
         # Create test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='pass', username='aov_hov')
+        user = account_models.User.objects.get(username='aov_hov')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)

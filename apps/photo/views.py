@@ -21,6 +21,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Q
 from django.shortcuts import render
 from django.utils import timezone
+from fcm_django.models import FCMDevice
+from fcm_django.fcm import FCMError
 from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
@@ -945,22 +947,30 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
             owning_apns = APNSDevice.objects.filter(user=owning_user)
 
+            # Check for an existing FCM registry
+            fcm_device = FCMDevice.objects.filter(user=owning_user)
+            if not fcm_device.exists() and owning_apns.exists():
+                fcm_token = communication_tasks.update_device(owning_apns)
+                if fcm_token:
+                    fcm_device = FCMDevice.objects.create(user=owning_user, type="ios", registration_id=fcm_token)
+                    fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
+
             message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
 
             # This check is here to make sure the record is only created for devices that we have. No APNS means no
             # permission for notifications on the device.
-            if owning_apns.exists():
-                if auth_user.username != owning_user.first().username:
-                    # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
-                    owning_apns = APNSDevice.objects.filter(id=owning_apns.first().id)
+            if fcm_device.exists() and auth_user.username != owning_user.first().username:
 
-                    try:
-                        communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
-                        # Create the record of the notification being sent
-                        PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
-                                                              content_object=photo.first(), sender=auth_user)
-                    except APNSServerError:
-                        pass
+                try:
+                    communication_tasks.send_push_notification(message, fcm_device)
+                    # Create the record of the notification being sent
+                    PushNotificationRecord.objects.create(message=message, fcm_receiver=fcm_device.first(), action="C",
+                                                          content_object=photo.first(), sender=auth_user)
+
+                    # Delete the APNs device for easier deprecation later
+                    owning_apns.delete()
+                except FCMError:
+                    pass
 
             if mentioned:
                 # Add the mentioned users list to the comment for easier tracking on front.
@@ -970,19 +980,30 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
                 for mentioned_user in mentioned:
                     mentioned_user = account_models.User.objects.filter(username=mentioned_user)
                     mentioned_device = APNSDevice.objects.filter(user=mentioned_user)
+                    mentioned_fcm_device = FCMDevice.objects.filter(user=mentioned_user)
 
-                    if mentioned_device.exists() and (mentioned_user.first().username != auth_user.username):
-                        mentioned_device = APNSDevice.objects.filter(id__in=mentioned_device.values_list("id", flat=True))
-                        message = "{} mentioned you in a comment, {}.".format(auth_user.username, mentioned_user.first().username)
+                    if not mentioned_fcm_device.exists() and mentioned_device.exists():
+                        fcm_token = communication_tasks.update_device(mentioned_device)
+                        if fcm_token:
+                            mentioned_fcm_device = FCMDevice.objects.create(user=mentioned_user.first(), type="ios",
+                                                                  registration_id=fcm_token)
+                            mentioned_fcm_device = FCMDevice.objects.filter(id=mentioned_fcm_device.id)
+
+                    if mentioned_fcm_device.exists() and (mentioned_user.first().username != auth_user.username):
+                        message = "{} mentioned you in a comment, {}.".format(auth_user.username,
+                                                                              mentioned_user.first().username)
 
                         try:
-                            communication_tasks.send_push_notification(message,
-                                                                       mentioned_device.values_list("id", flat=True))
+                            communication_tasks.send_push_notification(message, mentioned_fcm_device)
                             # Create the record of the notification being sent
-                            PushNotificationRecord.objects.create(message=message, receiver=mentioned_device.first(),
+                            PushNotificationRecord.objects.create(message=message,
+                                                                  fcm_receiver=mentioned_fcm_device.first(),
                                                                   action="T", content_object=photo.first(),
                                                                   sender=auth_user)
-                        except APNSServerError:
+
+                            # Delete the APNs device for easier deprecation later
+                            mentioned_device.delete()
+                        except FCMError:
                             continue
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
@@ -1041,32 +1062,56 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
             owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
             owning_apns = APNSDevice.objects.filter(user=owning_user)
 
+            # Check for an existing FCM registry
+            fcm_device = FCMDevice.objects.filter(user=owning_user)
+            if not fcm_device.exists() and owning_apns.exists():
+                fcm_token = communication_tasks.update_device(owning_apns)
+                if fcm_token:
+                    fcm_device = FCMDevice.objects.create(user=owning_user, type="ios", registration_id=fcm_token)
+                    fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
+
             message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
 
-            if owning_apns.exists():
+            if fcm_device.exists():
                 if auth_user.username != owning_user.first().username:
                     try:
-                        communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+                        communication_tasks.send_push_notification(message, fcm_device)
 
                         # Create the record of the notification being sent
-                        PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="C",
-                                                              content_object=photo.first(), sender=auth_user)
-                    except APNSServerError:
+                        PushNotificationRecord.objects.create(message=message, fcm_receiver=fcm_device.first(),
+                                                              action="C", content_object=photo.first(),
+                                                              sender=auth_user)
+
+                        # Delete the APNs device for easier deprecation later
+                        owning_apns.delete()
+                    except FCMError:
                         pass
 
             # Send a push notification to the person being replied to, as well.
             original_commenter = account_models.User.objects.filter(id__in=photo_comment.values_list("user", flat=True))
             original_commenter_apns = APNSDevice.objects.filter(user=original_commenter)
 
+            # Check for an existing FCM registry
+            original_commenter_fcm_device = FCMDevice.objects.filter(user=original_commenter)
+            if not original_commenter_fcm_device.exists() and original_commenter_apns.exists():
+                fcm_token = communication_tasks.update_device(original_commenter_apns)
+                if fcm_token:
+                    original_commenter_fcm_device = FCMDevice.objects.create(user=original_commenter, type="ios",
+                                                                             registration_id=fcm_token)
+                    original_commenter_fcm_device = FCMDevice.objects.filter(id=original_commenter_fcm_device.id)
+
             message = "{} replied to your comment, {}.".format(auth_user.username, original_commenter.first().username)
 
             if auth_user.username != original_commenter.first().username:
-                communication_tasks.send_push_notification(message,
-                                                           original_commenter_apns.values_list("id", flat=True))
+                communication_tasks.send_push_notification(message, original_commenter_fcm_device)
 
                 # Create the record of the notification being sent
-                PushNotificationRecord.objects.create(message=message, receiver=original_commenter_apns.first(),
+                PushNotificationRecord.objects.create(message=message,
+                                                      fcm_receiver=original_commenter_fcm_device.first(),
                                                       action="C", content_object=photo.first(), sender=auth_user)
+
+                # Delete the APNs device for easier deprecation later
+                original_commenter_apns.delete()
 
             if mentioned:
                 new_comment.mentions = mentioned
@@ -1075,19 +1120,31 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
                 for mentioned_user in mentioned:
                     mentioned_user = account_models.User.objects.filter(username=mentioned_user)
                     mentioned_device = APNSDevice.objects.filter(user=mentioned_user)
+                    mentioned_fcm_device = FCMDevice.objects.filter(user=mentioned_user)
 
-                    if mentioned_device.exists() and (mentioned_user.first().username != auth_user.username):
-                        mentioned_device = APNSDevice.objects.filter(id__in=mentioned_device.values_list("id", flat=True))
-                        message = "{} mentioned you in a comment, {}.".format(auth_user.username, mentioned_user.first().username)
+                    if not mentioned_fcm_device.exists() and mentioned_device.exists():
+                        fcm_token = communication_tasks.update_device(mentioned_device)
+                        if fcm_token:
+                            mentioned_fcm_device = FCMDevice.objects.create(user=mentioned_user.first(), type="ios",
+                                                                            registration_id=fcm_token)
+                            mentioned_fcm_device = FCMDevice.objects.filter(id=mentioned_fcm_device.id)
+
+                    if mentioned_fcm_device.exists() and (mentioned_user.first().username != auth_user.username):
+                        message = "{} mentioned you in a comment, {}.".format(auth_user.username,
+                                                                              mentioned_user.first().username)
 
                         try:
                             communication_tasks.send_push_notification(message,
-                                                                       mentioned_device.values_list("id", flat=True))
+                                                                       mentioned_fcm_device)
                             # Create the record of the notification being sent
-                            PushNotificationRecord.objects.create(message=message, receiver=mentioned_device.first(),
+                            PushNotificationRecord.objects.create(message=message,
+                                                                  fcm_receiver=mentioned_fcm_device.first(),
                                                                   action="T", content_object=photo.first(),
                                                                   sender=auth_user)
-                        except APNSServerError:
+
+                            # Delete the APNs device for easier deprecation later
+                            mentioned_device.delete()
+                        except FCMError:
                             continue
 
             serializer = photo_serializers.PhotoCommentSerializer(new_comment)
@@ -1221,22 +1278,31 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
                     owning_user = account_models.User.objects.filter(id=photo.user.id)
                     owning_apns = APNSDevice.objects.filter(user=owning_user)
 
+                    # Check for an existing FCM registry
+                    fcm_device = FCMDevice.objects.filter(user=owning_user)
+                    if not fcm_device.exists() and owning_apns.exists():
+                        fcm_token = communication_tasks.update_device(owning_apns)
+                        if fcm_token:
+                            fcm_device = FCMDevice.objects.create(user=owning_user, type="ios",
+                                                                  registration_id=fcm_token)
+                            fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
+
                     message = "Your artwork has been saved by another user, {}.".format(owning_user.first().username)
 
                     # This check is here to make sure the record is only created for devices that we have. No APNS means no
                     # permission for notifications on the device.
-                    if owning_apns.exists():
-                        # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
-                        owning_apns = APNSDevice.objects.filter(id=owning_apns.first().id)
+                    if fcm_device.exists():
 
                         try:
-                            communication_tasks.send_push_notification(message,
-                                                                       owning_apns.values_list("id", flat=True))
+                            communication_tasks.send_push_notification(message, fcm_device)
                             # Create the record of the notification being sent
-                            PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(),
+                            PushNotificationRecord.objects.create(message=message, fcm_receiver=fcm_device.first(),
                                                                   action="U",
                                                                   content_object=photo, sender=authenticated_user)
-                        except APNSServerError:
+
+                            # Delete the APNs device for easier deprecation later
+                            owning_apns.delete()
+                        except FCMError:
                             pass
 
                 response = get_default_response('201')
@@ -1309,21 +1375,31 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                     owning_user = account_models.User.objects.filter(id=photo.user.id)
                     owning_apns = APNSDevice.objects.filter(user=owning_user)
 
+                    # Check for an existing FCM registry
+                    fcm_device = FCMDevice.objects.filter(user=owning_user)
+                    if not fcm_device.exists() and owning_apns.exists():
+                        fcm_token = communication_tasks.update_device(owning_apns)
+                        if fcm_token:
+                            fcm_device = FCMDevice.objects.create(user=owning_user, type="ios",
+                                                                  registration_id=fcm_token)
+                            fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
+
                     message = "{} has upvoted your artwork, {}.".format(
                         auth_user.username, owning_user.first().username)
 
                     # This check is here to make sure the record is only created for devices that we have. No APNS means no
                     # permission for notifications on the device.
-                    if owning_apns.exists():
-                        # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
-                        owning_apns = APNSDevice.objects.filter(id=owning_apns.first().id)
+                    if fcm_device.exists():
 
                         try:
-                            communication_tasks.send_push_notification(message, owning_apns.values_list("id", flat=True))
+                            communication_tasks.send_push_notification(message, fcm_device)
                             # Create the record of the notification being sent
-                            PushNotificationRecord.objects.create(message=message, receiver=owning_apns.first(), action="U",
-                                                                  content_object=photo, sender=auth_user)
-                        except APNSServerError:
+                            PushNotificationRecord.objects.create(message=message, fcm_receiver=fcm_device.first(),
+                                                                  action="U", content_object=photo, sender=auth_user)
+
+                            # Delete the APNs device for easier deprecation later
+                            owning_apns.delete()
+                        except FCMError:
                             pass
 
                 response = get_default_response('200')

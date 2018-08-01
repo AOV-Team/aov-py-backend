@@ -3,6 +3,7 @@ from apps.common.models import EditMixin
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from fcm_django.models import FCMDevice
 from push_notifications.models import APNSDevice
 
 
@@ -32,7 +33,8 @@ class PushNotificationRecord(EditMixin):
 
     action = models.CharField(max_length=1, choices=ACTION_CHOICES)
     message = models.TextField()
-    receiver = models.ForeignKey(APNSDevice)
+    receiver = models.ForeignKey(APNSDevice, blank=True, null=True)
+    fcm_receiver = models.ForeignKey(FCMDevice, blank=True, null=True)
     sender = models.ForeignKey(User, blank=True, null=True)
 
     viewed = models.BooleanField(default=False)

@@ -36,6 +36,11 @@ EMAIL['EMAIL_HOST_USER'] = 'ronquillo.m@gmail.com'
 EMAIL['DEFAULT_FROM_EMAIL'] = 'info@artofvisuals.com'
 EMAIL['SERVER_EMAIL'] = 'ronquillo.m@gmail.com'
 
+FCM_DJANGO_SETTINGS = {
+    "FCM_SERVER_KEY": 'AIzaSyDUZTiz8kkycYYCdVyH54seJbKzW3ra9Eg',
+    "ONE_DEVICE_PER_USER": True
+}
+
 # Simpler hasher for DEV/TESTING only
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
