@@ -128,6 +128,8 @@ class TestPhotoSave(TestCase):
         self.assertEqual(len(updated_photo.photo_feed.all()), 1)
         self.assertIsNotNone(updated_photo.aov_feed_add_date)
         self.assertEqual(PushNotificationRecord.objects.count(), 1)
+        self.assertIsNotNone(PushNotificationRecord.objects.first().fcm_receiver)
+        self.assertIsNone(PushNotificationRecord.objects.first().receiver)
 
     def test_photo_save_sends_notification_only_once_when_added_to_picks(self):
         """
@@ -142,8 +144,9 @@ class TestPhotoSave(TestCase):
         user.save()
         category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
                                                                              classification_type='category')
-        device = APNSDevice.objects \
-            .create(registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=user)
+        device = FCMDevice.objects \
+            .create(registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50',
+                    user=user, type="ios")
 
         # Create some gear
         gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
@@ -157,14 +160,16 @@ class TestPhotoSave(TestCase):
         photo1.category.add(category)
         photo1.votes = 1
         photo1.photo_feed.add(photo_models.PhotoFeed.objects.create_or_update(name="AOV Picks"))
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             photo1.save()
 
-            p.assert_called_with(
-                alert="Your artwork has been featured in the AOV Picks gallery, {}!".format(user.username),
-                registration_ids=[device.registration_id])
+            p.assert_called_with(api_key=None, badge=None,
+                data=None, icon=None,
+                registration_ids=[device.registration_id], sound=None,
+                title=None,
+                body="Your artwork has been featured in the AOV Picks gallery, {}!".format(user.username),)
 
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             photo1.save()
 
             p.assert_not_called()
@@ -173,8 +178,10 @@ class TestPhotoSave(TestCase):
         self.assertEqual(len(updated_photo.photo_feed.all()), 1)
         self.assertIsNotNone(updated_photo.aov_feed_add_date)
         self.assertEqual(PushNotificationRecord.objects.count(), 1)
+        self.assertIsNotNone(PushNotificationRecord.objects.first().fcm_receiver)
+        self.assertIsNone(PushNotificationRecord.objects.first().receiver)
 
-    def test_photo_save_successful_no_apns_device(self):
+    def test_photo_save_successful_no_fcm_device(self):
         """
             Unit test to verify the photo still saves successfully, even if a notification is not sent
 
@@ -199,7 +206,7 @@ class TestPhotoSave(TestCase):
         photo1.category.add(category)
         photo1.votes = 1
         photo1.photo_feed.add(photo_models.PhotoFeed.objects.create_or_update(name="AOV Picks"))
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
             photo1.save()
 
             p.assert_not_called()

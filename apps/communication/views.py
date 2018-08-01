@@ -96,9 +96,13 @@ class UserNotificationRecordViewSet(generics.ListCreateAPIView):
 
         auth_user = TokenAuthentication().authenticate(self.request)[0]
         cutoff = timezone.now() - timedelta(days=7)
+        queryset = PushNotificationRecord.objects.none()
+        queryset = (queryset | PushNotificationRecord.objects.filter(
+            receiver__user=auth_user, created_at__gte=cutoff).order_by("-created_at") |
+                    PushNotificationRecord.objects.filter(fcm_receiver__user=auth_user,
+                                                          created_at__gte=cutoff).order_by("-created_at"))
 
-        return PushNotificationRecord.objects.filter(
-            receiver__user=auth_user, created_at__gte=cutoff).order_by("-created_at")
+        return queryset
 
     def post(self, request, **kwargs):
         """
@@ -112,8 +116,10 @@ class UserNotificationRecordViewSet(generics.ListCreateAPIView):
         auth_user = TokenAuthentication().authenticate(request)[0]
         record_id = kwargs.get("record_id")
         response = get_default_response('404')
+        record_entry = PushNotificationRecord.objects.none()
 
-        record_entry = PushNotificationRecord.objects.filter(receiver__user=auth_user, id=record_id)
+        record_entry = (record_entry | PushNotificationRecord.objects.filter(receiver__user=auth_user, id=record_id) |
+                        PushNotificationRecord.objects.filter(fcm_receiver__user=auth_user, id=record_id))
 
         if record_entry.exists():
             record_entry = record_entry.first()

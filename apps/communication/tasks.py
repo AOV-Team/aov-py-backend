@@ -43,7 +43,7 @@ def send_push_notification(message, recipients, **kwargs):
                     devices.send_message(body=message, **kwargs)
                 except ConnectionError:
                     continue
-                except (FCMError, APNSServerError):
+                except FCMError:
                     continue
 
             return

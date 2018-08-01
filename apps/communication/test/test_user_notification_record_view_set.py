@@ -7,6 +7,7 @@ from datetime import timedelta
 from django.contrib.gis.geos import Point
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from fcm_django.models import FCMDevice
 from rest_framework.test import APIClient
 
 
@@ -41,8 +42,9 @@ class TestUserNotificationRecordViewSetGET(TestCase):
         auth_user = account_models.User.objects.get(username="aov2")
         target_user = account_models.User.objects.create_user(email='mrstest@artofvisuals.com', password='WhoAmI',
                                                               username='aov1')
-        device = APNSDevice.objects.create(
-            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=target_user)
+        device = FCMDevice.objects.create(
+            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=target_user,
+            type="ios")
         photo = photo_models.Photo(coordinates=Point(-116, 43),
                                    image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
                                    user=target_user)
@@ -55,17 +57,17 @@ class TestUserNotificationRecordViewSetGET(TestCase):
             name="Test Gallery", user=target_user, photos=photo_models.Photo.objects.all())
 
         message = "{} has upvoted your artwork.".format(auth_user.username)
-        PushNotificationRecord.objects.create(message=message, receiver=device, action="U",
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="U",
                                               content_object=photo, sender=auth_user)
         message = "{} has commented on your artwork.".format(auth_user.username)
-        PushNotificationRecord.objects.create(message=message, receiver=device, action="C",
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="C",
                                               content_object=photo, sender=auth_user)
         message = "Your artwork has been featured in the AOV Picks gallery!"
-        PushNotificationRecord.objects.create(message=message, receiver=device, action="A",
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="A",
                                               content_object=photo, sender=auth_user)
         message = "{} started following you.".format(auth_user.username)
-        PushNotificationRecord.objects.create(message=message, receiver=device, action="F", content_object=target_user,
-                                              sender=auth_user)
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="F",
+                                              content_object=target_user, sender=auth_user)
 
     def tearDown(self):
         """
@@ -137,8 +139,9 @@ class TestUserNotificationRecordViewSetPOST(TestCase):
         auth_user = account_models.User.objects.get(username="aov2")
         target_user = account_models.User.objects.create_user(email='mrstest@artofvisuals.com', password='WhoAmI',
                                                               username='aov1')
-        device = APNSDevice.objects.create(
-            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=target_user)
+        device = FCMDevice.objects.create(
+            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=target_user,
+            type="ios")
         photo = photo_models.Photo(coordinates=Point(-116, 43),
                                    image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
                                    user=target_user)
@@ -151,16 +154,17 @@ class TestUserNotificationRecordViewSetPOST(TestCase):
             name="Test Gallery", user=target_user, photos=photo_models.Photo.objects.all())
 
         message = "{} has upvoted your artwork.".format(auth_user.username)
-        PushNotificationRecord.objects.create(message=message, receiver=device, action="U",
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="U",
                                               content_object=photo, sender=auth_user)
         message = "{} has commented on your artwork.".format(auth_user.username)
-        PushNotificationRecord.objects.create(message=message, receiver=device, action="C",
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="C",
                                               content_object=photo, sender=auth_user)
         message = "Your artwork has been featured in the AOV Picks gallery!"
-        PushNotificationRecord.objects.create(message=message, receiver=device, action="A",
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="A",
                                               content_object=photo, sender=auth_user)
         message = "{} started following you.".format(auth_user.username)
-        PushNotificationRecord.objects.create(message=message, receiver=device, action="F", content_object=target_user,
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="F",
+                                              content_object=target_user,
                                               sender=auth_user)
 
     def tearDown(self):
@@ -173,6 +177,7 @@ class TestUserNotificationRecordViewSetPOST(TestCase):
         account_models.User.objects.all().delete()
         photo_models.Photo.objects.all().delete()
         test_helpers.clear_directory('backend/media/', '*.jpg')
+
 
     def test_user_notification_record_view_set_viewed_post_successful(self):
         """

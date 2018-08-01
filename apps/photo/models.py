@@ -16,7 +16,6 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from fcm_django.models import FCMDevice
 from imagekit.models import ImageSpecField
-from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
 
 
@@ -220,7 +219,9 @@ class Photo(geo_models.Model):
             if not fcm_device.exists() and owning_apns.exists():
                 fcm_token = update_device(owning_apns)
                 if fcm_token:
-                    fcm_device = FCMDevice.objects.create(user=owning_user, type="ios", registration_id=fcm_token)
+                    fcm_device = FCMDevice.objects.create(user=owning_user.first(),
+                                                          type="ios", registration_id=fcm_token)
+                    fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
 
             message = "Your artwork has been featured in the AOV Picks gallery, {}!".format(owning_user.first().username)
@@ -238,10 +239,9 @@ class Photo(geo_models.Model):
                     # Check for record of a notification being sent for this already
                     photo_type = ContentType.objects.get_for_model(self)
                     already_sent = PushNotificationRecord.objects.none()
-                    already_sent = already_sent | PushNotificationRecord.objects.filter(message=message,
-                                                                                        fcm_receiver__in=fcm_device,
-                                                                                        object_id=self.id, action="A",
-                                                                                        content_type__pk=photo_type.id)
+                    already_sent = already_sent | PushNotificationRecord.objects.filter(
+                        message=message, fcm_receiver__in=fcm_device, object_id=self.id, action="A",
+                        content_type__pk=photo_type.id)
                     already_sent = already_sent | PushNotificationRecord.objects.filter(message=message,
                                                                                         receiver__in=owning_apns,
                                                                                         object_id=self.id, action="A",
@@ -252,11 +252,11 @@ class Photo(geo_models.Model):
                         fcm_device = FCMDevice.objects.filter(id=fcm_device.first().id)
 
                         # Send a push notification to the owner of the photo, letting them know they made it to AOV Picks
-                        try:
-                            send_push_notification(message, fcm_device.values_list("id", flat=True))
-                            new_notification_sent = True
-                        except APNSServerError:
-                            pass
+                        send_push_notification(message, fcm_device.values_list("id", flat=True))
+                        new_notification_sent = True
+
+                        # Delete the APNs device for easier deprecation later
+                        owning_apns.delete()
 
             else:
                 self.aov_feed_add_date = None
