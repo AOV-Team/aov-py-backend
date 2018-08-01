@@ -50,11 +50,11 @@ coverage.xml
 *.csv
 *.pem
 *.txt
+*.sh
 project_config.py
 !requirements.txt
 *.dir
 *.bak
-scripts/
 upload/
 # Exceptions for text files
 !*_sample.txt
