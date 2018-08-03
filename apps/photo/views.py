@@ -952,7 +952,8 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             if not fcm_device.exists() and owning_apns.exists():
                 fcm_token = communication_tasks.update_device(owning_apns)
                 if fcm_token:
-                    fcm_device = FCMDevice.objects.create(user=owning_user, type="ios", registration_id=fcm_token)
+                    fcm_device = FCMDevice.objects.create(user=owning_user.first(),
+                                                          type="ios", registration_id=fcm_token)
                     fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
             message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
@@ -1067,7 +1068,8 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
             if not fcm_device.exists() and owning_apns.exists():
                 fcm_token = communication_tasks.update_device(owning_apns)
                 if fcm_token:
-                    fcm_device = FCMDevice.objects.create(user=owning_user, type="ios", registration_id=fcm_token)
+                    fcm_device = FCMDevice.objects.create(user=owning_user.first(),
+                                                          type="ios", registration_id=fcm_token)
                     fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
             message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
@@ -1096,8 +1098,8 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
             if not original_commenter_fcm_device.exists() and original_commenter_apns.exists():
                 fcm_token = communication_tasks.update_device(original_commenter_apns)
                 if fcm_token:
-                    original_commenter_fcm_device = FCMDevice.objects.create(user=original_commenter, type="ios",
-                                                                             registration_id=fcm_token)
+                    original_commenter_fcm_device = FCMDevice.objects.create(user=original_commenter.first(),
+                                                                             type="ios", registration_id=fcm_token)
                     original_commenter_fcm_device = FCMDevice.objects.filter(id=original_commenter_fcm_device.id)
 
             message = "{} replied to your comment, {}.".format(auth_user.username, original_commenter.first().username)
@@ -1264,10 +1266,9 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
 
             # Make sure there is no existing entry
             photo_type = ContentType.objects.get_for_model(photo)
-            interest = account_models.UserInterest.objects \
-                .filter(user=authenticated_user, interest_type=user_interest, content_type__pk=photo_type.id,
-                        object_id=photo.id) \
-                .first()
+            interest = account_models.UserInterest.objects.filter(
+                user=authenticated_user, interest_type=user_interest, content_type__pk=photo_type.id,
+                object_id=photo.id).first()
 
             if not interest:
                 account_models.UserInterest.objects.create(content_object=photo,
@@ -1283,7 +1284,7 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
                     if not fcm_device.exists() and owning_apns.exists():
                         fcm_token = communication_tasks.update_device(owning_apns)
                         if fcm_token:
-                            fcm_device = FCMDevice.objects.create(user=owning_user, type="ios",
+                            fcm_device = FCMDevice.objects.create(user=owning_user.first(), type="ios",
                                                                   registration_id=fcm_token)
                             fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
@@ -1380,7 +1381,7 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                     if not fcm_device.exists() and owning_apns.exists():
                         fcm_token = communication_tasks.update_device(owning_apns)
                         if fcm_token:
-                            fcm_device = FCMDevice.objects.create(user=owning_user, type="ios",
+                            fcm_device = FCMDevice.objects.create(user=owning_user.first(), type="ios",
                                                                   registration_id=fcm_token)
                             fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
