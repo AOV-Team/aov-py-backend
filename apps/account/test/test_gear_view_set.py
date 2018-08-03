@@ -202,7 +202,7 @@ class TestGearViewSetPOST(TestCase):
 
         self.assertEquals(
             gear.link,
-            "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=Canon+EOS+5D+Mark+II+Test")
+            "https://www.adorama.com/l/?kbid=913826&searchinfo=Canon+EOS+5D+Mark+II+Test")
         self.assertTrue(gear.public)
         self.assertFalse(gear.reviewed)
 
@@ -419,7 +419,7 @@ class TestGearViewSetPOST(TestCase):
 
         self.assertEquals(
             result['link'],
-            "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=Canon+EOS+5D+Mark+II+Test")
+            "https://www.adorama.com/l/?kbid=913826&searchinfo=Canon+EOS+5D+Mark+II+Test")
         self.assertEquals(result['item_make'], 'Canon')
         self.assertEquals(result['item_model'], 'EOS 5D Mark II Test')
         self.assertNotIn('public', result)
@@ -434,7 +434,7 @@ class TestGearViewSetPOST(TestCase):
 
         self.assertEquals(
             gear.link,
-            "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=Canon+EOS+5D+Mark+II+Test")
+            "https://www.adorama.com/l/?kbid=913826&searchinfo=Canon+EOS+5D+Mark+II+Test")
         self.assertEquals(gear.item_make, 'Canon')
         self.assertEquals(gear.item_model, 'EOS 5D Mark II Test')
         self.assertFalse(gear.public)

@@ -284,9 +284,9 @@ class GearViewSet(generics.ListCreateAPIView):
         payload = request.data
         response = get_default_response('400')
         # Adorama base link
-        # base_gear_url = "https://www.adorama.com/l/?searchinfo="
+        base_gear_url = "https://www.adorama.com/l/?kbid=913826&searchinfo="
         # Amazon base link
-        base_gear_url = "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords="
+        # base_gear_url = "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords="
 
         if 'item_make' in payload and 'item_model' in payload:
             # Only admins can add links or set reviewed=True
