@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 
-class TestUsersViewSetPOST(TestCase):
+class TestUserLocationViewSetPOST(TestCase):
     """
     Test /api/users/{}/location POST (user location creation)
     """
@@ -47,10 +47,33 @@ class TestUsersViewSetPOST(TestCase):
         self.assertEqual(result['longitude'], -116.2023436)
 
 
-class TestUsersViewSetGET(TestCase):
+class TestUserLocationViewSetGET(TestCase):
     """
     Test /api/users/{}/location GET (user location retrieval)
     """
+
+    def setUp(self):
+        """
+            Sets up reused data for the tests
+
+        :return: None
+        """
+        user_data = {
+            'email': 'mr@mypapaya.io',
+            'password': 'WhoWantsToBeAMillionaire?',
+            'username': 'aov_hov'
+        }
+        account_models.User.objects.create_user(**user_data)
+
+    def tearDown(self):
+        """
+            Removes excess data for each test case
+
+        :return: None
+        """
+        account_models.User.objects.all().delete()
+        account_models.UserLocation.objects.all().delete()
+
     def test_user_location_view_set_get_successful(self):
         """
         Successful /api/users/{}/location GET.
@@ -58,13 +81,7 @@ class TestUsersViewSetGET(TestCase):
 
         :return: None
         """
-
-        user_data = {
-            'email': 'mr@mypapaya.io',
-            'password': 'WhoWantsToBeAMillionaire?',
-            'username': 'aov_hov'
-        }
-        user = account_models.User.objects.create_user(**user_data)
+        user = account_models.User.objects.get(username="aov_hov")
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -84,7 +101,7 @@ class TestUsersViewSetGET(TestCase):
         self.assertEqual(request.status_code, 200)
 
         response = client.get('/api/users/{}/location'.format(user.id), format='json')
-        data = response.data
+        data = response.data["results"][0]
 
         self.assertEqual(response.status_code, 200)
 
@@ -100,7 +117,7 @@ class TestUsersViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(username='aov_hov')
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
 
@@ -139,7 +156,7 @@ class TestUsersViewSetGET(TestCase):
         self.assertEqual(request.status_code, 200)
 
         third_user = account_models.User.objects.create_user(
-            email='mrtest2@mypapaya.io', password='WhoAmI', username='aov3')
+            email='mrtest3@mypapaya.io', password='WhoAmI', username='aov3')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(third_user)
@@ -166,7 +183,8 @@ class TestUsersViewSetGET(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         # Case insensitive
-        request = client.get('/api/photos?geo_location=-118,42,-115,44')
+        request = client.get('/api/users/{}/location?geo_location=-118,42,-115,44'.format(user.id))
+        print(request.data)
         results = request.data['results']
 
         self.assertEquals(len(results), 2)
