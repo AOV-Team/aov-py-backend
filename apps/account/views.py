@@ -911,56 +911,6 @@ class UserLocationViewSet(generics.ListCreateAPIView):
         user_location = account_models.UserLocation.objects.filter(**query_params)
         return user_location
 
-        # if user_location.exists():
-        #     serialized_data = account_serializers.UserLocationSerializer(user_location, many=True)
-        #
-        #     response = get_default_response('200')
-        #     response.data = serialized_data.data
-        #     return response
-        # else:
-        #     raise NotFound('UserLocation does not exist')
-
-    # def get(self, request, **kwargs):
-    #     """
-    #     Retrieval method
-    #
-    #     :return: QuerySet
-    #     """
-    #     user_id = kwargs.get('user_id', None)
-    #     geo_location = self.request.query_params.get('geo_location')
-    #     query_params = dict()
-    #
-    #     # If searching by a box of coordinates
-    #     # Format ?geo_location=SW LONG,SW LAT,NE LONG, NE LAT
-    #     if geo_location:
-    #         coordinates = tuple(geo_location.split(','))
-    #
-    #         # Check that we have 4 coordinates
-    #         # And each coordinate needs to be a number
-    #         if len(coordinates) != 4:
-    #             raise ValidationError('Expecting geo_location to have 4 coordinates: "SW LONG,SW LAT,NE LONG, NE LAT"')
-    #         else:
-    #             try:
-    #                 for c in coordinates:
-    #                     float(c)
-    #             except ValueError:
-    #                 raise ValidationError('Expecting number format for coordinates')
-    #
-    #         rectangle = Polygon.from_bbox(coordinates)
-    #         query_params['coordinates__contained'] = rectangle
-    #
-    #     user = account_models.User.objects.filter(id=user_id)
-    #     user_location = account_models.UserLocation.objects.filter(user=user, **query_params)
-    #
-    #     if user_location.exists():
-    #         serialized_data = account_serializers.UserLocationSerializer(user_location, many=True)
-    #
-    #         response = get_default_response('200')
-    #         response.data = serialized_data.data
-    #         return response
-    #     else:
-    #         raise NotFound('UserLocation does not exist')
-
     def post(self, request, **kwargs):
         """
 
