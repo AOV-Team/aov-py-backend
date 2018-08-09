@@ -184,7 +184,6 @@ class TestUserLocationViewSetGET(TestCase):
 
         # Case insensitive
         request = client.get('/api/users/{}/location?geo_location=-118,42,-115,44'.format(user.id))
-        print(request.data)
         results = request.data['results']
 
         self.assertEquals(len(results), 2)

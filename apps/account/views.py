@@ -884,7 +884,9 @@ class UserLocationViewSet(generics.ListCreateAPIView):
             """
         user_id = self.kwargs.get('user_id', None)
         geo_location = self.request.query_params.get('geo_location')
-        query_params = dict()
+        query_params = {
+            "user_id": user_id
+        }
 
         # If searching by a box of coordinates
         # Format ?geo_location=SW LONG,SW LAT,NE LONG, NE LAT
@@ -904,9 +906,9 @@ class UserLocationViewSet(generics.ListCreateAPIView):
 
             rectangle = Polygon.from_bbox(coordinates)
             query_params['coordinates__contained'] = rectangle
+            del query_params["user_id"]
 
-        user = account_models.User.objects.filter(id=user_id)
-        user_location = account_models.UserLocation.objects.filter(user=user, **query_params)
+        user_location = account_models.UserLocation.objects.filter(**query_params)
         return user_location
 
         # if user_location.exists():
