@@ -61,6 +61,7 @@ class TestPhotoViewSetGET(TestCase):
 
         request = client.get('/api/photos')
         results = request.data['results']
+        print(results)
 
         self.assertIn('next', request.data)
         self.assertEquals(len(results), 2)

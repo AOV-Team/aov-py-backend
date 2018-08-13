@@ -268,22 +268,22 @@ class PhotoDetailsSerializer(serializers.ModelSerializer):
     @staticmethod
     def setup_eager_loading(queryset):
         queryset = queryset\
-            .select_related('user')\
-            .prefetch_related('category')\
-            .prefetch_related('gear')\
-            .prefetch_related('tag')
+            .select_related("user")\
+            .prefetch_related("category")\
+            .prefetch_related("gear")\
+            .prefetch_related("tag")
 
         return queryset
 
     class Meta:
         model = models.Photo
-        fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions',
-                  'latitude', 'location', 'longitude', 'photo_data', 'photo_feed',
-                  'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes', 'user_voted',
-                  'user_starred')
-        ordering_fields = ('id', 'location')
-        ordering = ('-id',)
-        read_only_fields = ('photo_data', 'user_details', 'comments', 'user_voted', 'user_starred')
+        fields = ("id", "category", "gear", "geo_location", "tag", "user", "attribution_name", "dimensions",
+                  "latitude", "location", "longitude", "photo_data", "photo_feed",
+                  "user_details", "magazine_authorized", "caption", "votes_behind", "comments", "votes", "user_voted",
+                  "user_starred")
+        ordering_fields = ("id", "location")
+        ordering = ("-id",)
+        read_only_fields = ("photo_data", "user_details", "comments", "user_voted", "user_starred")
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -303,6 +303,7 @@ class PhotoSerializer(serializers.ModelSerializer):
     image_tiny_246 = serializers.ImageField(required=False)
     image_tiny_272 = serializers.ImageField(required=False)
 
+    rank = serializers.SerializerMethodField()
     scaled_render = serializers.SerializerMethodField()
     tag = serializers.SerializerMethodField()
     user_details = serializers.SerializerMethodField()
@@ -422,6 +423,24 @@ class PhotoSerializer(serializers.ModelSerializer):
             })
 
         return votes_behind_dict
+    
+    def get_rank(self, obj):
+        classifications = obj.category.all()
+        rank_dict = dict()
+
+        for classification_id, classification_name in classifications.values_list('id', 'name'):
+            category_photos = models.Photo.objects.filter(category=classification_id)
+            count = 1
+            for category_photo_id in category_photos.annotate(
+                    max_votes=Max('votes')).order_by("-max_votes").values_list("id", flat=True):
+                if category_photo_id == obj.id:
+                    rank_dict.update({
+                        classification_name: count
+                    })
+                else:
+                    count += 1
+
+        return rank_dict
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -443,16 +462,16 @@ class PhotoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Photo
-        fields = ('id', 'category', 'gear', 'geo_location', 'tag', 'user', 'attribution_name', 'dimensions', 'image',
-                  'image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
-                  'image_tiny_272', 'latitude', 'location', 'longitude', 'photo_data', 'original_image_url', 'public',
-                  'photo_feed', 'user_details', 'magazine_authorized', 'caption', 'votes_behind', 'comments', 'votes',
-                  'user_voted', 'user_starred', 'bts_lens', 'bts_shutter', 'bts_iso', 'bts_aperture',
-                  'bts_camera_settings', 'bts_time_of_day', 'bts_camera_make', 'bts_camera_model',
-                  'bts_photo_editor', 'scaled_render')
-        extra_kwargs = {'original_image_url':  {'write_only': True},
-                        'public': {'default': True, 'write_only': True}}
-        ordering_fields = ('id', 'location')
-        ordering = ('-id',)
-        read_only_fields = ('image_blurred', 'image_medium', 'image_small', 'image_small_2', 'image_tiny_246',
-                            'image_tiny_272', 'scaled_render')
+        fields = ("id", "category", "gear", "geo_location", "tag", "user", "attribution_name", "dimensions", "image",
+                  "image_blurred", "image_medium", "image_small", "image_small_2", "image_tiny_246",
+                  "image_tiny_272", "latitude", "location", "longitude", "photo_data", "original_image_url", "public",
+                  "photo_feed", "user_details", "magazine_authorized", "caption", "votes_behind", "comments", "votes",
+                  "user_voted", "user_starred", "bts_lens", "bts_shutter", "bts_iso", "bts_aperture",
+                  "bts_camera_settings", "bts_time_of_day", "bts_camera_make", "bts_camera_model",
+                  "bts_photo_editor", "scaled_render", "rank")
+        extra_kwargs = {"original_image_url":  {"write_only": True},
+                        "public": {"default": True, "write_only": True}}
+        ordering_fields = ("id", "location")
+        ordering = ("-id",)
+        read_only_fields = ("image_blurred", "image_medium", "image_small", "image_small_2", "image_tiny_246",
+                            "image_tiny_272", "scaled_render", "rank")
