@@ -1,7 +1,6 @@
 from django.contrib.gis.db import models as geo_models
 from django.db import models
 import datetime
-import os
 import random
 
 
@@ -83,7 +82,7 @@ def get_random_queryset_elements(queryset, number, yield_object=True):
             pass
 
 
-def get_uploaded_file_path(instance, filename, purpose=None):
+def get_uploaded_file_path(instance, filename):
     """
     Function that determines file path for specified file
 

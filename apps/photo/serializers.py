@@ -427,9 +427,19 @@ class PhotoSerializer(serializers.ModelSerializer):
     def get_rank(self, obj):
         classifications = obj.category.all()
         rank_dict = dict()
+        photos = models.Photo.objects.all()
+        count = 1
+        for category_photo_id in photos.annotate(
+                max_votes=Max('votes')).order_by("-max_votes").values_list("id", flat=True):
+            if category_photo_id == obj.id:
+                rank_dict.update({
+                    "overall": count
+                })
+            else:
+                count += 1
 
         for classification_id, classification_name in classifications.values_list('id', 'name'):
-            category_photos = models.Photo.objects.filter(category=classification_id)
+            category_photos = photos.filter(category=classification_id)
             count = 1
             for category_photo_id in category_photos.annotate(
                     max_votes=Max('votes')).order_by("-max_votes").values_list("id", flat=True):
