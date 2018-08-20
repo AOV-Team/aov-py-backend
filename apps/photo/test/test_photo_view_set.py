@@ -6,6 +6,7 @@ from apps.photo.photo import Photo
 from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.test import override_settings, TestCase
+from factory import DjangoModelFactory
 from os.path import getsize
 from rest_framework.test import APIClient
 from rest_framework_tracking.models import APIRequestLog
@@ -17,17 +18,15 @@ class TestPhotoViewSetGET(TestCase):
     """
     Test GET api/photos
     """
-    def test_photo_view_set_get_successful(self):
+
+    def setUp(self):
         """
-        Test that we can get photos
+            Method to create re-usable data for unit tests
 
         :return: None
         """
-        # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        user.location = 'Boise'
-        user.social_name = '@theaov'
-        user.save()
+        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1',
+                                                       location="Boise", social_name="@theaov")
         category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
                                                                              classification_type='category')
 
@@ -35,22 +34,44 @@ class TestPhotoViewSetGET(TestCase):
         gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
         gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
-        photo1 = photo_models \
-            .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
-                   user=user)
-        photo1.save()
-        photo1.gear.add(gear_1, gear_2)
-        photo1.category.add(category)
-        photo1.votes = 1
-        photo1.photo_feed.add(1)
-        photo1.save()
+        for number in range(1, 101):
+            photo1 = photo_models.Photo(coordinates=Point(-116, 43),
+                                        image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                                        user=user)
+            photo1.save()
+            photo1.gear.add(gear_1, gear_2)
+            photo1.category.add(category)
+            photo1.votes = number
+            photo1.photo_feed.add(1)
+            photo1.save()
 
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
-        photo2.save()
-        photo2.votes = 12
-        photo2.category.add(category)
-        photo2.save()
+        # photo2 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        # photo2.save()
+        # photo2.votes = 12
+        # photo2.category.add(category)
+        # photo2.save()
+
+    def tearDown(self):
+        """
+            Removes unnecessary test data after each unit test
+
+        :return: None
+        """
+
+        account_models.User.objects.all().delete()
+        photo_models.Photo.objects.all().delete()
+        photo_models.PhotoVote.objects.all().delete()
+        test_helpers.clear_directory('backend/media/', '*.jpg')
+
+    def test_photo_view_set_get_successful(self):
+        """
+        Test that we can get photos
+
+        :return: None
+        """
+        # Test data
+        user = account_models.User.objects.get(username='aov1')
+        gear_1 = account_models.Gear.objects.get(item_make='Canon', item_model='EOS 5D Mark II')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -63,14 +84,15 @@ class TestPhotoViewSetGET(TestCase):
         results = request.data['results']
 
         self.assertIn('next', request.data)
-        self.assertEquals(len(results), 2)
-        self.assertEquals(len(results[0]['gear']), 0)
+        self.assertEquals(len(results), 12)
         self.assertEquals(len(results[1]['gear']), 2)
         self.assertEquals(results[1]['gear'][0], gear_1.id)
         self.assertEquals(results[1]['latitude'], 43.0)
         self.assertEquals(results[1]['longitude'], -116.0)
-        self.assertEquals(results[1]['votes'], 1)
-        self.assertEqual(results[1]['votes_behind'][category.name], 11)
+        self.assertEquals(results[1]['votes'], 99)
+        self.assertEquals(results[1]['rank']['Night'], 2)
+        self.assertEquals(results[1]['rank']['overall'], 2)
+        self.assertEqual(results[1]['votes_behind']['Night'], 1)
         self.assertIsNotNone(results[0]['image_blurred'])
         self.assertIsNotNone(results[0]['scaled_render'])
         # self.assertIsNotNone(results[0]['image_medium'])
@@ -81,7 +103,9 @@ class TestPhotoViewSetGET(TestCase):
         self.assertEquals(results[0]['user_details']['location'], user.location)
         self.assertEquals(results[0]['user_details']['social_name'], user.social_name)
         self.assertEquals(results[0]['user_details']['username'], user.username)
-        self.assertEquals(results[0]['votes'], 12)
+        self.assertEquals(results[0]['votes'], 100)
+        self.assertEquals(results[0]['rank']['Night'], 1)
+        self.assertEquals(results[0]['rank']['overall'], 1)
 
     def test_photo_view_set_get_public(self):
         """

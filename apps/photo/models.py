@@ -224,7 +224,9 @@ class Photo(geo_models.Model):
                     fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
 
-            message = "Your artwork has been featured in the AOV Picks gallery, {}!".format(owning_user.first().username)
+            if owning_user.exists():
+                message = "Your artwork has been featured in the AOV Picks gallery, {}!".format(owning_user.first().username)
+
         else:
             fcm_device = FCMDevice.objects.none()
             owning_apns = APNSDevice.objects.none()
