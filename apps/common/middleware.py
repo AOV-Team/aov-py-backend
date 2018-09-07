@@ -6,7 +6,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 class UserSessionMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        ignored_path_list = ["admin", "logging", "jet", "api/me"]
+        ignored_path_list = ["admin", "logging", "jet", "api/me", "feedback"]
         path = request.get_full_path()
         user = getattr(request, "user", None)
 

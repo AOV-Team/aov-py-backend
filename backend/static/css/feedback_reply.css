@@ -1,0 +1,12 @@
+.username {
+    font-weight: bold;
+}
+
+.message {
+    font-style: italic;
+}
+
+.reply-text-area {
+    border: 1px solid black;
+    margin-bottom: 5px;
+}

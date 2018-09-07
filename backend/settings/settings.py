@@ -27,7 +27,7 @@ SECRET_KEY = '&ovy=!!3@8s@68950+td&##!n!=(&vh_at@j71kti&pu^@2k%_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = DEBUG
 ADMINS = (
-    ("Garrett", "neelik.n33l@gmail.com"),
+    ("Garrett", "garrett@artofvisuals.com"),
 )
 
 INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'social.apps.django_app.default',
     'rest_framework_tracking',
     'fcm_django',
+    'rangefilter',
 ]
 
 if DEBUG:

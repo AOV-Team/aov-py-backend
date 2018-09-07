@@ -8,7 +8,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" type="text/css" href="{% static "jet/css/vendor.css" as url %}{{ url|jet_append_version }}" />
 <link rel="stylesheet" type="text/css" href="{% static "jet/css/icons/style.css" as url %}{{ url|jet_append_version }}" />
 <link rel="stylesheet" type="text/css" href="{% static "jet/css/themes/"|add:THEME|add:"/base.css" as url %}{{ url|jet_append_version }}" class="base-stylesheet" />
@@ -172,6 +172,12 @@
                         <span class="sidebar-link-label">
                             <span class="sidebar-link-icon icon-user"></span>
                             Power Users
+                        </span>
+                    </a>
+                    <a href="/admin/utils/feedback/" class="sidebar-link icon">
+                        <span class="sidebar-link-label">
+                            <span class="sidebar-link-icon fa fa-comments"></span>
+                            Feedback
                         </span>
                     </a>
                     {% block nav-global %}{% endblock %}

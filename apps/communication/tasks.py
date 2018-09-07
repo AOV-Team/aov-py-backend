@@ -4,8 +4,6 @@ from django.conf import settings
 from django.utils import timezone
 from fcm_django.models import FCMDevice, FCMDeviceQuerySet
 from fcm_django.fcm import FCMError
-from push_notifications.apns import APNSError, APNSServerError
-from push_notifications.models import APNSDevice, APNSDeviceQuerySet
 from requests import post
 
 
