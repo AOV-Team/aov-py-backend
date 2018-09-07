@@ -92,6 +92,8 @@ urlpatterns = [
 
     # utils
     url(r'api/me/actions$', utils_views.MeActionsViewSet.as_view()),
+    url(r'api/utils/feedback$', utils_views.FeedbackViewSet.as_view()),
+    url(r'api/utils/feedback/(?P<pk>[0-9^/]+)/reply$', utils_views.FeedbackViewSet.as_view()),
     url(r'api/utils/profiles$', utils_views.APIRequestLogViewSet.as_view()),
 
     # logging
@@ -108,9 +110,9 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^admin/photos/$', photo_views.photo_admin),
     url(r'^admin/photos/map/$', photo_views.photo_map_admin),
+    url(r'^admin/power_users/$', account_views.power_users_admin),
     url(r'^admin/push/$', communication_views.push_notification_manager),
     url(r'^admin/statistics/$', analytic_views.statistics_admin),
-    url(r'^admin/power_users/$', account_views.power_users_admin),
 ]
 
 # DEBUG URLs

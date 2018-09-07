@@ -40,5 +40,19 @@
   },
   "pk": 3,
   "model": "dbmail.mailtemplate"
+  },
+  {
+  "fields": {
+    "name": "Feedback Reply",
+    "subject": "Thank you for your feedback!",
+    "message": "<p>Your Feedback:<br>{{original}}<br><br>AoV's Response:<br>{{message}}</p>",
+    "slug": "feedback-reply",
+    "is_html": true,
+    "category": 1,
+    "created": "2018-08-31",
+    "updated": "2018-08-31"
+  },
+  "pk": 4,
+  "model": "dbmail.mailtemplate"
   }
 ]
