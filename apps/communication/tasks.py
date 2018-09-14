@@ -5,6 +5,7 @@ from django.utils import timezone
 from fcm_django.models import FCMDevice, FCMDeviceQuerySet
 from fcm_django.fcm import FCMError
 from requests import post
+from requests.exceptions import Timeout
 
 
 def chunk_devices(queryset, size: int):
@@ -53,7 +54,9 @@ def send_push_notification(message, recipients, **kwargs):
         pass
     except FCMError:
         pass
-
+    except Timeout:
+        # TODO Need to implement some sort of retry here
+        pass
 
 @shared_task(name='send_scheduled_push_notifications')
 def send_scheduled_push_notifications():
