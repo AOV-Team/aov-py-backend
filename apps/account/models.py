@@ -8,6 +8,11 @@ from django.db import models
 from django.utils import timezone
 
 
+class Blocked(common_models.EditMixin):
+    user = models.ForeignKey("User", related_name="blocked")
+    blocked_by = models.ForeignKey("User", related_name="blocked_by")
+
+
 class GearManager(models.Manager):
     def create_or_update(self, **kwargs):
         """

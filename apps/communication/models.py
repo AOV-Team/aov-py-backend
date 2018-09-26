@@ -7,6 +7,29 @@ from fcm_django.models import FCMDevice
 from push_notifications.models import APNSDevice
 
 
+class Conversation(EditMixin):
+    """
+        Model to connect multiple messages and users to a single thread
+    """
+    participants = models.ManyToManyField(User, related_name="participants")
+    message_count = models.PositiveIntegerField()
+
+
+class DirectMessage(EditMixin):
+    """
+        Model for a user-to-user direct message object
+
+    """
+    sender = models.ForeignKey(User, related_name="sender")
+    recipient = models.ForeignKey(User, related_name="recipient")
+    message = models.TextField()
+    conversation = models.ForeignKey(Conversation, related_name="conversation")
+    index = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name_plural = "Direct Messages"
+
+
 class PushMessage(models.Model):
     """
     Push message to be sent out at a specific time
@@ -26,6 +49,7 @@ class PushNotificationRecord(EditMixin):
     ACTION_CHOICES = (
         ("A", "AoV Pick"),
         ("C", "Comment"),
+        ("D", "Direct Message"),
         ("F", "Follower"),
         ("R", "Feedback Reply"),
         ("T", "Tagged"),

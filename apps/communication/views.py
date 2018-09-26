@@ -1,15 +1,21 @@
+from apps.account.models import User
 from apps.common.views import get_default_response
-from apps.communication.models import PushNotificationRecord
-from apps.communication.serializers import AOVFCMDeviceSerializer, PushNotificationRecordSerializer
-from apps.communication.tasks import send_push_notification
+from apps.communication.models import PushNotificationRecord, DirectMessage, Conversation
+from apps.communication.serializers import (
+    AOVFCMDeviceSerializer, PushNotificationRecordSerializer, DirectMessageSerializer
+)
+from apps.communication.tasks import send_push_notification, update_device
 from datetime import timedelta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
-from fcm_django.models import FCMDevice
 from fcm_django.api.rest_framework import FCMDeviceViewSet
+from django.db import transaction
+from fcm_django.models import FCMDevice
+from fcm_django.fcm import FCMError
+from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -74,6 +80,111 @@ class DevicesViewSet(LoggingMixin, FCMDeviceViewSet):
                 raise ValidationError(serializer.errors)
         else:
             raise ValidationError('Missing required key "registration_id"')
+
+
+class DirectMessageViewSet(generics.ListCreateAPIView):
+    """
+    /api/users/{}/messages
+
+    """
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = DirectMessageSerializer
+
+    @transaction.atomic
+    def post(self, request, **kwargs):
+        """
+            Method to handle the POST HTTP requests. Creates new user-to-user message objects
+
+        :param request: HTTP Request object containing message and sender information
+        :param kwargs: Additional keyword arguments used to identify the recipient of the message
+        :return: HTTP Response object denoting success/failure status of the request.
+        """
+
+        # sending_user = TokenAuthentication().authenticate(request)[0]
+        sending_user = User.objects.filter(id=TokenAuthentication().authenticate(request)[0].id).first()
+        recipient = User.objects.filter(id=kwargs.get('pk'))
+
+        if recipient.exists():
+            recipient = recipient.first()
+            # If a Conversation ID is provided, use that Conversation. Otherwise, create a new one.
+            conversation_id = request.data.get("conversation_id", None)
+            if conversation_id:
+                conversation = Conversation.objects.get(id=conversation_id)
+            else:
+                conversation = Conversation.objects.create(message_count=0)
+                conversation.participants = [sending_user, recipient]
+                conversation.save()
+
+            message = request.data.get("message")
+            object_details = {
+                "sender": sending_user,
+                "recipient": recipient,
+                "message": message,
+                "conversation": conversation,
+                "index": conversation.message_count + 1
+            }
+
+            # Create the Direct Message object
+            new_message = DirectMessage.objects.create(**object_details)
+            conversation.message_count = conversation.message_count + 1
+            conversation.save()
+
+            # Notify the user of the new DM
+            # recipient = owning_user
+            owning_apns = APNSDevice.objects.filter(user=recipient)
+
+            # Check for an existing FCM registry
+            fcm_device = FCMDevice.objects.filter(user=recipient)
+            if not fcm_device.exists() and owning_apns.exists():
+                fcm_token = update_device(owning_apns)
+                if fcm_token:
+                    fcm_device = FCMDevice.objects.create(user=recipient,
+                                                          type="ios", registration_id=fcm_token)
+                    fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
+
+            message = "New message from {}.".format(sending_user.username)
+
+            # This check is here to make sure the record is only created for devices that we have. No APNS means no
+            # permission for notifications on the device.
+            if fcm_device.exists() and sending_user.username != recipient.username:
+
+                try:
+                    send_push_notification(message, fcm_device)
+                    # Create the record of the notification being sent
+                    PushNotificationRecord.objects.create(message=message, fcm_receiver=fcm_device.first(), action="D",
+                                                          content_object=new_message, sender=sending_user)
+
+                    # Delete the APNs device for easier deprecation later
+                    owning_apns.delete()
+                except FCMError:
+                    pass
+
+            # Serialize and return the message to the front, for display.
+            serialized_message = DirectMessageSerializer(new_message)
+            response = get_default_response('200')
+            response.data = serialized_message.data
+
+        else:
+            response = get_default_response('400')
+        return response
+
+    def get_queryset(self):
+        """
+            Method to retrieve the messages in a conversation
+
+        :return: QuerySet of DirectMessage objects in a given Conversation
+        """
+
+        sending_user = User.objects.filter(id=TokenAuthentication().authenticate(self.request)[0].id).first()
+        conversation_pk = self.kwargs.get('pk')
+        conversation = Conversation.objects.filter(id=conversation_pk)
+        queryset = DirectMessage.objects.none()
+
+        if conversation.exists() and sending_user.id in conversation.first().participants.values_list('id', flat=True):
+            queryset = DirectMessage.objects.filter(conversation=conversation).order_by("index")
+
+        return queryset
 
 
 class UserNotificationRecordViewSet(generics.ListCreateAPIView):
