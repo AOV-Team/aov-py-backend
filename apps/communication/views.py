@@ -1,4 +1,4 @@
-from apps.account.models import User
+from apps.account.models import User, Blocked
 from apps.common.views import get_default_response
 from apps.communication.models import PushNotificationRecord, DirectMessage, Conversation
 from apps.communication.serializers import (
@@ -104,9 +104,16 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
         # sending_user = TokenAuthentication().authenticate(request)[0]
         sending_user = User.objects.filter(id=TokenAuthentication().authenticate(request)[0].id).first()
         recipient = User.objects.filter(id=kwargs.get('pk'))
+        response = get_default_response('200')
 
         if recipient.exists():
             recipient = recipient.first()
+
+            # Check that the recipient is not in the sending_user's blocked list
+            blocked_by_sender = Blocked.objects.filter(blocked_by=sending_user)
+            if recipient.id in blocked_by_sender.values_list("user", flat=True):
+                return response
+
             # If a Conversation ID is provided, use that Conversation. Otherwise, create a new one.
             conversation_id = request.data.get("conversation_id", None)
             if conversation_id:
@@ -162,7 +169,6 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
 
             # Serialize and return the message to the front, for display.
             serialized_message = DirectMessageSerializer(new_message)
-            response = get_default_response('200')
             response.data = serialized_message.data
 
         else:

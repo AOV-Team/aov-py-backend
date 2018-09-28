@@ -40,6 +40,7 @@ class TestDirectMessageViewSetPOST(TestCase):
         :return: None
         """
         account_models.User.objects.all().delete()
+        account_models.Blocked.objects.all().delete()
         FCMDevice.objects.all().delete()
         PushNotificationRecord.objects.all().delete()
         DirectMessage.objects.all().delete()
@@ -140,6 +141,40 @@ class TestDirectMessageViewSetPOST(TestCase):
         self.assertEqual(api_response_data["recipient"], recipient.id)
         self.assertEqual(api_response_data["index"], 3)
         self.assertEqual(Conversation.objects.count(), 1)
+
+    def test_message_blocked_user_does_nothing(self):
+        """
+            Test that attempting to message a blocked User does nothing
+
+        :return: None
+        """
+        sender = account_models.User.objects.get(username="gallen")
+        recipient = account_models.User.objects.get(username="aov1")
+
+        # Create a Blocked entry
+        account_models.Blocked.objects.create(user=recipient, blocked_by=sender)
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(sender)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        # Wrap the call in a mock so we aren't sending real push notifications during tests
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
+            # Send the message
+            message_data = {
+                "message": "Yo, hit me up later for some shots!"
+            }
+
+            api_response = client.post("/api/users/{}/messages".format(recipient.id), data=message_data, format="json")
+
+            # Assert the mocked call for push notification occurred.
+            p.assert_not_called()
+
+        self.assertEqual(api_response.status_code, 200)
+        self.assertFalse(Conversation.objects.filter().exists())
 
 
 class TestDirectMessageViewSetGET(TestCase):
