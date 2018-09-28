@@ -43,6 +43,7 @@ urlpatterns = [
     url(r'api/me/starred/photos$', account_views.UserStarredPhotosViewSet.as_view()),
     url(r'api/users$', account_views.UserViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)$', account_views.UserSingleViewSet.as_view()),
+    url(r'api/users/(?P<pk>[0-9^/]+)/blocked$', account_views.BlockUserViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/following$', account_views.UserFollowingViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/followers$', account_views.UserFollowersViewSet.as_view()),
     url(r'api/users/(?P<user_id>[0-9^/]+)/followers/(?P<follower_id>[0-9^/]+)$',
@@ -59,7 +60,9 @@ urlpatterns = [
     url(r'api/statistics/(?P<resource>[a-z^/]+)$', analytic_views.StatisticsViewSet.as_view()),
 
     # communication
+    url(r'api/conversations/(?P<pk>[0-9^/]+)$', communication_views.DirectMessageViewSet.as_view()),
     url(r'api/devices$', communication_views.DevicesViewSet.as_view({"get": "list", "post": "post"})),
+    url(r'api/users/(?P<pk>[0-9^/]+)/messages$', communication_views.DirectMessageViewSet.as_view()),
 
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),

@@ -195,6 +195,69 @@ class AuthenticateResetViewSet(APIView):
         return response
 
 
+class BlockUserViewSet(generics.ListCreateAPIView):
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = MediumResultsSetPagination
+    serializer_class = account_serializers.UserPublicSerializer
+
+    def get_queryset(self):
+        """
+            Return a list of Blocked users
+
+        :return: Queryset of Blocked Users for a given User
+        """
+
+
+        accessing_user = TokenAuthentication().authenticate(self.request)[0]
+        blocking_user_pk = self.kwargs.get("pk")
+        blocking_user = account_models.User.objects.filter(id=blocking_user_pk)
+        blocked_users = account_models.User.objects.none()
+
+        if blocking_user.exists() and accessing_user.id == int(blocking_user_pk):
+            blocked_user_entries = account_models.Blocked.objects.filter(blocked_by=blocking_user)
+            blocked_users = account_models.User.objects.filter(
+                id__in=blocked_user_entries.values_list("user", flat=True))
+
+        return blocked_users
+
+    def post(self, request, **kwargs):
+        """
+            Create a new Blocked entry for accessing user
+
+        :param request: HTTP Request object that contains the id of the offending user
+        :param kwargs: Additional keyword arguments provided via the url, in this case the PK for the blocking User
+        :return: HTTP Response verifying the block was successful
+        """
+
+        blocking_user_pk = kwargs.get("pk")
+        blocking_user = account_models.User.objects.filter(id=blocking_user_pk)
+        user_getting_blocked = request.data.get("user_id")
+        remove_block = request.data.get("remove")
+        response = get_default_response('200')
+
+        if blocking_user.exists():
+            # Check if the user the block is for is already blocked by the blocking user
+            blocking_user = blocking_user.first()
+
+            # If this is a request to remove the block, process that
+            if remove_block:
+                blocked_entry = account_models.Blocked.objects.filter(
+                    user_id=user_getting_blocked, blocked_by=blocking_user)
+                blocked_entry.delete()
+                return response
+
+            blocked_ids = account_models.Blocked.objects.filter(blocked_by=blocking_user).values_list("user", flat=True)
+
+            if user_getting_blocked not in blocked_ids:
+                new_block = account_models.Blocked.objects.create(user_id=user_getting_blocked, blocked_by=blocking_user)
+
+                serialized = account_serializers.BlockedSerializer(new_block).data
+                response.data = serialized
+
+        return response
+
+
 class GearSingleViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)

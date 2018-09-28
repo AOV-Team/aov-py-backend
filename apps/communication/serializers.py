@@ -20,6 +20,14 @@ class AOVFCMDeviceSerializer(FCMDeviceSerializer):
         extra_kwargs = {"user": {"read_only": True, "required": True}}
 
 
+class DirectMessageSerializer(serializers.ModelSerializer):
+    conversation = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = models.DirectMessage
+        fields = ("id", "sender", "recipient", "message", "index", "conversation")
+
+
 class PushNotificationRecordSerializer(serializers.ModelSerializer):
     action = serializers.SerializerMethodField()
     sender = serializers.SerializerMethodField()

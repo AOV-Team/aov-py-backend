@@ -1,6 +1,6 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
-from apps.communication.models import APNSDevice, PushNotificationRecord
+from apps.communication.models import PushNotificationRecord
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from datetime import timedelta

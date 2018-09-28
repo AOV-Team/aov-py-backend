@@ -24,6 +24,16 @@ class UserPublicSerializer(serializers.ModelSerializer):
                   'social_url', 'username', 'website_url',)
 
 
+class BlockedSerializer(serializers.ModelSerializer):
+    user = UserPublicSerializer()
+    blocked_by = serializers.PrimaryKeyRelatedField(queryset=models.Gear.objects.all())
+
+    class Meta:
+        model = models.Blocked
+        fields = ('user', 'blocked_by',)
+        read_only_fields = ('user', 'blocked_by',)
+
+
 class UserSerializer(serializers.ModelSerializer):
     gear = serializers.PrimaryKeyRelatedField(many=True, queryset=models.Gear.objects.all(), required=False)
 
