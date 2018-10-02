@@ -60,8 +60,11 @@ urlpatterns = [
     url(r'api/statistics/(?P<resource>[a-z^/]+)$', analytic_views.StatisticsViewSet.as_view()),
 
     # communication
-    url(r'api/conversations/(?P<pk>[0-9^/]+)$', communication_views.DirectMessageViewSet.as_view()),
+    # url(r'api/conversations/(?P<pk>[0-9^/]+)$', communication_views.DirectMessageViewSet.as_view()),
     url(r'api/devices$', communication_views.DevicesViewSet.as_view({"get": "list", "post": "post"})),
+    url(r'api/users/(?P<pk>[0-9^/]+)/conversations$', communication_views.ConversationViewSet.as_view()),
+    url(r'api/users/(?P<pk>[0-9^/]+)/conversations/(?P<conversation_id>[0-9^/]+)$',
+        communication_views.ConversationViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)/messages$', communication_views.DirectMessageViewSet.as_view()),
 
     # photo
