@@ -214,6 +214,13 @@ Make sure the following files are in the project directory before running the pr
 }
 ```
 
+### `/api/users/{}/conversations`
+* GET
+
+### `/api/users/{}/conversations/{}`
+* GET
+* DELETE
+
 ### `/api/users/{}/messages`
 * POST
 ```javascript
@@ -222,6 +229,9 @@ Make sure the following files are in the project directory before running the pr
     "conversation_id": ""  // Included if the message is part of a current conversation, exclude if it's the start of a new conversation
 }
 ```
+
+### `/api/users/{}/messages?conversation_id=`
+* GET
 
 ### `/api/users/{}/photos`
 * GET
@@ -234,9 +244,6 @@ Make sure the following files are in the project directory before running the pr
 * POST
 
 ### `/api/statistics/{resource:photos|users}`
-* GET
-
-### `/api/conversations/{}`
 * GET
 
 ### `/api/devices`, `/api/devices?q=`

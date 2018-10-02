@@ -227,7 +227,7 @@ class TestDirectMessageViewSetGET(TestCase):
         DirectMessage.objects.all().delete()
         Conversation.objects.all().delete()
 
-    def test_conversation_retrieval_success(self):
+    def test_messages_for_conversation_retrieval_success(self):
         """
             Unit test to verify that retrieving a Conversation works accordingly
 
@@ -243,7 +243,8 @@ class TestDirectMessageViewSetGET(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        api_response = client.get("/api/conversations/{}".format(conversation.id), format="json")
+        api_response = client.get("/api/users/{}/messages?conversation_id={}".format(sender.id, conversation.id),
+                                  format="json")
         self.assertEqual(api_response.status_code, 200)
 
         api_response_data = api_response.data["results"]
@@ -271,7 +272,8 @@ class TestDirectMessageViewSetGET(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        api_response = client.get("/api/conversations/{}".format(conversation.id), format="json")
+        api_response = client.get("/api/users/{}/messages?conversation_id={}".format(
+            non_participating.id, conversation.id), format="json")
         self.assertEqual(api_response.status_code, 200)
 
         api_response_data = api_response.data["results"]

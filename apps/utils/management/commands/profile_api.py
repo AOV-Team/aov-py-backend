@@ -381,6 +381,21 @@ def run_sample_login(url_base, parameters):
         sys.stdout.write("Sessions created: {}  \r".format(count))
         sys.stdout.flush()
 
+## TODO Remove after conversation with Gumbo about supposed 500?
+# def run_send_direct_message(url_base, parameters):
+#     user = User.objects.get(email="nortongumbo@gmail.com")
+#     login_response = requests.post(url_base + "/auth", data={"email": PROFILE_USER, "password": PROFILE_PASSWORD})
+#     if login_response.status_code == 201:
+#         token = login_response.json()["token"]
+#         headers = {"authorization": "Token {}".format(token)}
+#
+#         payload = {
+#             "message": "This is a test"
+#         }
+#
+#         response = requests.post(url_base + "/users/{}/messages".format(user.id), headers=headers, json=payload)
+#         print(response.status_code, response.__dict__)
+
 
 class Command(BaseCommand):
     help = 'Make API requests to test profiling packages'
@@ -428,7 +443,8 @@ class Command(BaseCommand):
             "all_photos": run_all_photos_profile,
             "single_photo": run_single_photo_profile,
             "top_photos": run_top_photos_profile,
-            "login": run_sample_login
+            "login": run_sample_login,
+            "message": run_send_direct_message
         }
 
         if options["all"]:

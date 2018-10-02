@@ -2,7 +2,7 @@ from apps.account.models import User, Blocked
 from apps.common.views import get_default_response
 from apps.communication.models import PushNotificationRecord, DirectMessage, Conversation
 from apps.communication.serializers import (
-    AOVFCMDeviceSerializer, PushNotificationRecordSerializer, DirectMessageSerializer
+    AOVFCMDeviceSerializer, PushNotificationRecordSerializer, DirectMessageSerializer, ConversationSerializer
 )
 from apps.communication.tasks import send_push_notification, update_device
 from datetime import timedelta
@@ -80,6 +80,69 @@ class DevicesViewSet(LoggingMixin, FCMDeviceViewSet):
                 raise ValidationError(serializer.errors)
         else:
             raise ValidationError('Missing required key "registration_id"')
+
+
+class ConversationViewSet(generics.ListAPIView):
+    """
+    /api/users/{}/conversations
+
+    """
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = ConversationSerializer
+
+    def get_queryset(self):
+        """
+            Retrieve all active conversations for a given user
+
+        :return: QuerySet of Conversation objects
+        """
+        user_pk = self.kwargs.get("pk")
+        user = User.objects.filter(id=user_pk)
+        conversation_id = self.kwargs.get("conversation_id")
+        conversations = Conversation.objects.none()
+
+        if user.exists():
+            conversations = Conversation.objects.filter(participants=user)
+
+            if conversation_id:
+                conversations = conversations.filter(id=conversation_id)
+
+        return conversations
+
+    def delete(self, request, **kwargs):
+        """
+            Method to delete a conversation
+
+            /api/users/{}/conversations/{}
+
+        :param request: HTTP Request object
+        :param kwargs: Additional keyword arguments needed to process the request. For this user ID and conversation ID
+        :return: HTTP Response
+        """
+
+        user_pk = kwargs.get("pk")
+        conversation_id = kwargs.get("conversation_id")
+
+        user = User.objects.filter(id=user_pk)
+        conversation = Conversation.objects.filter(id=conversation_id)
+
+        if user.exists() and conversation.exists():
+            conversation = conversation.first()
+            user = user.first()
+            # Check if the user is part of that conversation
+            if conversation.participants.filter(id=user.id).exists():
+                conversation.participants.remove(user)
+                conversation.save()
+
+            # Do a check on the number of participants after removal of the user. If there are no more, delete the entire conversation
+            if conversation.participants.count() == 0:
+                messages = DirectMessage.objects.filter(conversation=conversation)
+                messages.delete()
+                conversation.delete()
+
+            return get_default_response('200')
+        return get_default_response('409')
 
 
 class DirectMessageViewSet(generics.ListCreateAPIView):
@@ -182,12 +245,12 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
         :return: QuerySet of DirectMessage objects in a given Conversation
         """
 
-        sending_user = User.objects.filter(id=TokenAuthentication().authenticate(self.request)[0].id).first()
-        conversation_pk = self.kwargs.get('pk')
+        user_pk = self.kwargs.get("pk")
+        conversation_pk = self.request.query_params.get('conversation_id')
         conversation = Conversation.objects.filter(id=conversation_pk)
         queryset = DirectMessage.objects.none()
 
-        if conversation.exists() and sending_user.id in conversation.first().participants.values_list('id', flat=True):
+        if conversation.exists() and conversation.first().participants.filter(id=user_pk).exists():
             queryset = DirectMessage.objects.filter(conversation=conversation).order_by("index")
 
         return queryset

@@ -20,6 +20,20 @@ class AOVFCMDeviceSerializer(FCMDeviceSerializer):
         extra_kwargs = {"user": {"read_only": True, "required": True}}
 
 
+class ConversationSerializer(serializers.ModelSerializer):
+    latest = serializers.SerializerMethodField()
+
+    def get_latest(self, obj):
+        message = models.DirectMessage.objects.filter(conversation=obj, index=obj.message_count)
+        if message.exists():
+            return DirectMessageSerializer(message.first()).data
+        return {}
+
+    class Meta:
+        model = models.Conversation
+        fields = ("id", "participants", "latest", "message_count")
+
+
 class DirectMessageSerializer(serializers.ModelSerializer):
     conversation = serializers.PrimaryKeyRelatedField(read_only=True)
 
