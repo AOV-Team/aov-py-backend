@@ -1,6 +1,7 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
 from apps.communication.models import DirectMessage, PushNotificationRecord, Conversation
+from apps.communication.serializers import DirectMessageSerializer
 from django.test import TestCase
 from fcm_django.models import FCMDevice
 from rest_framework.test import APIClient
@@ -73,8 +74,10 @@ class TestDirectMessageViewSetPOST(TestCase):
 
             api_response = client.post("/api/users/{}/messages".format(recipient.id), data=message_data, format="json")
 
+            push_data = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+
             # Assert the mocked call for push notification occurred.
-            p.assert_called_with(api_key=None, badge=None, data=None, icon=None,
+            p.assert_called_with(api_key=None, badge=None, data=push_data, icon=None,
                                  registration_ids=[device.registration_id], sound=None, title=None,
                                  body="New message from {}.".format(sender.username))
 
@@ -129,8 +132,63 @@ class TestDirectMessageViewSetPOST(TestCase):
 
             api_response = client.post("/api/users/{}/messages".format(recipient.id), data=message_data, format="json")
 
+            push_data = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+
             # Assert the mocked call for push notification occurred.
-            p.assert_called_with(api_key=None, badge=None, data=None, icon=None,
+            p.assert_called_with(api_key=None, badge=None, data=push_data, icon=None,
+                                 registration_ids=[device.registration_id], sound=None, title=None,
+                                 body="New message from {}.".format(sender.username))
+
+        self.assertEqual(api_response.status_code, 200)
+        api_response_data = api_response.data
+        self.assertEqual(api_response_data["message"], message_data["message"])
+        self.assertEqual(api_response_data["sender"], sender.id)
+        self.assertEqual(api_response_data["recipient"], recipient.id)
+        self.assertEqual(api_response_data["index"], 3)
+        self.assertEqual(Conversation.objects.count(), 1)
+
+    def test_message_existing_conversation_excluded_id(self):
+        """
+            Unit test to verify that sending a message in an existing conversation without providing an ID works \
+            correctly
+
+        :return: None
+        """
+
+        sender = account_models.User.objects.get(username="gallen")
+        recipient = account_models.User.objects.get(username="aov1")
+        device = FCMDevice.objects.get(user=recipient)
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(sender)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        # Create a simple two user conversation
+        conversation = Conversation.objects.create(message_count=2)
+        conversation.participants = [sender.id, recipient.id]
+        conversation.save()
+
+        DirectMessage.objects.create(sender=sender, recipient=recipient, conversation=conversation, index=1,
+                                     message="Hey man, how's it going?")
+        DirectMessage.objects.create(sender=recipient, recipient=sender, conversation=conversation, index=2,
+                                     message="Pretty good.")
+
+        # Wrap the call in a mock so we aren't sending real push notifications during tests
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
+            # Send the message
+            message_data = {
+                "message": "Cool, cool."
+            }
+
+            api_response = client.post("/api/users/{}/messages".format(recipient.id), data=message_data, format="json")
+
+            push_data = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+
+            # Assert the mocked call for push notification occurred.
+            p.assert_called_with(api_key=None, badge=None, data=push_data, icon=None,
                                  registration_ids=[device.registration_id], sound=None, title=None,
                                  body="New message from {}.".format(sender.username))
 

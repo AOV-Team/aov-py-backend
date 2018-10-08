@@ -7,7 +7,7 @@ from apps.communication.serializers import (
 from apps.communication.tasks import send_push_notification, update_device
 from datetime import timedelta
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
@@ -182,9 +182,22 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
             if conversation_id:
                 conversation = Conversation.objects.get(id=conversation_id)
             else:
-                conversation = Conversation.objects.create(message_count=0)
-                conversation.participants = [sending_user, recipient]
-                conversation.save()
+                # There was no conversation ID. Check if a conversation exists and the ID was inadvertently left off
+                existing_convo = Conversation.objects.filter(
+                    participants__in=[sending_user, recipient]).distinct().annotate(
+                    num_participants=Count('participants')).filter(num_participants=2)
+
+                # TODO
+                # This only works for one to one conversations. If Group Messaging is introduced, this will need
+                # to be updated to have a conversation type (added to model) and force inclusion of the conversation ID.
+                # -- gallen
+
+                if existing_convo.exists():
+                    conversation = existing_convo.first()
+                else:
+                    conversation = Conversation.objects.create(message_count=0)
+                    conversation.participants = [sending_user, recipient]
+                    conversation.save()
 
             message = request.data.get("message")
             object_details = {
@@ -215,12 +228,16 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
 
             message = "New message from {}.".format(sending_user.username)
 
+            # Serialize and return the message to the front, for display.
+            serialized_message = DirectMessageSerializer(new_message)
+            response.data = serialized_message.data
+
             # This check is here to make sure the record is only created for devices that we have. No APNS means no
             # permission for notifications on the device.
             if fcm_device.exists() and sending_user.username != recipient.username:
 
                 try:
-                    send_push_notification(message, fcm_device)
+                    send_push_notification(message, fcm_device, data=serialized_message.data)
                     # Create the record of the notification being sent
                     PushNotificationRecord.objects.create(message=message, fcm_receiver=fcm_device.first(), action="D",
                                                           content_object=new_message, sender=sending_user)
@@ -229,10 +246,6 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
                     owning_apns.delete()
                 except FCMError:
                     pass
-
-            # Serialize and return the message to the front, for display.
-            serialized_message = DirectMessageSerializer(new_message)
-            response.data = serialized_message.data
 
         else:
             response = get_default_response('400')
