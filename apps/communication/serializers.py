@@ -1,4 +1,5 @@
 from apps.account.models import User
+from apps.account.serializers import UserPublicSerializer
 from apps.communication import models as models
 from apps.photo.models import Photo
 from apps.photo.serializers import PhotoSerializer
@@ -22,6 +23,7 @@ class AOVFCMDeviceSerializer(FCMDeviceSerializer):
 
 class ConversationSerializer(serializers.ModelSerializer):
     latest = serializers.SerializerMethodField()
+    participants = UserPublicSerializer(many=True)
 
     def get_latest(self, obj):
         message = models.DirectMessage.objects.filter(conversation=obj, index=obj.message_count)
