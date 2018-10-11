@@ -101,6 +101,15 @@ class ConversationViewSet(generics.ListAPIView):
         user = User.objects.filter(id=user_pk)
         conversation_id = self.kwargs.get("conversation_id")
         conversations = Conversation.objects.none()
+        participants = self.request.query_params.getlist("participants", None)
+
+        if not user_pk and not conversation_id and participants is not None:
+            participants = User.objects.filter(id__in=participants)
+            # print(participants)
+            conversations = Conversation.objects.filter(
+                    participants__in=participants).distinct().annotate(
+                    num_participants=Count('participants')).filter(num_participants__gte=participants.count())
+            print(conversations)
 
         if user.exists():
             conversations = Conversation.objects.filter(participants=user)
