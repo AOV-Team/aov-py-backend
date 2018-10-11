@@ -98,6 +98,37 @@ class TestConversationViewSetGET(TestCase):
         self.assertEqual(len(api_response_data), 0)
 
 
+    def test_conversation_retrieval_by_participant_list(self):
+        """
+            Unit test to verify that requesting conversations based on it's participants works correctly
+
+        :return: None
+        """
+        # Make a new user specifically for this test
+        participant = account_models.User.objects.create(email='gumbo@artofvisuals.com', password='haha',
+                                                         username='ngumbo')
+        user = account_models.User.objects.get(username="gallen")
+
+        # Add the new participant to the conversation
+        conversation = Conversation.objects.first()
+        conversation.participants.add(participant)
+        conversation.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(participant)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        api_response = client.get("/api/conversations?participants={}&participants={}".format(participant.id, user.id),
+                                  format="json")
+        self.assertEqual(api_response.status_code, 200)
+
+        api_response_data = api_response.data["results"]
+        self.assertEqual(len(api_response_data), 1)
+
+
 class TestConversationViewSetDELETE(TestCase):
     """
         Class to test the deletion of a Conversation by a user
