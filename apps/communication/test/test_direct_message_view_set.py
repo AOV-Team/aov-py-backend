@@ -308,8 +308,8 @@ class TestDirectMessageViewSetGET(TestCase):
         api_response_data = api_response.data["results"]
 
         self.assertEqual(len(api_response_data), 3)
-        self.assertEqual(api_response_data[0]["message"], "Hey man, how's it going?")
-        self.assertEqual(api_response_data[-1]["message"], "Good to hear. Movie tonight?")
+        self.assertEqual(api_response_data[-1]["message"], "Hey man, how's it going?")
+        self.assertEqual(api_response_data[0]["message"], "Good to hear. Movie tonight?")
 
     def test_conversation_retrieval_by_user_not_participating(self):
         """
