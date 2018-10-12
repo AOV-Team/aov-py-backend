@@ -273,7 +273,7 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
         queryset = DirectMessage.objects.none()
 
         if conversation.exists() and conversation.first().participants.filter(id=user_pk).exists():
-            queryset = DirectMessage.objects.filter(conversation=conversation).order_by("index")
+            queryset = DirectMessage.objects.filter(conversation=conversation).order_by("-index")
 
         return queryset
 

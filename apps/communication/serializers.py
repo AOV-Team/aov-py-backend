@@ -1,5 +1,6 @@
 from apps.account.models import User
 from apps.account.serializers import UserPublicSerializer
+from apps.common.serializers import DateTimeFieldWithTZ
 from apps.communication import models as models
 from apps.photo.models import Photo
 from apps.photo.serializers import PhotoSerializer
@@ -38,10 +39,11 @@ class ConversationSerializer(serializers.ModelSerializer):
 
 class DirectMessageSerializer(serializers.ModelSerializer):
     conversation = serializers.PrimaryKeyRelatedField(read_only=True)
+    created_at = DateTimeFieldWithTZ()
 
     class Meta:
         model = models.DirectMessage
-        fields = ("id", "sender", "recipient", "message", "index", "conversation")
+        fields = ("id", "sender", "recipient", "message", "index", "conversation", "created_at")
 
 
 class PushNotificationRecordSerializer(serializers.ModelSerializer):
