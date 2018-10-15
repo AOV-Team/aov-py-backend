@@ -43,7 +43,7 @@ class DirectMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.DirectMessage
-        fields = ("id", "sender", "recipient", "message", "index", "conversation", "created_at")
+        fields = ("id", "sender", "recipient", "message", "index", "conversation", "created_at", "read")
 
 
 class PushNotificationRecordSerializer(serializers.ModelSerializer):

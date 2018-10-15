@@ -24,6 +24,7 @@ class DirectMessage(EditMixin):
     recipient = models.ForeignKey(User, related_name="recipient")
     message = models.TextField()
     conversation = models.ForeignKey(Conversation, related_name="conversation")
+    read = models.BooleanField(default=False)
     index = models.PositiveIntegerField()
 
     class Meta:

@@ -278,6 +278,62 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
         return queryset
 
 
+class DirectMessageMarkReadViewSet(generics.CreateAPIView):
+    """
+    /api/users/{}/messages/{}/read
+
+    """
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = DirectMessageSerializer
+
+    def post(self, request, **kwargs):
+        auth_user = TokenAuthentication().authenticate(request)[0]
+        direct_message_id = kwargs.get("message_pk")
+        sender_pk = kwargs.get("pk")
+        response = get_default_response('404')
+        direct_message = DirectMessage.objects.none()
+
+        direct_message = (direct_message | DirectMessage.objects.filter(recipient=auth_user, sender_id=sender_pk,
+                                                                      id=direct_message_id))
+
+        if direct_message.exists():
+            direct_message = direct_message.first()
+
+            direct_message.read = True
+            direct_message.save()
+            response = get_default_response('200')
+            serialized_direct_message = DirectMessageSerializer(direct_message).data
+            response.data = serialized_direct_message
+
+            # Send a push data to the sender of the message notifying them it's been read
+            sender = User.objects.get(id=sender_pk)
+            owning_apns = APNSDevice.objects.filter(user=sender)
+
+            # Check for an existing FCM registry
+            fcm_device = FCMDevice.objects.filter(user=sender)
+            if not fcm_device.exists() and owning_apns.exists():
+                fcm_token = update_device(owning_apns)
+                if fcm_token:
+                    fcm_device = FCMDevice.objects.create(user=sender,
+                                                          type="ios", registration_id=fcm_token)
+                    fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
+
+            # This check is here to make sure the record is only created for devices that we have. No APNS means no
+            # permission for notifications on the device.
+            if fcm_device.exists():
+
+                try:
+                    send_push_notification(None, fcm_device, data=serialized_direct_message)
+
+                    # Delete the APNs device for easier deprecation later
+                    owning_apns.delete()
+                except FCMError:
+                    pass
+
+        return response
+
+
 class UserNotificationRecordViewSet(generics.ListCreateAPIView):
     """
         /api/users/me/notifications

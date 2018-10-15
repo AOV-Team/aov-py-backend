@@ -92,3 +92,42 @@ class TestTaskSendPushNotification(TestCase):
 
             p.assert_called_with(body=message, api_key=None, badge=None, data=None, icon=None, title=None,
                                  registration_ids=list(devices.values_list("registration_id", flat=True)), sound=None)
+
+    def test_task_send_push_notification_data_only(self):
+        """
+        Test that we can send push data messages successfully
+
+        :return: None
+        """
+        FCMDevice.objects.get(registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50')
+        FCMDevice.objects.get(registration_id='1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A1A')
+
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
+            data = {"test": "data"}
+
+            send_push_notification(None, 'all', data=data)
+
+            p.assert_called_with(api_key=None, badge=None, data=data, icon=None,
+                                 registration_ids=list(
+                                     FCMDevice.objects.all().values_list("registration_id", flat=True)), sound=None,
+                                 title=None, body=None)
+
+    def test_task_send_push_notification_specific_data_only(self):
+        """
+        Test that we can send a data only push notification to specific devices
+
+        :return: None
+        """
+        # Create test data
+        APNSDevice.objects.create(
+            registration_id='THISISATESTTHISISATESTTHISISATESTTHISISATESTTHISISATESTAHAAHAAHA')
+        devices = FCMDevice.objects.exclude(
+            registration_id="1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50")
+
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
+            data = {"test": "data"}
+
+            send_push_notification(None, devices, data=data)
+
+            p.assert_called_with(body=None, api_key=None, badge=None, data=data, icon=None, title=None,
+                                 registration_ids=list(devices.values_list("registration_id", flat=True)), sound=None)
