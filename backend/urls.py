@@ -66,6 +66,7 @@ urlpatterns = [
     url(r'api/users/(?P<pk>[0-9^/]+)/conversations/(?P<conversation_id>[0-9^/]+)$',
         communication_views.ConversationViewSet.as_view()),
     url(r'api/users/(?P<pk>[0-9^/]+)/messages$', communication_views.DirectMessageViewSet.as_view()),
+    url(r'api/users/(?P<pk>[0-9^/]+)/messages/(?P<message_pk>[0-9^/]+)/read$', communication_views.DirectMessageMarkReadViewSet.as_view()),
 
     # photo
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),

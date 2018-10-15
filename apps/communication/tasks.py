@@ -39,7 +39,10 @@ def send_push_notification(message, recipients, **kwargs):
             for devices in chunk_devices(all_devices, 100):
                 devices = FCMDevice.objects.filter(id__in=devices.values_list("id", flat=True))
                 try:
-                    devices.send_message(body=message, **kwargs)
+                    if not message and all(["body" in kwargs and kwargs.get("body")]):
+                        devices.send_message(**kwargs)
+                    else:
+                        devices.send_message(body=message, **kwargs)
                 except ConnectionError:
                     continue
                 except FCMError:
@@ -49,7 +52,10 @@ def send_push_notification(message, recipients, **kwargs):
     elif type(recipients) is list or type(recipients) is FCMDeviceQuerySet:
         devices = FCMDevice.objects.filter(id__in=recipients)
     try:
-        devices.send_message(body=message, **kwargs)
+        if not message and all(["body" in kwargs and kwargs.get("body")]):
+            devices.send_message(**kwargs)
+        else:
+            devices.send_message(body=message, **kwargs)
     except ConnectionError:
         pass
     except FCMError:
