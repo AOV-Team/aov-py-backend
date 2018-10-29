@@ -1,5 +1,5 @@
 from apps.account.models import User, Blocked
-from apps.common.views import get_default_response
+from apps.common.views import get_default_response, LargeResultsSetPagination
 from apps.communication.models import PushNotificationRecord, DirectMessage, Conversation
 from apps.communication.serializers import (
     AOVFCMDeviceSerializer, PushNotificationRecordSerializer, DirectMessageSerializer, ConversationSerializer
@@ -162,6 +162,7 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
     serializer_class = DirectMessageSerializer
+    pagination_class = LargeResultsSetPagination
 
     @transaction.atomic
     def post(self, request, **kwargs):
