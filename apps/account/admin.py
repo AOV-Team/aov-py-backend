@@ -281,7 +281,7 @@ class ProfileAdmin(GuardedModelAdmin):
                      'user__username',)
 
     def has_delete_permission(self, request, obj=None):
-        if settings.DEBUG:
+        if settings.DEBUG or request.user.is_superuser:
             return True
 
         return False

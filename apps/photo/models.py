@@ -115,7 +115,7 @@ class PhotoClassification(models.Model):
         upload_to=common_models.get_classification_background_file_path, blank=True, null=True)
     classification_type = models.CharField(max_length=32, choices=CLASSIFICATION_TYPE_CHOICES, default='tag')
     icon = models.ImageField(upload_to=common_models.get_classification_icon_file_path, blank=True, null=True)
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=512)
     photo_feed = models.ForeignKey('PhotoFeed', on_delete=models.SET_NULL, null=True, blank=True)
     public = models.BooleanField(default=True)
 
