@@ -395,7 +395,7 @@ class PhotoSerializer(serializers.ModelSerializer):
             user = self.context["request"].user
 
         # Put in a check to prevent the attempts of retrieving PhotoVote objects for the AnonymousUser object.
-        if user.__string__() != "AnonymousUser":
+        if user.__str__() != "AnonymousUser":
             photo_vote = models.PhotoVote.objects.filter(photo=obj, user=user)
         else:
             photo_vote = models.PhotoVote.objects.none()
