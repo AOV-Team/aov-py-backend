@@ -4,6 +4,7 @@ from django.contrib import admin
 
 class ConversationAdmin(admin.ModelAdmin):
     list_display = ('id', 'message_count', 'get_participants')
+    raw_id_fields = ("participants", )
     search_fields = ('id', 'participants__email', 'participants__username')
 
     def get_participants(self, obj):
@@ -21,6 +22,7 @@ class PushMessageAdmin(admin.ModelAdmin):
 
 class PushNotificationRecordAdmin(admin.ModelAdmin):
     list_display = ("id", "action", "receiver", "sender",)
+    readonly_fields = ("sender",)
     search_fields = ("id", "message", "receiver__user__email", "sender__email", "sender__username",
                      "receiver__user__username",)
 
