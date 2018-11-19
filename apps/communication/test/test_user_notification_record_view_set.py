@@ -1,6 +1,6 @@
 from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
-from apps.communication.models import PushNotificationRecord
+from apps.communication.models import PushNotificationRecord, Conversation, DirectMessage
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from datetime import timedelta
@@ -45,6 +45,8 @@ class TestUserNotificationRecordViewSetGET(TestCase):
         device = FCMDevice.objects.create(
             registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=target_user,
             type="ios")
+
+        # Create photos to be used
         photo = photo_models.Photo(coordinates=Point(-116, 43),
                                    image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
                                    user=target_user)
@@ -55,6 +57,15 @@ class TestUserNotificationRecordViewSetGET(TestCase):
         photo2.save()
         photo_models.Gallery.objects.create_or_update(
             name="Test Gallery", user=target_user, photos=photo_models.Photo.objects.all())
+
+        # Set up a conversation with DMs
+        conversation = Conversation.objects.create(message_count=1)
+        conversation.participants = [auth_user, target_user]
+        conversation.save()
+
+        dm = DirectMessage.objects.create(sender=auth_user, recipient=target_user, message="Hey",
+                                          conversation=conversation, index=1)
+
 
         message = "{} has upvoted your artwork.".format(auth_user.username)
         PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="U",
@@ -68,6 +79,9 @@ class TestUserNotificationRecordViewSetGET(TestCase):
         message = "{} started following you.".format(auth_user.username)
         PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="F",
                                               content_object=target_user, sender=auth_user)
+        message = "New message from {}.".format(auth_user.username)
+        PushNotificationRecord.objects.create(message=message, fcm_receiver=device, action="D",
+                                              content_object=dm, sender=auth_user)
 
     def tearDown(self):
         """
@@ -103,7 +117,30 @@ class TestUserNotificationRecordViewSetGET(TestCase):
         results = request.data['results']
 
         self.assertEqual(request.status_code, 200)
-        self.assertEqual(len(results), 3)
+        self.assertEqual(len(results), 4)
+
+        # Retrieve the objects that should be in related_object field of Records, and check if they are there
+        dm = DirectMessage.objects.first()
+        photo = photo_models.Photo.objects.first()
+        dm_found = False
+        photo_found = False
+        photo_found_count = 0
+
+        for record in results:
+            related_object = record["related_object"][0]
+
+
+            if related_object["id"] == dm.id:
+                dm_found = True
+
+            if related_object["id"] == photo.id:
+                photo_found = True
+                photo_found_count += 1
+
+            if all([photo_found, dm_found, photo_found_count == 3]):
+                break
+
+        self.assertTrue(all([photo_found, dm_found, photo_found_count == 3]))
 
 
 class TestUserNotificationRecordViewSetPOST(TestCase):
