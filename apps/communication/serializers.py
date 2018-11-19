@@ -62,6 +62,9 @@ class PushNotificationRecordSerializer(serializers.ModelSerializer):
             return PhotoSerializer(
                 Photo.objects.filter(id=obj.object_id), many=True, context={"request": self.context["request"]}).data
 
+        elif obj.action == "D":
+            return DirectMessageSerializer(models.DirectMessage.objects.filter(id=obj.object_id), many=True).data
+
     def get_sender(self, obj):
         if obj.action == "A":
             return None
