@@ -247,10 +247,16 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
             if fcm_device.exists() and sending_user.username != recipient.username:
 
                 try:
-                    send_push_notification(message, fcm_device, data=serialized_message.data)
                     # Create the record of the notification being sent
-                    PushNotificationRecord.objects.create(message=message, fcm_receiver=fcm_device.first(), action="D",
-                                                          content_object=new_message, sender=sending_user)
+                    record = PushNotificationRecord.objects.create(
+                        message=message, fcm_receiver=fcm_device.first(), action="D", content_object=new_message,
+                        sender=sending_user)
+                    push_data = {
+                        "direct_message": serialized_message.data,
+                        "record_id": record.id
+                    }
+                    send_push_notification(message, fcm_device, data=push_data)
+
 
                     # Delete the APNs device for easier deprecation later
                     owning_apns.delete()

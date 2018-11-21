@@ -74,7 +74,13 @@ class TestDirectMessageViewSetPOST(TestCase):
 
             api_response = client.post("/api/users/{}/messages".format(recipient.id), data=message_data, format="json")
 
-            push_data = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+            message = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+            record_id = PushNotificationRecord.objects.first().id
+
+            push_data = {
+                "direct_message": message,
+                "record_id": record_id
+            }
 
             # Assert the mocked call for push notification occurred.
             p.assert_called_with(api_key=None, badge=None, data=push_data, icon=None,
@@ -132,7 +138,13 @@ class TestDirectMessageViewSetPOST(TestCase):
 
             api_response = client.post("/api/users/{}/messages".format(recipient.id), data=message_data, format="json")
 
-            push_data = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+            message = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+            record_id = PushNotificationRecord.objects.first().id
+
+            push_data = {
+                "direct_message": message,
+                "record_id": record_id
+            }
 
             # Assert the mocked call for push notification occurred.
             p.assert_called_with(api_key=None, badge=None, data=push_data, icon=None,
@@ -185,7 +197,13 @@ class TestDirectMessageViewSetPOST(TestCase):
 
             api_response = client.post("/api/users/{}/messages".format(recipient.id), data=message_data, format="json")
 
-            push_data = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+            message = DirectMessageSerializer(DirectMessage.objects.get(message=message_data["message"])).data
+            record_id = PushNotificationRecord.objects.first().id
+
+            push_data = {
+                "direct_message": message,
+                "record_id": record_id
+            }
 
             # Assert the mocked call for push notification occurred.
             p.assert_called_with(api_key=None, badge=None, data=push_data, icon=None,
