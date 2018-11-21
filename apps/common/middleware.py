@@ -12,7 +12,7 @@ class UserSessionMiddleware(MiddlewareMixin):
         user = getattr(request, "user", None)
 
         # Type check via toString representation to avoid dealing with AnonymousUser requests
-        if user.__str__() != "AnonymousUser" and all([ignored not in path for ignored in ignored_path_list]):
+        if user and user.__str__() != "AnonymousUser" and all([ignored not in path for ignored in ignored_path_list]):
             # Send the user_logged_in signal ONLY if the path is the authenticate view
             if "auth" in path:
                 try:

@@ -296,3 +296,30 @@ class TestUserFollowersViewSetPOST(TestCase):
         followers = target_user.follower.all()
 
         self.assertEquals(followers.count(), 0)
+
+    def test_user_followers_view_set_follow_back_post_successful(self):
+        """
+        Test that I can follow one of my followers
+
+        :return: None
+        """
+        # Test data
+        target_user = account_models.User.objects.create_user(age=25, email='mrtest@mypapaya.io',
+                                                              social_name='@ronquilloaeon', username='aov_hov')
+
+        access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
+
+        # Follow target user
+        target_user.follower = [access_user]
+        target_user.save()
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(target_user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        request = client.post('/api/users/{}/followers'.format(access_user.id), format='json')
+
+        self.assertEquals(request.status_code, 201)
