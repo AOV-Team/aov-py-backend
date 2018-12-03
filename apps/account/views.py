@@ -416,7 +416,7 @@ class MeViewSet(generics.GenericAPIView):
         :return: Response object
         """
         authenticated_user = TokenAuthentication().authenticate(request)[0]
-        payload = request.data
+        payload = request.data.copy()
         response = get_default_response('200')
 
         # Remove PKs and other fields that cannot be updated via API
@@ -462,8 +462,6 @@ class MeViewSet(generics.GenericAPIView):
 
         if 'is_superuser' in payload:
             del payload['is_superuser']
-
-        # updated_user = account_models.User.objects.get(id=authenticated_user.id)
 
         # Password
         if 'password' in payload:
@@ -624,7 +622,7 @@ class MeProfileViewSet(generics.GenericAPIView):
         :return: Response object
         """
         authenticated_user = TokenAuthentication().authenticate(request)[0]
-        payload = request.data
+        payload = request.data.copy()
         response = get_default_response('404')
 
         # Gear not allowed
