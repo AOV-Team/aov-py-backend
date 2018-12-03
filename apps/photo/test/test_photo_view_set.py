@@ -722,6 +722,39 @@ class TestPhotoViewSetPOST(TestCase):
 
     @override_settings(REMOTE_IMAGE_STORAGE=False,
                        DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
+    def test_photo_view_set_post_long_geo_location(self):
+        """
+        Test that we get a 403 if geo_location is not in "POINT (long, lat)" format
+
+        :return: None
+        """
+        # Test data
+        image = 'apps/common/test/data/photos/cover.jpg'
+
+        user = account_models.User.objects.get(email='mrtest@mypapaya.io', username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Landscape', classification_type='category')
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open(image, 'rb') as i:
+            payload = {
+                'category': category.id,
+                'geo_location': 'POINT ({} {})'.format(-97.72594869999999, 30.258850199999998),
+                'image': i
+            }
+
+            request = client.post('/api/photos', data=payload, format='multipart')
+
+        self.assertEquals(request.status_code, 200)
+
+
+    @override_settings(REMOTE_IMAGE_STORAGE=False,
+                       DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage')
     def test_photo_view_set_post_bad_request_fields_missing(self):
         """
         Test that we get 400 if required fields are missing

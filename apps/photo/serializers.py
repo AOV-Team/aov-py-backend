@@ -293,7 +293,7 @@ class PhotoSerializer(serializers.ModelSerializer):
     """
     comments = serializers.SerializerMethodField()
     dimensions = serializers.SerializerMethodField()
-    geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
+    geo_location = serializers.CharField(max_length=64, write_only=True, required=False)
     image_blurred = serializers.ImageField(required=False)
 
     #TODO Remove the following block when optimizations are done on Frontend
