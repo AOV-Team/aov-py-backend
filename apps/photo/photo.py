@@ -85,7 +85,8 @@ class Photo(ImageFile):
 
             try:
                 os.remove(icc_filename)
-            except OSError:
+            except OSError as e:
+                print(e)
                 pass
 
         # If the image is neither of the above, then just return the original image
@@ -103,8 +104,15 @@ class Photo(ImageFile):
         self.resize(max_width=max_width)
 
         mem_img = BytesIO()
-        self.pillow_image.save(fp=mem_img, format='JPEG', icc_profile=self.pillow_image.info.get('icc_profile'),
-                               quality=quality)
+        if self.pillow_image.mode == "P":
+            self.pillow_image.convert("RGB").save(fp=mem_img, format='JPEG',
+                                                  icc_profile=self.pillow_image.info.get('icc_profile'),
+                                                  quality=quality)
+        else:
+
+            self.pillow_image.save(fp=mem_img, format='JPEG', icc_profile=self.pillow_image.info.get('icc_profile'),
+                                   quality=quality)
+
         content = ContentFile(mem_img.getvalue())
 
         return InMemoryUploadedFile(content, None, self.name, 'image/jpeg', content.tell, None)
