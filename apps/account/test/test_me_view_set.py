@@ -128,6 +128,45 @@ class TestMeViewSetPATCH(TestCase):
         self.assertIsNotNone(updated_user.avatar)
         self.assertNotEqual(avatar, updated_user.avatar)
 
+    def test_me_view_set_patch_avatar_png(self):
+        """
+        Test that we can update user's photo
+
+        :return: None
+        """
+        # Create data
+        user = account_models.User.objects\
+            .create_user(age=23, email='test@test.com', social_name='aeon', username='aov_hov')
+
+        self.assertIsNotNone(user.avatar)
+        avatar = user.avatar
+
+        # Simulate auth
+        token = test_helpers.get_token_for_user(user)
+
+        # Get data from endpoint
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        with open('apps/common/test/data/photos/garrett-avatar.png', 'rb') as image:
+            payload = {
+                'avatar': image,
+                'email': user.email,
+                'username': user.username
+            }
+
+            request = client.patch('/api/me', data=payload, format='multipart')
+
+        result = request.data
+
+        self.assertIsNotNone(result['avatar'])
+
+        # Should have compressed and saved image
+        updated_user = account_models.User.objects.get(id=user.id)
+
+        self.assertIsNotNone(updated_user.avatar)
+        self.assertNotEqual(avatar, updated_user.avatar)
+
     def test_me_view_set_patch_gear(self):
         """
         Test that we can update user's gear
