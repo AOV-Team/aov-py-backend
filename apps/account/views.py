@@ -7,7 +7,7 @@ from apps.common.mailer import send_transactional_email
 from apps.common.exceptions import ForbiddenValue, OverLimitException
 from apps.common.serializers import setup_eager_loading
 from apps.common.views import get_default_response, DefaultResultsSetPagination, LargeResultsSetPagination, \
-    MediumResultsSetPagination, remove_pks_from_payload
+    MediumResultsSetPagination, remove_pks_from_payload, query_dict_to_dict
 from apps.communication.models import PushNotificationRecord
 from apps.communication.tasks import send_push_notification
 from apps.photo import models as photo_models
@@ -416,7 +416,7 @@ class MeViewSet(generics.GenericAPIView):
         :return: Response object
         """
         authenticated_user = TokenAuthentication().authenticate(request)[0]
-        payload = request.data.copy()
+        payload = query_dict_to_dict(request.data)
         response = get_default_response('200')
 
         # Remove PKs and other fields that cannot be updated via API
@@ -622,7 +622,7 @@ class MeProfileViewSet(generics.GenericAPIView):
         :return: Response object
         """
         authenticated_user = TokenAuthentication().authenticate(request)[0]
-        payload = request.data.copy()
+        payload = query_dict_to_dict(request.data)
         response = get_default_response('404')
 
         # Gear not allowed

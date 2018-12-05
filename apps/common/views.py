@@ -1,3 +1,4 @@
+from django.http import QueryDict
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -110,6 +111,21 @@ def get_default_response(status_code):
         return Response(data=copy.copy(RESPONSES[status_code]), status=copy.copy(STATUS_CODES[status_code]))
     else:
         raise NameError('The status code {} not supported.'.format(status_code))
+
+
+def query_dict_to_dict(query_dict: QueryDict):
+    """
+    Convert a QueryDict to a dictionary with same key/value pairs
+
+    :param query_dict: HTTP Request QueryDict from a Django view
+    :return: dict() instance with same data as the QueryDict
+    """
+    converted_dict = dict()
+
+    for key, value in query_dict.items():
+        converted_dict.update({key: value})
+
+    return converted_dict
 
 
 class DefaultResultsSetPagination(PageNumberPagination):
