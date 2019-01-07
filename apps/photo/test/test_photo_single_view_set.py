@@ -130,7 +130,7 @@ class TestPhotoSingleViewSetGET(TestCase):
         result = request.data
 
         self.assertIn('dimensions', result)
-        self.assertNotIn('image', result)
+        self.assertIn('image', result)
         self.assertEquals(len(result['gear']), 2)
         self.assertIsInstance(result['gear'][0], int)
         self.assertEquals(result['user'], user.id)
@@ -206,19 +206,19 @@ class TestPhotoSingleViewSetGET(TestCase):
 
         # Get data from endpoint
         client = APIClient()
-        client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         request = client.get('/api/photos/{}'.format(photo.id))
         result = request.data
 
         self.assertIn('dimensions', result)
-        self.assertNotIn('image', result)
+        self.assertIn('image', result)
         self.assertEquals(len(result['gear']), 2)
         self.assertIsInstance(result['gear'][0], int)
         self.assertEquals(result['user'], user.id)
         self.assertEquals(result['user_details']['location'], user.location)
         self.assertEquals(result['user_details']['social_name'], user.social_name)
         self.assertEquals(result['user_details']['username'], user.username)
+        self.assertFalse(result["user_starred"]["starred"])
 
 
 class TestPhotoSingleViewSetPATCH(TestCase):

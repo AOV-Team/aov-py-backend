@@ -1439,13 +1439,6 @@ class TagSearchViewSet(generics.ListAPIView):
         return qs.order_by("name")
 
 
-# class TagPhotoViewSet(generics.ListAPIView):
-#     """
-#         /api/tags/<id>/photos
-#
-#     """
-
-
 class UserFollowingPhotoViewSet(generics.ListAPIView):
     """
         View to retrieve all photos for the users being followed by the requesting user

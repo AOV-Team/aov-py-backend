@@ -370,13 +370,15 @@ class PhotoSerializer(serializers.ModelSerializer):
         """
 
         authenticate = TokenAuthentication().authenticate(self.context["request"])
+        star_interest = account_models.UserInterest.objects.none()
         if authenticate:
             user = authenticate[0]
         else:
             user = self.context["request"].user
-        photo_type = ContentType.objects.get_for_model(obj)
-        star_interest = account_models.UserInterest.objects.filter(interest_type='star', user=user,
-                                                                   object_id=obj.id, content_type__pk=photo_type.id)
+
+        if user.__str__() != "AnonymousUser":
+            star_interest = obj.user_interest.filter(user=user, interest_type="star")
+
         return {
             "starred": star_interest.exists(),
         }
@@ -399,6 +401,7 @@ class PhotoSerializer(serializers.ModelSerializer):
             photo_vote = models.PhotoVote.objects.filter(photo=obj, user=user)
         else:
             photo_vote = models.PhotoVote.objects.none()
+
         if photo_vote.exists():
             return {
                 "voted": True,
