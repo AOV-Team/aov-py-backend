@@ -148,7 +148,7 @@ class TestMeViewSetPATCH(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
-        with open('apps/common/test/data/photos/garrett-avatar.png', 'rb') as image:
+        with open('apps/common/test/data/photos/avatar.png', 'rb') as image:
             payload = {
                 'avatar': image,
                 'email': user.email,

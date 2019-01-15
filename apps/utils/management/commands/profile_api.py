@@ -382,19 +382,19 @@ def run_sample_login(url_base, parameters):
         sys.stdout.flush()
 
 ## TODO Remove after conversation with Gumbo about supposed 500?
-# def run_send_direct_message(url_base, parameters):
-#     user = User.objects.get(email="nortongumbo@gmail.com")
-#     login_response = requests.post(url_base + "/auth", data={"email": PROFILE_USER, "password": PROFILE_PASSWORD})
-#     if login_response.status_code == 201:
-#         token = login_response.json()["token"]
-#         headers = {"authorization": "Token {}".format(token)}
-#
-#         payload = {
-#             "message": "This is a test"
-#         }
-#
-#         response = requests.post(url_base + "/users/{}/messages".format(user.id), headers=headers, json=payload)
-#         print(response.status_code, response.__dict__)
+def run_update_profile(url_base, parameters):
+    login_response = requests.post(url_base + "/auth", data={"email": PROFILE_USER, "password": PROFILE_PASSWORD})
+    if login_response.status_code == 201:
+        token = login_response.json()["token"]
+        headers = {"authorization": "Token {}".format(token)}
+
+        with open('apps/common/test/data/photos/avatar-min.png', 'rb') as image:
+            payload = {
+                'avatar': image
+            }
+
+            response = requests.patch(url_base + "/api/me", headers=headers, files=payload)
+        print(response.status_code, response.__dict__)
 
 
 class Command(BaseCommand):
@@ -444,7 +444,7 @@ class Command(BaseCommand):
             "single_photo": run_single_photo_profile,
             "top_photos": run_top_photos_profile,
             "login": run_sample_login,
-            "message": run_send_direct_message
+            "me": run_update_profile
         }
 
         if options["all"]:

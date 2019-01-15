@@ -17,6 +17,7 @@ from apps.account import views as account_views
 from apps.analytic import views as analytic_views
 from apps.communication import views as communication_views
 from apps.photo import views as photo_views
+from apps.podcast import views as podcast_views
 from apps.utils import views as utils_views
 from django.conf import settings
 from django.conf.urls import include, url
@@ -86,6 +87,9 @@ urlpatterns = [
         photo_views.PhotoSingleInterestsViewSet.as_view()),
     url(r'api/photos/top$', photo_views.PhotoAppTopPhotosViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/votes', photo_views.PhotoSingleVotesViewSet.as_view()),
+
+    # podcast
+    url(r'api/podcast/get_featured$', podcast_views.GetFeaturedRequestView.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
