@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    'corsheaders',
     'imagekit',
     'storages',
     'apps.account',
@@ -83,6 +84,7 @@ if DEBUG:
 
 MIDDLEWARE += [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'apps.common.middleware.UserSessionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
