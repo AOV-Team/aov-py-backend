@@ -33,6 +33,9 @@ class Requester(common_models.EditMixin):
         default_permissions = ('add', 'change', 'delete', 'view')
         verbose_name_plural = 'Requesters'
 
+    def __str__(self):
+        return "{} - {}".format(self.instagram_handle, self.full_name)
+
 
 class GetFeaturedRequest(common_models.EditMixin):
     """
@@ -52,6 +55,22 @@ class GetFeaturedRequest(common_models.EditMixin):
         default_permissions = ('add', 'change', 'delete', 'view')
         verbose_name_plural = 'Get Featured Requests'
 
+    def __str__(self):
+        return "Request made by {}".format(self.requester_fk.full_name)
+
+
+class CameraManager(models.Manager):
+    def create_or_update(self, **kwargs):
+        new_camera = Camera(**kwargs)
+        existing = Camera.objects.filter(model=new_camera.model).first()
+
+        if existing:
+            new_camera.created_at = existing.created_at
+            new_camera.pk = existing.pk
+            new_camera.id = existing.id
+
+        new_camera.save()
+        return new_camera
 
 
 class Camera(common_models.EditMixin):
@@ -64,6 +83,11 @@ class Camera(common_models.EditMixin):
 
     model = models.CharField(max_length=156)
 
+    objects = CameraManager()
+
     class Meta:
         default_permissions = ('add', 'change', 'delete', 'view')
         verbose_name_plural = 'Cameras'
+
+    def __str__(self):
+        return self.model

@@ -72,7 +72,7 @@ class GetFeaturedRequestView(generics.GenericAPIView):
             # Save original photo to media
             try:
                 photo = Photo(request.data['image'])
-                photo.save('AVATAR_NEW_USER_{}_{}'.format(common_models.get_date_stamp_str(), photo.name),
+                photo.save('GET_FEATURED_{}_{}'.format(common_models.get_date_stamp_str(), photo.name),
                            custom_bucket=settings.STORAGE['IMAGES_ORIGINAL_BUCKET_NAME'])
 
                 # Process image to save
@@ -85,7 +85,7 @@ class GetFeaturedRequestView(generics.GenericAPIView):
             requester_fk=requester, image=request.data.get("image", None))
 
         # Handle any Cameras submitted
-        cameras = request.data.get("Camera", [])
+        cameras = request.data.get("camera", [])
 
         for camera in cameras:
             podcast_models.Camera.objects.create_or_update(model=camera, get_featured_request_fk=get_featured_request)

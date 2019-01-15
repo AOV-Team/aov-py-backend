@@ -97,7 +97,7 @@ def get_uploaded_file_path(instance, filename):
         filename = 'u{}.{}'.format(instance.user.id, filename.split('.')[-1])
 
     elif hasattr(instance, "requester_fk"):
-        filename = 'AVATAR_{}.{}'.format(instance.requester_fk.email, filename.split('.')[-1])
+        filename = 'GET_FEATURED.{}'.format(filename.split('.')[-1])
 
     elif hasattr(instance, "gender") and instance.__str__() == "User":
         # Instance is of type User
