@@ -92,12 +92,17 @@ def get_uploaded_file_path(instance, filename):
     """
     # If image has user, use username.{extension}
     # Else use name of file
-    try:
-        filename = 'u{}.{}'\
-            .format(instance.user.id, filename.split('.')[-1]) if instance.user else filename
-    except AttributeError:
+
+    if hasattr(instance, "user"):
+        filename = 'u{}.{}'.format(instance.user.id, filename.split('.')[-1])
+
+    elif hasattr(instance, "requester_fk"):
+        filename = 'AVATAR_{}.{}'.format(instance.requester_fk.email, filename.split('.')[-1])
+
+    elif hasattr(instance, "gender") and instance.__str__() == "User":
         # Instance is of type User
         filename = 'AVATAR_{}.{}'.format(instance.email, filename.split('.')[-1])
+
 
     # Date stamp
     current_time = get_date_stamp_str()
