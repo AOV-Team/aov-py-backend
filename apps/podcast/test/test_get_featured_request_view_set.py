@@ -108,3 +108,23 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
 
         self.assertEqual(request.status_code, 400)
         self.assertEqual(request.data["message"], "Missing required field location")
+
+    def test_new_request_with_story(self):
+        """
+        Unit test to verify an optional story can be submitted with the request, and we'll store it
+
+        :return: None
+        """
+        # Get data from endpoint
+        client = APIClient()
+
+        payload = {
+            "email": "user@test.com",
+            "full_name": "testUsername",
+            "location": "Boise",
+            "story": "lorem ipsum blah blah blah"
+        }
+
+        request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+
+        self.assertEqual(request.status_code, 200)

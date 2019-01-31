@@ -50,6 +50,7 @@ class GetFeaturedRequest(common_models.EditMixin):
     # audio = models.FileField(upload_to=common_models.get_audio_file_path)
 
     reviewed = models.BooleanField(default=False)
+    story = models.TextField(null=True, blank=True)
 
     class Meta:
         default_permissions = ('add', 'change', 'delete', 'view')
