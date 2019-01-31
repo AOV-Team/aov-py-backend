@@ -47,7 +47,7 @@ class GetFeaturedRequest(common_models.EditMixin):
 
     # Media fields
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path, null=True, blank=True)
-    # audio = models.FileField(upload_to=common_models.get_audio_file_path)
+    audio = models.URLField(blank=True, null=True, help_text="URL to the hosted media (AWS, Soundcloud, etc.)")
 
     reviewed = models.BooleanField(default=False)
 
@@ -91,3 +91,14 @@ class Camera(common_models.EditMixin):
 
     def __str__(self):
         return self.model
+
+
+# class Episode(common_models.EditMixin):
+#     """
+#         A single episode of the AoV Podcast
+#
+#     """
+#     # MEDIA
+#     # audio and metadata
+#     audio = models.URLField(help_text="URL to the hosted media (AWS, Soundcloud, etc.)")
+

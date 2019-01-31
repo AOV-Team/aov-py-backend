@@ -39,6 +39,29 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
 
         self.assertEqual(request.status_code, 200)
 
+    def test_new_request_with_audio(self):
+        """
+        Test case to make sure a new person can submit a request with an audio soundbite.
+
+        :return: None
+        """
+        # Get data from endpoint
+        client = APIClient()
+
+        with open("apps/common/test/data/audio/allredct_gold_podcast_2.wav", "rb") as audio:
+            payload = {
+                "audio": audio,
+                "email": "user@test.com",
+                "full_name": "testUsername",
+                "location": "Boise",
+
+            }
+
+            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+
+        self.assertEqual(request.status_code, 200)
+
+
     def test_new_request_no_image(self):
         """
         Unit test to verify posting a new request works with no image

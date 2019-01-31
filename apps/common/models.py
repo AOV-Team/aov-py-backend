@@ -82,6 +82,26 @@ def get_random_queryset_elements(queryset, number, yield_object=True):
             pass
 
 
+def get_audio_file_path(instance, filename):
+    """
+    Function that determines a filepath for audio files
+
+    :param instance: Instance of a db object for which the file is being saved
+    :param filename: Name of file
+    :return: Path to the file
+    """
+
+    # It's a GetFeatured audio file
+    if hasattr(instance, "reviewed"):
+        filename = "GET_FEATURED_AUDIO.{}".format(filename.split('.')[-1])
+
+    # It's a Podcast Episode
+    elif hasattr(instance, "archived"):
+        filename = "PODCAST_{}.{}".format(instance.title, filename.split('.')[-1])
+
+    return build_file_name(get_date_stamp_str(), filename)
+
+
 def get_uploaded_file_path(instance, filename):
     """
     Function that determines file path for specified file
@@ -110,6 +130,7 @@ def get_uploaded_file_path(instance, filename):
     # 2016-11-30_135957_{filename|username}.{ext}
     return build_file_name(current_time, filename)
 
+
 def get_classification_background_file_path(instance, filename):
     """
         Function that determines file path for specified file
@@ -123,6 +144,7 @@ def get_classification_background_file_path(instance, filename):
     filepath = "{}".format(new_filename.replace(' ', '_'))
 
     return filepath
+
 
 def get_classification_icon_file_path(instance, filename):
     """
