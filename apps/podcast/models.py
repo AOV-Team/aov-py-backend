@@ -50,6 +50,7 @@ class GetFeaturedRequest(common_models.EditMixin):
     audio = models.URLField(blank=True, null=True, help_text="URL to the hosted media (AWS, Soundcloud, etc.)")
 
     reviewed = models.BooleanField(default=False)
+    story = models.TextField(null=True, blank=True)
 
     class Meta:
         default_permissions = ('add', 'change', 'delete', 'view')

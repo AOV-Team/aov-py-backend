@@ -82,7 +82,7 @@ class GetFeaturedRequestView(generics.GenericAPIView):
 
 
         get_featured_request = podcast_models.GetFeaturedRequest.objects.create(
-            requester_fk=requester, image=request.data.get("image", None))
+            requester_fk=requester, image=request.data.get("image", None), story=request.data.get("story", None))
 
         # Handle any Cameras submitted
         cameras = request.data.get("camera", [])
