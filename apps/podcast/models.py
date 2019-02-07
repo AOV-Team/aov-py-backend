@@ -1,9 +1,13 @@
 from apps.common import models as common_models
+from django.conf import settings
 from django.db import models
+from django.utils import timezone
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class RequesterManager(models.Manager):
-    def create_or_update(self, **kwargs):
+    @staticmethod
+    def create_or_update(**kwargs):
         new_requester = Requester(**kwargs)
         existing = Requester.objects.filter(email=new_requester.email).first()
 
@@ -61,7 +65,8 @@ class GetFeaturedRequest(common_models.EditMixin):
 
 
 class CameraManager(models.Manager):
-    def create_or_update(self, **kwargs):
+    @staticmethod
+    def create_or_update(**kwargs):
         new_camera = Camera(**kwargs)
         existing = Camera.objects.filter(model=new_camera.model).first()
 
@@ -94,12 +99,78 @@ class Camera(common_models.EditMixin):
         return self.model
 
 
-# class Episode(common_models.EditMixin):
-#     """
-#         A single episode of the AoV Podcast
-#
-#     """
-#     # MEDIA
-#     # audio and metadata
-#     audio = models.URLField(help_text="URL to the hosted media (AWS, Soundcloud, etc.)")
+class Episode(common_models.EditMixin):
+    """
+        A single episode of the AoV Podcast
 
+    """
+    # GENERAL
+    episode_number = models.PositiveIntegerField()
+    title = models.CharField(max_length=64)
+    participant_social = models.CharField(max_length=31, help_text="Maximum 30 characters, including the @")
+    description = models.TextField()
+    quote = models.CharField(max_length=128)
+    player_title_display = models.CharField(max_length=64)
+    player_subtitle_display = models.CharField(max_length=64)
+
+    # MEDIA
+    audio = models.FileField(upload_to=common_models.get_podcast_file_path,
+                             storage=S3Boto3Storage(bucket=settings.AWS_AUDIO_BUCKET),
+                             help_text="URL to the hosted media (AWS, Soundcloud, etc.)")
+
+    # INTERNAL
+    published = models.BooleanField(default=False)
+    published_date = models.DateTimeField(blank=True, null=True)
+    archived = models.BooleanField(default=False)
+    archive_date = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return "AoV Podcast #{} - {}".format(self.episode_number, self.title)
+
+    def save(self, *args, **kwargs):
+        """
+        Overwrite of default save to handle auto-updating of the published_date and archived_date when those flags
+        change
+
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        # Check the value of published
+        if self.published and not self.published_date:
+            self.published_date = timezone.now()
+
+        if self.archived and not self.archive_date:
+            self.archive_date = timezone.now()
+
+        super(Episode, self).save(*args, **kwargs)
+
+    class META:
+        default_permissions = ('add', 'change', 'delete', 'view')
+        unique_together = ("episode_number", "title")
+        verbose_name_plural = "Episodes"
+
+
+class PodcastImage(common_models.EditMixin):
+    """
+    Model to store images to be used for various Podcast episodes
+
+    """
+    IMAGE_CHOICES = (
+        ("EI", "Episode Image"),
+        ("BI", "Background Image"),
+        ("RI", "Related Image"),
+        ("PI", "Player Image")
+    )
+
+    image = models.ImageField(upload_to=common_models.get_uploaded_file_path,
+                              help_text="Image to be displayed below to the player on the webpage.")
+    episode = models.ForeignKey("Episode")
+    display_type = models.CharField(max_length=2, choices=IMAGE_CHOICES)
+
+    def __str__(self):
+        return "{} for {}".format(self.get_display_type_display(), self.episode.title)
+
+    class META:
+        default_permissions = ('add', 'change', 'delete', 'view')
+        verbose_name_plural = "Podcast Images"

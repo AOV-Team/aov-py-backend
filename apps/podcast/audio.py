@@ -37,8 +37,7 @@ class Audio(File):
         settings.py
         :return: either the remote_key
         """
-        if settings.REMOTE_IMAGE_STORAGE:
-
+        if settings.REMOTE_AUDIO_STORAGE:
             if custom_bucket:
                 storage = S3Boto3Storage(bucket=custom_bucket)
             else:

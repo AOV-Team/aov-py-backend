@@ -82,7 +82,7 @@ def get_random_queryset_elements(queryset, number, yield_object=True):
             pass
 
 
-def get_audio_file_path(instance, filename):
+def get_podcast_file_path(instance, filename):
     """
     Function that determines a filepath for audio files
 

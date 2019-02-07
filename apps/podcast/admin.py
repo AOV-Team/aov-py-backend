@@ -1,4 +1,4 @@
-from apps.podcast.models import Camera, GetFeaturedRequest, Requester
+from apps.podcast import models as podcast_models
 from django.conf import settings
 from django.contrib import admin
 
@@ -41,6 +41,27 @@ class CameraAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.register(Camera, CameraAdmin)
-admin.site.register(GetFeaturedRequest, GetFeaturedRequestAdmin)
-admin.site.register(Requester, RequesterAdmin)
+class EpisodeAdmin(admin.ModelAdmin):
+    list_display = ("title", "episode_number", "participant_social", "published_date", "archived")
+    search_fields = ("title", "episode_number", "participant_social", "quote", "description")
+    ordering = ("-archived", "episode_number")
+
+    def has_delete_permission(self, request, obj=None):
+        if settings.DEBUG or (request.user and (request.user.is_superuser or request.user.is_staff)):
+            return True
+
+        return False
+
+
+class PodcastImageAdmin(admin.ModelAdmin):
+    list_display = ("image", "episode", "display_type")
+    search_fields = ("episode__episode_number", "episode__participant_social", "episode__title", "episode__quote",
+                     "episode__description")
+    raw_id_fields = ("episode",)
+    ordering = ("-episode__archived", "episode__episode_number")
+
+admin.site.register(podcast_models.Camera, CameraAdmin)
+admin.site.register(podcast_models.Episode, EpisodeAdmin)
+admin.site.register(podcast_models.GetFeaturedRequest, GetFeaturedRequestAdmin)
+admin.site.register(podcast_models.PodcastImage, PodcastImageAdmin)
+admin.site.register(podcast_models.Requester, RequesterAdmin)
