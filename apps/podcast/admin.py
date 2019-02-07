@@ -15,7 +15,7 @@ class RequesterAdmin(admin.ModelAdmin):
 
 
 class GetFeaturedRequestAdmin(admin.ModelAdmin):
-    list_display = ("image", "reviewed", "requester_fk")
+    list_display = ("requester_fk", "image", "reviewed")
     readonly_fields = ("requester_fk",)
     search_fields = ("requester_fk__email", "requester_fk__instagram_handle",
                      "requester_fk__full_name")
