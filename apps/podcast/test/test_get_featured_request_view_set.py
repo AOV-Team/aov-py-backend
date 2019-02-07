@@ -1,7 +1,7 @@
 from apps.podcast import models as podcast_models
-from django.conf import settings
-from django.test import TestCase
+from django.test import override_settings, TestCase
 from rest_framework.test import APIClient
+from unittest import skip
 
 
 class TestGetFeaturedRequestViewSetPOST(TestCase):
@@ -38,6 +38,109 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
             request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
+
+    @override_settings(REMOTE_AUDIO_STORAGE=False)
+    def test_new_request_with_audio_large_file(self):
+        """
+        Test case to make sure a new person can submit a request with an audio soundbite.
+
+        :return: None
+        """
+        # Get data from endpoint
+        client = APIClient()
+
+        with open("apps/common/test/data/audio/allredct_gold_podcast_2.wav", "rb") as audio:
+            payload = {
+                "audio_sample": audio,
+                "email": "user@test.com",
+                "full_name": "testUsername",
+                "location": "Boise",
+
+            }
+
+            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+
+        self.assertEqual(request.status_code, 200)
+        get_featured = podcast_models.GetFeaturedRequest.objects.get(requester_fk__email=payload["email"])
+        self.assertIsNotNone(get_featured.audio)
+
+    @skip("Uses 91 MB file. Expensive operation, don't run unless testing bandwidth")
+    def test_new_request_with_audio_remote_large_file(self):
+        """
+        Test case to make sure a new person can submit a request with an audio soundbite.
+
+        Audio is saved to S3
+
+        :return: None
+        """
+        # Get data from endpoint
+        client = APIClient()
+
+        with open("apps/common/test/data/audio/allredct_gold_podcast_2.wav", "rb") as audio:
+            payload = {
+                "audio_sample": audio,
+                "email": "user@test.com",
+                "full_name": "testUsername",
+                "location": "Boise",
+
+            }
+
+            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+
+        self.assertEqual(request.status_code, 200)
+        get_featured = podcast_models.GetFeaturedRequest.objects.get(requester_fk__email=payload["email"])
+        self.assertIsNotNone(get_featured.audio)
+
+    @override_settings(REMOTE_AUDIO_STORAGE=False)
+    def test_new_request_with_audio_small_file(self):
+        """
+        Test case to make sure a new person can submit a request with an audio soundbite.
+
+        :return: None
+        """
+        # Get data from endpoint
+        client = APIClient()
+
+        with open("apps/common/test/data/audio/musicbox.wav", "rb") as audio:
+            payload = {
+                "audio_sample": audio,
+                "email": "user@test.com",
+                "full_name": "testUsername",
+                "location": "Boise",
+
+            }
+
+            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+
+        self.assertEqual(request.status_code, 200)
+        get_featured = podcast_models.GetFeaturedRequest.objects.get(requester_fk__email=payload["email"])
+        self.assertIsNotNone(get_featured.audio)
+
+    def test_new_request_with_audio_remote_small_file(self):
+        """
+        Test case to make sure a new person can submit a request with an audio soundbite.
+
+        Audio is saved to S3
+
+        :return: None
+        """
+        # Get data from endpoint
+        client = APIClient()
+
+        with open("apps/common/test/data/audio/musicbox.wav", "rb") as audio:
+            payload = {
+                "audio_sample": audio,
+                "email": "user@test.com",
+                "full_name": "testUsername",
+                "location": "Boise",
+
+            }
+
+            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+
+        self.assertEqual(request.status_code, 200)
+        get_featured = podcast_models.GetFeaturedRequest.objects.get(requester_fk__email=payload["email"])
+        self.assertIsNotNone(get_featured.audio)
 
     def test_new_request_no_image(self):
         """

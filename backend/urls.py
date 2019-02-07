@@ -90,6 +90,7 @@ urlpatterns = [
 
     # podcast
     url(r'api/podcast/get_featured$', podcast_views.GetFeaturedRequestView.as_view()),
+    url(r'api/podcast/episodes$', podcast_views.EpisodeViewSet.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
