@@ -38,7 +38,7 @@ class GetFeaturedRequestView(generics.GenericAPIView):
         # Is there at least one Camera provided?
         if "camera" in request.data:
             # Check length, as there can be more than one
-            if not len(request.data['camera']) > 0:
+            if not len(request.data.getlist("camera")) > 0:
                 raise MissingRequiredFieldException("Missing required Camera entry.")
         else:
             MissingRequiredFieldException("Missing required field Camera")
@@ -53,7 +53,6 @@ class GetFeaturedRequestView(generics.GenericAPIView):
             sample:
         """
         response = get_default_response("400")
-
         try:
             self._verify_required_data(request)
 
@@ -98,7 +97,7 @@ class GetFeaturedRequestView(generics.GenericAPIView):
             audio=audio_url)
 
         # Handle any Cameras submitted
-        cameras = request.data.get("camera", [])
+        cameras = request.data.getlist("camera", [])
 
         for camera in cameras:
             podcast_models.Camera.objects.create_or_update(model=camera, get_featured_request_fk=get_featured_request)
