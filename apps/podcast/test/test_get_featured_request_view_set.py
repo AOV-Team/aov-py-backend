@@ -231,3 +231,23 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
         request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
+
+    def test_new_request_with_camera(self):
+        """
+        Unit test to verify that the handling of the camera submissions works properly
+
+        :return: None
+        """
+        client = APIClient()
+
+        payload = {
+            "email": "user@test.com",
+            "full_name": "testUsername",
+            "location": "Boise",
+            "camera": ["Sony A7III", "Canon DSLR"]
+        }
+
+        request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+
+        self.assertEqual(request.status_code, 200)
+        self.assertEqual(podcast_models.Camera.objects.count(), 2)
