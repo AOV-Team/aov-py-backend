@@ -19,6 +19,7 @@ class GetFeaturedRequestView(generics.GenericAPIView):
 
     """
     permission_classes = (permissions.AllowAny,)
+    serializer_class = podcast_serializers.GetFeaturedRequestSerializer
 
     @staticmethod
     def _verify_required_data(request):
@@ -42,6 +43,9 @@ class GetFeaturedRequestView(generics.GenericAPIView):
                 raise MissingRequiredFieldException("Missing required Camera entry.")
         else:
             MissingRequiredFieldException("Missing required field Camera")
+
+    def get_queryset(self):
+        return podcast_models.GetFeaturedRequest.objects.none()
 
     def post(self, request):
         """
