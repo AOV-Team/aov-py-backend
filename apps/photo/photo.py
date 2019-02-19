@@ -142,7 +142,7 @@ class Photo(ImageFile):
         """
         # Determine filetype by extension
         ext = filename.split('.')[-1]
-        if ext == 'jpg':
+        if ext in ["jpg", "jpeg"]:
             format = "JPEG"
         elif ext == 'png':
             format = "PNG"

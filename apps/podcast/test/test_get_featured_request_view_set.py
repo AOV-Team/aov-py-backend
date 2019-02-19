@@ -31,8 +31,28 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
                 "image": image,
                 "email": "user@test.com",
                 "full_name": "testUsername",
-                "location": "Boise",
+                "location": "Boise"
+            }
 
+            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+
+        self.assertEqual(request.status_code, 200)
+
+    def test_new_request_with_image_jpeg(self):
+        """
+        Unit test to verify uploading a .jpeg works just like a .jpg
+
+        :return: None
+        """
+        # Get data from endpoint
+        client = APIClient()
+
+        with open("apps/common/test/data/photos/jpeg.jpeg", "rb") as image:
+            payload = {
+                "image": image,
+                "email": "user@test.com",
+                "full_name": "testUsername",
+                "location": "Boise"
             }
 
             request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
