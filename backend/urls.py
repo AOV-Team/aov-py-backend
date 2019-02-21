@@ -89,8 +89,8 @@ urlpatterns = [
     url(r'api/photos/(?P<pk>[0-9^/]+)/votes', photo_views.PhotoSingleVotesViewSet.as_view()),
 
     # podcast
-    url(r'api/podcast/get_featured$', podcast_views.GetFeaturedRequestView.as_view()),
-    url(r'api/podcast/episodes$', podcast_views.EpisodeViewSet.as_view()),
+    url(r'api/aov-web/podcast/get_featured$', podcast_views.GetFeaturedRequestView.as_view()),
+    url(r'api/aov-web/podcast/episodes$', podcast_views.EpisodeViewSet.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
