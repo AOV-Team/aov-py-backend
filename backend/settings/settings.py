@@ -111,6 +111,7 @@ JET_SIDE_MENU_CUSTOM_APPS = [
     ('authtoken', ['__all__']),
     ('auth', ['__all__']),
     ('communication', ['__all__']),
+    ('discover', ['__all__']),
     ('podcast', ['__all__']),
     ('dbmail', ['MailTemplate']),
     ('push_notifications', ['APNSDevice']),
