@@ -1,6 +1,6 @@
 # Podcast API
 
-Base URL: `https://www.staging.artofvisuals.com/api/podcast`
+Base URL: `https://www.staging.artofvisuals.com/api/aov-web/podcast`
 
 ## ENDPOINTS
 
