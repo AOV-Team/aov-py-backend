@@ -16,6 +16,7 @@ Including another URLconf
 from apps.account import views as account_views
 from apps.analytic import views as analytic_views
 from apps.communication import views as communication_views
+from apps.discover import views as discover_views
 from apps.photo import views as photo_views
 from apps.podcast import views as podcast_views
 from apps.utils import views as utils_views
@@ -91,6 +92,13 @@ urlpatterns = [
     # podcast
     url(r'api/podcast/get_featured$', podcast_views.GetFeaturedRequestView.as_view()),
     url(r'api/podcast/episodes$', podcast_views.EpisodeViewSet.as_view()),
+
+    # discover
+    url(r'api/aov-web/discover/downloaders$', discover_views.DownloaderView.as_view()),
+    url(r'api/aov-web/discover/states$', discover_views.StateView.as_view()),
+    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/photographers$', discover_views.StatePhotographerView.as_view()),
+    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/photos$', discover_views.StatePhotoView.as_view()),
+    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/sponsors$', discover_views.StateSponsorView.as_view()),
 
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),

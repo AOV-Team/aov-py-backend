@@ -1,0 +1,352 @@
+[
+  {
+    "fields": {
+      "name": "Alabama"
+    },
+    "pk": 1,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Alaska"
+    },
+    "pk": 2,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Arizona"
+    },
+    "pk": 3,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Arkansas"
+    },
+    "pk": 4,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "California"
+    },
+    "pk": 5,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Colorado"
+    },
+    "pk": 6,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Connecticut"
+    },
+    "pk": 7,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Delaware"
+    },
+    "pk": 8,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Florida"
+    },
+    "pk": 9,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Georgia"
+    },
+    "pk": 10,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Hawaii"
+    },
+    "pk": 11,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Idaho"
+    },
+    "pk": 12,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Illinois"
+    },
+    "pk": 13,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Indiana"
+    },
+    "pk": 14,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Iowa"
+    },
+    "pk": 15,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Kansas"
+    },
+    "pk": 16,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Kentucky"
+    },
+    "pk": 17,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Louisiana"
+    },
+    "pk": 18,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Maine"
+    },
+    "pk": 19,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Maryland"
+    },
+    "pk": 20,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Massachusetts"
+    },
+    "pk": 21,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Michigan"
+    },
+    "pk": 22,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Minnesota"
+    },
+    "pk": 23,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Mississippi"
+    },
+    "pk": 24,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Missouri"
+    },
+    "pk": 25,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Montana"
+    },
+    "pk": 26,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Nebraska"
+    },
+    "pk": 27,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Nevada"
+    },
+    "pk": 28,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "New Hampshire"
+    },
+    "pk": 29,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "New Jersey"
+    },
+    "pk": 30,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "New Mexico"
+    },
+    "pk": 31,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "New York"
+    },
+    "pk": 32,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "North Carolina"
+    },
+    "pk": 33,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "North Dakota"
+    },
+    "pk": 34,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Ohio"
+    },
+    "pk": 35,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Oklahoma"
+    },
+    "pk": 36,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Oregon"
+    },
+    "pk": 37,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Pennsylvania"
+    },
+    "pk": 38,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Rhode Island"
+    },
+    "pk": 39,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "South Carolina"
+    },
+    "pk": 40,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "South Dakota"
+    },
+    "pk": 41,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Tennessee"
+    },
+    "pk": 42,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Texas"
+    },
+    "pk": 43,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Utah"
+    },
+    "pk": 44,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Vermont"
+    },
+    "pk": 45,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Virginia"
+    },
+    "pk": 46,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Washington"
+    },
+    "pk": 47,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "West Virginia"
+    },
+    "pk": 48,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Wisconsin"
+    },
+    "pk": 49,
+    "model": "discover.state"
+  },
+  {
+    "fields": {
+      "name": "Wyoming"
+    },
+    "pk": 50,
+    "model": "discover.state"
+  }
+]

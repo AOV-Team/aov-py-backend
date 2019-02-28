@@ -113,16 +113,32 @@ def get_uploaded_file_path(instance, filename):
     # If image has user, use username.{extension}
     # Else use name of file
 
+    file_ext = filename.split('.')[-1]
+    instance_class = instance.__str__()
+
     if hasattr(instance, "user"):
-        filename = 'u{}.{}'.format(instance.user.id, filename.split('.')[-1])
+        filename = 'u{}.{}'.format(instance.user.id, file_ext)
 
     elif hasattr(instance, "requester_fk"):
-        filename = 'GET_FEATURED.{}'.format(filename.split('.')[-1])
+        filename = 'GET_FEATURED.{}'.format(file_ext)
 
-    elif hasattr(instance, "gender") and instance.__str__() == "User":
+    elif hasattr(instance, "gender") and instance_class == "User":
         # Instance is of type User
-        filename = 'AVATAR_{}.{}'.format(instance.email, filename.split('.')[-1])
+        filename = 'AVATAR_{}.{}'.format(instance.email, file_ext)
 
+    elif instance_class == "State":
+        filename = "STATE_ICON_{}.{}".format(instance.name, file_ext)
+
+    elif instance_class == "Sponsor":
+        # Check if it's the profile image or the downloadable file by checking the file extension
+        if file_ext in ["jpg", "jpeg", "png"]:
+            # This is the profile image
+            filename = "SPONSOR_IMAGE_{}.{}".format(instance.name, file_ext)
+        else:
+            filename = "INFO_GUIDE_BY_{}.{}".format(instance.name, file_ext)
+
+    elif instance_class == "Photographer":
+        filename = "PHOTOGRAPHER_PROFILE.{}".format(file_ext)
 
     # Date stamp
     current_time = get_date_stamp_str()

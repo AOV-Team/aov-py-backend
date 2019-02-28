@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'apps.account',
     'apps.analytic',
     'apps.communication',
+    'apps.discover',
     'apps.marketplace',
     'apps.podcast',
     'apps.photo.apps.PhotoConfig',
