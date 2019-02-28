@@ -67,7 +67,7 @@ class TestEpisodeViewSetGET(TestCase):
 
         client = APIClient()
 
-        response = client.get("/api/podcast/episodes")
+        response = client.get("/api/aov-web/podcast/episodes")
         episodes = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
@@ -88,7 +88,7 @@ class TestEpisodeViewSetGET(TestCase):
 
         client = APIClient()
 
-        response = client.get("/api/podcast/episodes")
+        response = client.get("/api/aov-web/podcast/episodes")
         episodes = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
@@ -104,14 +104,14 @@ class TestEpisodeViewSetGET(TestCase):
         client = APIClient()
 
         # Filter by episode number
-        response = client.get("/api/podcast/episodes?number=3")
+        response = client.get("/api/aov-web/podcast/episodes?number=3")
         episodes = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(episodes), 1)
 
         # Filter by title
-        response = client.get("/api/podcast/episodes?title=podcast")
+        response = client.get("/api/aov-web/podcast/episodes?title=podcast")
         episodes = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
@@ -121,7 +121,7 @@ class TestEpisodeViewSetGET(TestCase):
         episode = podcast_models.Episode.objects.first()
         episode.published_date = datetime.datetime(2018, 2, 12)
         episode.save()
-        response = client.get("/api/podcast/episodes?published_before=2019-02-07")
+        response = client.get("/api/aov-web/podcast/episodes?published_before=2019-02-07")
         episodes = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
@@ -131,7 +131,7 @@ class TestEpisodeViewSetGET(TestCase):
         episode = podcast_models.Episode.objects.first()
         episode.published_date = datetime.datetime(2019, 3, 12)
         episode.save()
-        response = client.get("/api/podcast/episodes?published_after=2019-03-01")
+        response = client.get("/api/aov-web/podcast/episodes?published_after=2019-03-01")
         episodes = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
