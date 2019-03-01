@@ -34,7 +34,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
                 "location": "Boise"
             }
 
-            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+            request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
 
@@ -55,7 +55,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
                 "location": "Boise"
             }
 
-            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+            request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
 
@@ -78,7 +78,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
 
             }
 
-            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+            request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
         get_featured = podcast_models.GetFeaturedRequest.objects.get(requester_fk__email=payload["email"])
@@ -105,7 +105,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
 
             }
 
-            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+            request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
         get_featured = podcast_models.GetFeaturedRequest.objects.get(requester_fk__email=payload["email"])
@@ -130,7 +130,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
 
             }
 
-            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+            request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
         get_featured = podcast_models.GetFeaturedRequest.objects.get(requester_fk__email=payload["email"])
@@ -156,7 +156,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
 
             }
 
-            request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+            request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
         get_featured = podcast_models.GetFeaturedRequest.objects.get(requester_fk__email=payload["email"])
@@ -177,7 +177,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
             "location": "Boise"
         }
 
-        request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+        request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
 
@@ -193,7 +193,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
             "location": "Boise"
         }
 
-        request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+        request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 400)
         self.assertEqual(request.data["message"], "Missing required field email")
@@ -210,7 +210,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
             "location": "Boise"
         }
 
-        request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+        request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 400)
         self.assertEqual(request.data["message"], "Missing required field full_name")
@@ -227,7 +227,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
             "full_name": "testUsername"
         }
 
-        request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+        request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 400)
         self.assertEqual(request.data["message"], "Missing required field location")
@@ -248,7 +248,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
             "story": "lorem ipsum blah blah blah"
         }
 
-        request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+        request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
 
@@ -267,7 +267,7 @@ class TestGetFeaturedRequestViewSetPOST(TestCase):
             "camera": ["Sony A7III", "Canon DSLR"]
         }
 
-        request = client.post("/api/podcast/get_featured", data=payload, format="multipart")
+        request = client.post("/api/aov-web/podcast/get_featured", data=payload, format="multipart")
 
         self.assertEqual(request.status_code, 200)
         self.assertEqual(podcast_models.Camera.objects.count(), 2)
