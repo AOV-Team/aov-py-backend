@@ -142,5 +142,5 @@ class StatePhoto(common_models.EditMixin):
         return "Photo for {}".format(self.state.name)
 
     class Meta:
-        verbose_name_plural = "State Photographers"
+        verbose_name_plural = "State Photos"
         unique_together = ("photo", "state")
