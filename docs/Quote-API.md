@@ -1,6 +1,6 @@
 # Quote API
 
-Base Url: `https://www.staging.artofvisuals.com/api/aov-web`
+Base Url: `https://staging.artofvisuals.com/api/aov-web`
 
 ## ENDPOINTS
 
