@@ -3,6 +3,14 @@ from rest_framework import serializers
 import re
 
 
+class AOVWebUserSerializer(serializers.ModelSerializer):
+    """ This serializer is for publicly consumable web based requests"""
+
+    class Meta:
+        model = models.User
+        fields = ("id", "age", "first_name", "last_name", "location", "social_name", "username", "avatar",)
+
+
 class GearSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Gear

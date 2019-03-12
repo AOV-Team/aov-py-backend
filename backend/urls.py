@@ -89,17 +89,6 @@ urlpatterns = [
     url(r'api/photos/top$', photo_views.PhotoAppTopPhotosViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/votes', photo_views.PhotoSingleVotesViewSet.as_view()),
 
-    # podcast
-    url(r'api/aov-web/podcast/get_featured$', podcast_views.GetFeaturedRequestView.as_view()),
-    url(r'api/aov-web/podcast/episodes$', podcast_views.EpisodeViewSet.as_view()),
-
-    # discover
-    url(r'api/aov-web/discover/downloaders$', discover_views.DownloaderView.as_view()),
-    url(r'api/aov-web/discover/states$', discover_views.StateView.as_view()),
-    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/photographers$', discover_views.StatePhotographerView.as_view()),
-    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/photos$', discover_views.StatePhotoView.as_view()),
-    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/sponsors$', discover_views.StateSponsorView.as_view()),
-
     # sample
     # url(r'api/sample_tasks', account_views.SampleTasksViewSet.as_view()),
 
@@ -133,6 +122,23 @@ urlpatterns = [
     url(r'^admin/power_users/$', account_views.power_users_admin),
     url(r'^admin/push/$', communication_views.push_notification_manager),
     url(r'^admin/statistics/$', analytic_views.statistics_admin),
+
+    ## AOV-WEB
+
+    # podcast
+    url(r'api/aov-web/podcast/get_featured$', podcast_views.GetFeaturedRequestView.as_view()),
+    url(r'api/aov-web/podcast/episodes$', podcast_views.EpisodeViewSet.as_view()),
+
+    # discover
+    url(r'api/aov-web/discover/downloaders$', discover_views.DownloaderView.as_view()),
+    url(r'api/aov-web/discover/states$', discover_views.StateView.as_view()),
+    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/photographers$', discover_views.StatePhotographerView.as_view()),
+    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/photos$', discover_views.StatePhotoView.as_view()),
+    url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/sponsors$', discover_views.StateSponsorView.as_view()),
+
+    # users
+    url(r'api/aov-web/users/(?P<pk>[0-9^/]+)$', account_views.AOVWebUsersView.as_view()),
+    url(r'api/aov-web/users/(?P<pk>[0-9^/]+)/profile$', account_views.AOVWebUserProfileView.as_view()),
 ]
 
 # DEBUG URLs
