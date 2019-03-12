@@ -19,6 +19,7 @@ from apps.communication import views as communication_views
 from apps.discover import views as discover_views
 from apps.photo import views as photo_views
 from apps.podcast import views as podcast_views
+from apps.quote import views as quote_views
 from apps.utils import views as utils_views
 from django.conf import settings
 from django.conf.urls import include, url
@@ -135,6 +136,10 @@ urlpatterns = [
     url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/photographers$', discover_views.StatePhotographerView.as_view()),
     url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/photos$', discover_views.StatePhotoView.as_view()),
     url(r'api/aov-web/discover/states/(?P<pk>[0-9^/]+)/sponsors$', discover_views.StateSponsorView.as_view()),
+
+    # quote
+    url(r'api/aov-web/quotes$', quote_views.QuoteView.as_view()),
+    url(r'api/aov-web/quote-subscribers$', quote_views.QuoteSubscriberView.as_view()),
 
     # users
     url(r'api/aov-web/users/(?P<pk>[0-9^/]+)$', account_views.AOVWebUsersView.as_view()),
