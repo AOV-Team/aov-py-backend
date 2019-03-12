@@ -1,6 +1,6 @@
 # User API
 
-Base Url: `https://www.staging.artofvisuals.com/api/users`
+Base Url: `https://www.staging.artofvisuals.com/api/aov-web/`
 
 ## ENDPOINTS
 
@@ -23,21 +23,18 @@ A 200 status code with a response object.
        "id": int,
        "age": int,
        "avatar": <image url>,
-       "email": "",
        "first_name" "",
-       "gear": [int],
        "last_name": "",
        "location": "",
        "social_name": "",
-       "social_url": <resource url>,
-       "username": "",
-       "website_url": <resource url>
+       "username": ""
    }
 ```
 
 **Errors**
 
-In the event of requesting a User with an ID that does not exist, an HTTP 404 will be returned.
+In the event of requesting a User with an ID that does not exist, a successful response will return with an empty result
+set.
 
 ### User Profile
 **URL** - `/users/<id>/profile`

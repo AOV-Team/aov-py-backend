@@ -42,6 +42,52 @@ from urllib.parse import quote_plus
 import json
 
 
+class AOVWebUsersView(generics.ListAPIView):
+    """
+    Endpoint to retrieve users for AoV Web consumption
+
+    /api/aov-web/users/{}
+    """
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = account_serializers.AOVWebUserSerializer
+
+    def get_queryset(self):
+        """
+        Method to retrieve necessary QuerySet to be returned by GET requests
+
+        :return: QuerySet of User objects
+        """
+
+        user_id = self.kwargs.get("pk", None)
+        if user_id:
+            return account_models.User.objects.filter(id=user_id, is_active=True)
+        else:
+            return account_models.User.objects.none()
+
+
+class AOVWebUserProfileView(generics.ListAPIView):
+    """
+    Endpoint to retrieve users for AoV Web consumption
+
+    /api/aov-web/users/{}/profile
+    """
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = account_serializers.ProfileSerializer
+
+    def get_queryset(self):
+        """
+        Method to retrieve necessary QuerySet to be returned by GET requests
+
+        :return: QuerySet of Profile objects
+        """
+
+        user_id = self.kwargs.get("pk", None)
+        if user_id:
+            user = account_models.User.objects.filter(id=user_id, is_active=True)
+            return account_models.Profile.objects.filter(user=user)
+        else:
+            return account_models.Profile.objects.none()
+
 
 class AuthenticateViewSet(APIView):
     """
