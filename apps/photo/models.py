@@ -362,7 +362,7 @@ class PhotoComment(common_models.GeoEditMixin):
     :author: gallen
     """
 
-    photo = models.ForeignKey(Photo)
+    photo = models.ForeignKey(Photo, related_name="photo_comment")
     comment = models.TextField()
     parent = models.ForeignKey("self", null=True, related_name="replies")
     user = models.ForeignKey(account_models.User)

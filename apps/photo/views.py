@@ -511,6 +511,20 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
             else:
                 self.serializer_class = photo_serializers.PhotoSerializer
 
+        if page == "aov-web-all":
+            aov_web_images = photo_models.Photo.objects.filter(public=True, category__isnull=False).distinct().annotate(
+                images_order=(Count("user_action") + (Count("photo_comment", distinct=True) * 5))
+            ).order_by("-images_order")
+            return aov_web_images
+
+        if page == "aov-web-weekly":
+            cutoff = timezone.now() - timedelta(days=7)
+            aov_web_images = photo_models.Photo.objects.filter(public=True, category__isnull=False,
+                                                               created_at__gte=cutoff).distinct().annotate(
+                images_order=(Count("user_action") + (Count("photo_comment", distinct=True) * 5))
+            ).order_by("-images_order")
+            return aov_web_images
+
         if page == "picks":
             picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks")
             aov_picks = photo_models.Photo.objects.filter(
