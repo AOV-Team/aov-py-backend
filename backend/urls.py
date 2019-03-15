@@ -142,6 +142,7 @@ urlpatterns = [
     url(r'api/aov-web/quote-subscribers$', quote_views.QuoteSubscriberView.as_view()),
 
     # users
+    url(r'api/aov-web/users/top$', account_views.AOVWebTopUsersView.as_view()),
     url(r'api/aov-web/users/(?P<pk>[0-9^/]+)$', account_views.AOVWebUsersView.as_view()),
     url(r'api/aov-web/users/(?P<pk>[0-9^/]+)/profile$', account_views.AOVWebUserProfileView.as_view()),
 ]

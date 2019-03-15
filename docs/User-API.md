@@ -18,7 +18,7 @@ None
 
 A 200 status code with a response object.
 
-```javascript
+```json
    {
        "id": int,
        "age": int,
@@ -48,7 +48,7 @@ None
 
 **Response**
 
-```javascript
+```json
    {
        "user": int,
        "bio": "",
@@ -59,3 +59,39 @@ None
 **Errors**
 
 If a Profile for a User entity that does not exist is requested, an HTTP 404 will be returned.
+
+### TOp Users
+**URL** - `/users/top`
+
+**Accepted Methods**
+- GET
+
+**Accepted Data**
+
+None
+
+**Response**
+
+```json
+   {
+       "count": int,
+       "next": <resource url>
+       "previous": <resource url>
+       "results": [
+          {
+               "id": int,
+               "age": int,
+               "avatar": <image url>,
+               "first_name" "",
+               "last_name": "",
+               "location": "",
+               "social_name": "",
+               "username": ""
+           }
+       ]
+   }
+```
+
+**Errors**
+
+This endpoint should never error out. It should always return at least one user object in the result set.
