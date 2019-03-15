@@ -42,6 +42,27 @@ from urllib.parse import quote_plus
 import json
 
 
+class AOVWebTopUsersView(generics.ListAPIView):
+    """
+    Endpoint to retrieve the top App users for AoV Web consumption
+
+    /api/aov-web/users/top
+    """
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = account_serializers.AOVWebUserSerializer
+
+    def get_queryset(self):
+        """
+        Method to retrieve necessary QuerySet for the view
+
+        :return: QuerySet of User objects
+        """
+        return account_models.User.objects.filter(
+            is_active=True).exclude(email="AnonymousUser").distinct().annotate(
+            users_order=(Count("photo_user", distinct=True) + (Count("photo_comment_user", distinct=True) * 5))
+        ).order_by("-users_order")
+
+
 class AOVWebUsersView(generics.ListAPIView):
     """
     Endpoint to retrieve users for AoV Web consumption

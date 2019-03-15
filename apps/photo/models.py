@@ -172,7 +172,7 @@ class Photo(geo_models.Model):
     gear = models.ManyToManyField(account_models.Gear, blank=True)
     photo_feed = models.ManyToManyField(PhotoFeed, blank=True)
     tag = models.ManyToManyField(PhotoClassification, blank=True, related_name='tag')
-    user = models.ForeignKey(account_models.User, blank=True, null=True)
+    user = models.ForeignKey(account_models.User, blank=True, null=True, related_name="photo_user")
     user_action = GenericRelation(utils_models.UserAction)
     user_interest = GenericRelation(account_models.UserInterest)
 
@@ -362,10 +362,10 @@ class PhotoComment(common_models.GeoEditMixin):
     :author: gallen
     """
 
-    photo = models.ForeignKey(Photo)
+    photo = models.ForeignKey(Photo, related_name="photo_comment")
     comment = models.TextField()
     parent = models.ForeignKey("self", null=True, related_name="replies")
-    user = models.ForeignKey(account_models.User)
+    user = models.ForeignKey(account_models.User, related_name="photo_comment_user")
     votes = models.IntegerField(default=0)
     mentions = ArrayField(base_field=models.CharField(max_length=255, blank=True), blank=True, null=True)
 
