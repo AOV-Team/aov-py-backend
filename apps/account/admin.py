@@ -46,7 +46,7 @@ class StarredUserAdmin(admin.ModelAdmin):
 
     list_filter = ('is_active',)
     list_per_page = 100
-    ordering = ('-photo__count', '-id', 'username',)
+    ordering = ('-photo_user__count', '-id', 'username',)
 
     readonly_fields = ('created_at', 'id', 'last_login', 'photo_count',)
 
@@ -61,7 +61,7 @@ class StarredUserAdmin(admin.ModelAdmin):
         for i in interests:
             queryset = queryset | models.User.objects.filter(id=i.object_id)
 
-        return queryset.annotate(Count('photo'))
+        return queryset.annotate(Count('photo_user'))
 
     def has_add_permission(self, request):
         if settings.DEBUG:
@@ -92,9 +92,9 @@ class StarredUserAdmin(admin.ModelAdmin):
     action_buttons.short_description = 'Actions'
 
     def photo_count(self, obj):
-        return obj.photo__count
+        return obj.photo_user__count
 
-    photo_count.admin_order_field = 'photo__count'
+    photo_count.admin_order_field = 'photo_user__count'
     photo_count.short_description = 'Photos'
 
 
@@ -121,7 +121,7 @@ class StarUserFilter(admin.SimpleListFilter):
             for i in interests:
                 q = q | queryset.filter(id=i.object_id)
 
-            return q.annotate(Count('photo'))
+            return q.annotate(Count('photo_user'))
         elif self.value() == 'no':
             unstarred_users = list()
             user_type = ContentType.objects.get_for_model(models.User)
@@ -131,7 +131,7 @@ class StarUserFilter(admin.SimpleListFilter):
             for i in interests:
                 unstarred_users.append(i.object_id)
 
-            return queryset.exclude(id__in=unstarred_users).annotate(Count('photo'))
+            return queryset.exclude(id__in=unstarred_users).annotate(Count('photo_user'))
 
 
 class PowerUserFilter(admin.SimpleListFilter):
@@ -157,14 +157,14 @@ class PowerUserFilter(admin.SimpleListFilter):
 
         if self.value() == 'yes':
             if power_users.count() == 0:
-                return models.User.objects.none().annotate(Count('photo')).annotate(Count('follower'))
-            return power_users.annotate(Count('photo')).annotate(Count('follower'))
+                return models.User.objects.none().annotate(Count('photo_user')).annotate(Count('follower'))
+            return power_users.annotate(Count('photo_user')).annotate(Count('follower'))
 
         elif self.value() == 'no':
             power_user_ids = power_users.values_list("id", flat=True)
             q = users.exclude(id__in=power_user_ids)
 
-            return q.annotate(Count('photo')).annotate(Count('follower'))
+            return q.annotate(Count('photo_user')).annotate(Count('follower'))
 
 
 class UserAdmin(BaseUserAdmin):

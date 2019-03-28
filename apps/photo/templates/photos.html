@@ -175,6 +175,8 @@ $( document ).ready(function() {
                         <div id="photo-info" class="info" data-photo-id="{{ photo.id }}">
                             <h2>Photo info</h2>
                             <p>
+                                {% load admin_urls %}
+                                <strong>Photo ID:</strong> <a target="_blank" href="/admin/photo/photo/{{ photo.id }}/change/"> {{ photo.id }}</a><br>
                                 {% if photo.starred %}
                                     <span data-content-type="photos" data-id="{{ photo.id }}" class="star-button starred fa fa-star"></span>
                                 {% else %}
