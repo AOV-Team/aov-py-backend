@@ -318,8 +318,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         :param obj: Photo object
         :return: Number of comments related to the photo
         """
-        photo_comments = models.PhotoComment.objects.filter(photo=obj)
-        return photo_comments.count()
+        return obj.photo_comment.count()
 
     def get_dimensions(self, obj):
         """
@@ -462,11 +461,11 @@ class PhotoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def setup_eager_loading(queryset):
-        queryset = queryset\
-            .select_related('user')\
-            .prefetch_related('category')\
-            .prefetch_related('gear')\
-            .prefetch_related('tag')
+        # select_related for "to-one" relationships
+        queryset = queryset.select_related("user")
+
+        # prefetch_related for "to-many" relationships
+        queryset = queryset.prefetch_related("category", "tag", "gear", "photo_comment", "photo_vote")
 
         return queryset
 
