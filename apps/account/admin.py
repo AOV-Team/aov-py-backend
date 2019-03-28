@@ -188,7 +188,7 @@ class UserAdmin(BaseUserAdmin):
                     'created_at', 'action_buttons',)
     list_filter = (StarUserFilter, PowerUserFilter, 'is_active', 'is_superuser',)
     list_per_page = 100
-    ordering = ('-photo__count', '-follower__count', '-id', 'username',)
+    ordering = ('-photo_user__count', '-follower__count', '-id', 'username',)
 
     readonly_fields = ('created_at', 'gear', 'id', 'follower', 'last_login', 'photo_count',)
     search_fields = ('age', 'email', 'username', 'first_name', 'last_name', 'location', 'social_name',)
@@ -200,7 +200,8 @@ class UserAdmin(BaseUserAdmin):
         return qs
 
     def get_queryset(self, request):
-        return super(UserAdmin, self).get_queryset(request).annotate(Count('photo')).annotate(Count('follower'))
+        return super(UserAdmin, self).get_queryset(request).annotate(
+            Count('photo_user')).annotate(Count('follower', distinct=True))
 
     def has_delete_permission(self, request, obj=None):
         if settings.DEBUG or request.user.is_superuser:
@@ -245,9 +246,9 @@ class UserAdmin(BaseUserAdmin):
     followers_count.short_description = 'Followers'
 
     def photo_count(self, obj):
-        return obj.photo__count
+        return obj.photo_user__count
 
-    photo_count.admin_order_field = 'photo__count'
+    photo_count.admin_order_field = 'photo_user__count'
     photo_count.short_description = 'Photos'
 
     def download_csv(self, request, queryset):
