@@ -117,6 +117,28 @@ class PhotoFeedSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class PhotoCustomRenderSerializer(serializers.ModelSerializer):
+    """
+    Serializer that only returns a custom render size and the Photo ID
+
+    """
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        render_string = determine_render(self.context)
+        render_field = getattr(obj, render_string)
+        return self.context["request"].build_absolute_uri(render_field.url)
+
+    @staticmethod
+    def setup_eager_loading(queryset):
+        return queryset
+
+    class Meta:
+        model = models.Photo
+        fields = ("id", "image")
+        read_only_fields = ("image",)
+
+
 class PhotoRenderSerializer(serializers.ModelSerializer):
     """
         Serializer used when only Renders are needed
@@ -144,6 +166,25 @@ class PhotoRenderSerializer(serializers.ModelSerializer):
                             'image_tiny_272')
 
 
+class PhotoSimpleDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer to return only Photo pertinent information, without the media assets
+
+    """
+
+    @staticmethod
+    def setup_eager_loading(queryset):
+        # prefetch_related for "to-many" relationships
+        queryset = queryset.prefetch_related("category", "tag", "gear", "photo_vote", "photo_feed")
+
+        return queryset
+
+    class Meta:
+        model = models.Photo
+        fields = ("id", "user", "category", "gear", "tag", "latitude", "location", "longitude", "photo_data",
+                  "photo_feed", "caption")
+
+
 class PhotoDetailsSerializer(serializers.ModelSerializer):
     """
         Serializer to serialize all the metadata for a Photo
@@ -153,6 +194,8 @@ class PhotoDetailsSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     dimensions = serializers.SerializerMethodField()
     gear = serializers.PrimaryKeyRelatedField(many=True, queryset=account_models.Gear.objects.all(), required=False)
+    category = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=models.PhotoClassification.objects.filter(classification_type="category"), required=False)
     geo_location = serializers.CharField(max_length=32, write_only=True, required=False)
     tag = serializers.SerializerMethodField()
     user_details = serializers.SerializerMethodField()
@@ -167,8 +210,7 @@ class PhotoDetailsSerializer(serializers.ModelSerializer):
         :param obj: Photo object
         :return: Number of comments related to the photo
         """
-        photo_comments = models.PhotoComment.objects.filter(photo=obj)
-        return photo_comments.count()
+        return obj.photo_comment.count()
 
     def get_dimensions(self, obj):
         """
@@ -186,7 +228,7 @@ class PhotoDetailsSerializer(serializers.ModelSerializer):
         :param obj: Photo object
         :return: List of Tag names
         """
-        return list(obj.tag.values_list("name", flat=True))
+        return list(obj.tag.values("name", "id", "classification_type"))
 
     def get_user_details(self, obj):
         """
@@ -267,11 +309,11 @@ class PhotoDetailsSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def setup_eager_loading(queryset):
-        queryset = queryset\
-            .select_related("user")\
-            .prefetch_related("category")\
-            .prefetch_related("gear")\
-            .prefetch_related("tag")
+        # select_related for "to-one" relationships
+        # queryset = queryset.select_related("user")
+
+        # prefetch_related for "to-many" relationships
+        queryset = queryset.prefetch_related("category", "tag", "gear", "photo_comment", "photo_vote", "photo_feed")
 
         return queryset
 
@@ -465,7 +507,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         queryset = queryset.select_related("user")
 
         # prefetch_related for "to-many" relationships
-        queryset = queryset.prefetch_related("category", "tag", "gear", "photo_comment", "photo_vote")
+        queryset = queryset.prefetch_related("category", "tag", "gear", "photo_comment", "photo_vote", "photo_feed")
 
         return queryset
 

@@ -128,6 +128,6 @@ class StatePhotoView(generics.ListAPIView):
     def get_queryset(self):
         state = int(self.kwargs.get("pk"))
         if 1 <= state <= 50:
-            return discover_models.StatePhoto.objects.filter(state=state)
+            return discover_models.StatePhoto.objects.filter(state=state).order_by("-created_at")
         else:
             return discover_models.StatePhoto.objects.none()

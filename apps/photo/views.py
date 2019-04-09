@@ -1425,6 +1425,64 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
             raise NotFound('Photo does not exist')
 
 
+class PhotoSingleMediaView(generics.ListAPIView):
+    """
+    /api/photos/<id>/media
+
+    """
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = photo_serializers.PhotoRenderSerializer
+
+    def get_serializer_class(self):
+        """
+        Method to determine the serializer class needed based on request arguments
+
+        :return: Appropriate Serializer to be used on the QuerySet
+        """
+
+        if "width" in self.request.query_params and "height" in self.request.query_params:
+            return photo_serializers.PhotoCustomRenderSerializer
+        else:
+            return self.serializer_class
+
+    @setup_eager_loading
+    def get_queryset(self):
+        """
+        Method to return the appropriate single item QuerySet
+
+        :return: QuerySet containing a single Photo object
+        """
+
+        pk = self.kwargs.get("pk")
+        if pk:
+            return photo_models.Photo.objects.filter(id=pk)
+        else:
+            return photo_models.Photo.objects.none()
+
+
+class PhotoSingleDetailsView(generics.ListAPIView):
+    """
+    /api/photos/<id>/details
+
+    """
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = photo_serializers.PhotoSimpleDetailSerializer
+
+    @setup_eager_loading
+    def get_queryset(self):
+        """
+        Method to return the appropriate single item QuerySet
+
+        :return: QuerySet containing a single Photo object
+        """
+
+        pk = self.kwargs.get("pk")
+        if pk:
+            return photo_models.Photo.objects.filter(id=pk)
+        else:
+            return photo_models.Photo.objects.none()
+
+
 class TagSearchViewSet(generics.ListAPIView):
     """
         /api/photo_classifications/search
@@ -1481,3 +1539,5 @@ class UserFollowingPhotoViewSet(generics.ListAPIView):
 
         else:
             raise NotFound('User does not exist')
+
+

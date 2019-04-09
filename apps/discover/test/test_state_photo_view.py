@@ -6,6 +6,7 @@ from apps.photo.photo import Photo as photo_Photo
 from django.contrib.gis.geos import Point
 from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
+import datetime
 
 
 @override_settings(REMOTE_IMAGE_STORAGE=False)
@@ -57,7 +58,10 @@ class TestPhotoViewSetGET(TestCase):
         """
         client = APIClient()
 
+        start_time = datetime.datetime.now()
         response = client.get("/api/aov-web/discover/states/1/photos")
+        end_time = datetime.datetime.now()
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(len(response.data["results"]), 12)
+        self.assertLessEqual((end_time - start_time).total_seconds() * 1000.0, 200)

@@ -1,6 +1,6 @@
 from apps.common import serializers as common_serializers
 from apps.discover import models
-from apps.photo.serializers import PhotoSerializer
+from apps.photo.serializers import PhotoRenderSerializer
 from rest_framework import serializers
 
 
@@ -27,6 +27,16 @@ class DownloaderSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "email", "location", "state_sponsor")
 
 
+class PhotographerSerializer(serializers.ModelSerializer):
+    """
+    Serializer class for the Photographer model
+    """
+
+    class Meta:
+        model = models.Photographer
+        fields = ("name", "instagram", "profile_image")
+
+
 class StateSerializer(serializers.ModelSerializer):
     """
     Serializer class for State objects
@@ -36,15 +46,6 @@ class StateSerializer(serializers.ModelSerializer):
         model = models.State
         fields = ("id", "name", "fun_fact_1", "fun_fact_2", "fun_fact_3", "fun_fact_4", "fun_fact_5", "icon",
                   "video_url")
-
-class PhotographerSerializer(serializers.ModelSerializer):
-    """
-    Serializer class for the Photographer model
-    """
-
-    class Meta:
-        model = models.Photographer
-        fields = ("name", "instagram", "profile_image")
 
 
 class SponsorSerializer(serializers.ModelSerializer):
@@ -92,7 +93,7 @@ class StatePhotoSerializer(serializers.ModelSerializer):
     """
 
     state = StateSerializer()
-    photo = PhotoSerializer()
+    photo = PhotoRenderSerializer()
     created_at = common_serializers.DateTimeFieldWithTZ()
 
     class Meta:
