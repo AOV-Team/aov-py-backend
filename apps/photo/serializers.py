@@ -182,7 +182,9 @@ class PhotoSimpleDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Photo
         fields = ("id", "user", "category", "gear", "tag", "latitude", "location", "longitude", "photo_data",
-                  "photo_feed", "caption")
+                  "photo_feed", "caption", "bts_lens", "bts_shutter", "bts_iso", "bts_aperture",
+                  "bts_camera_settings", "bts_time_of_day", "bts_camera_make", "bts_camera_model",
+                  "bts_photo_editor",)
 
 
 class PhotoDetailsSerializer(serializers.ModelSerializer):
@@ -322,7 +324,9 @@ class PhotoDetailsSerializer(serializers.ModelSerializer):
         fields = ("id", "category", "gear", "geo_location", "tag", "user", "attribution_name", "dimensions",
                   "latitude", "location", "longitude", "photo_data", "photo_feed",
                   "user_details", "magazine_authorized", "caption", "votes_behind", "comments", "votes", "user_voted",
-                  "user_starred")
+                  "user_starred", "bts_lens", "bts_shutter", "bts_iso", "bts_aperture",
+                  "bts_camera_settings", "bts_time_of_day", "bts_camera_make", "bts_camera_model",
+                  "bts_photo_editor",)
         ordering_fields = ("id", "location")
         ordering = ("-id",)
         read_only_fields = ("photo_data", "user_details", "comments", "user_voted", "user_starred")
