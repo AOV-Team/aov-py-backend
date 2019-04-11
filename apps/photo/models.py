@@ -403,7 +403,7 @@ class PhotoVote(common_models.EditMixin):
     :author: gallen
     """
 
-    photo = models.ForeignKey(Photo)
+    photo = models.ForeignKey(Photo, related_name="photo_vote")
     upvote = models.BooleanField(default=False)
     user = models.ForeignKey(account_models.User)
 

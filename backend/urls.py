@@ -72,6 +72,7 @@ urlpatterns = [
     url(r'api/users/(?P<pk>[0-9^/]+)/messages/(?P<message_pk>[0-9^/]+)/read$', communication_views.DirectMessageMarkReadViewSet.as_view()),
 
     # photo
+    url(r'api/aov-web/photos/top$', photo_views.PhotoAppTopPhotosViewSet.as_view()),
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
     url(r'api/photo_classifications/search$', photo_views.TagSearchViewSet.as_view()),
     url(r'api/photo_classifications/(?P<photo_classification_id>[0-9^/]+)/photos$',
@@ -84,7 +85,9 @@ urlpatterns = [
     url(r'api/photos/(?P<pk>[0-9^/]+)/comments$', photo_views.PhotoSingleCommentViewSet.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/comments/(?P<comment_id>[0-9^/]+)/replies$',
         photo_views.PhotoSingleCommentReplyViewSet.as_view()),
-    url(r'api/photos/(?P<pk>[0-9^/]+)/flags', photo_views.PhotoSingleFlagsViewSet.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/details$', photo_views.PhotoSingleDetailsView.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/flags$', photo_views.PhotoSingleFlagsViewSet.as_view()),
+    url(r'api/photos/(?P<pk>[0-9^/]+)/media$', photo_views.PhotoSingleMediaView.as_view()),
     url(r'api/photos/(?P<pk>[0-9^/]+)/(?P<user_interest>stars|likes)$',
         photo_views.PhotoSingleInterestsViewSet.as_view()),
     url(r'api/photos/top$', photo_views.PhotoAppTopPhotosViewSet.as_view()),

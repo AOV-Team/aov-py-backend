@@ -183,7 +183,6 @@ def run_all_photos_profile(url_base, parameters):
                         or details only.
     :return: No return value
     """
-    start_time = datetime.datetime.now()
 
     # Set up the query parameter to specify the serialization required
     if parameters == "renders":
@@ -202,6 +201,7 @@ def run_all_photos_profile(url_base, parameters):
         print("Login complete!")
 
         print("Retrieving all photos")
+        start_time = datetime.datetime.now()
         all_photos = requests.get(url_base + "/logging/all_photos{}".format(q), headers=headers)
         if all_photos.status_code == 200:
             print("All photos received!")
@@ -425,6 +425,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """
             Command to test profiling packages. Makes a series of API requests to simulate app functionality.
+
+            ./manage.py profile_api -s local -p all_photos -P details
 
         :param args:
         :param options:

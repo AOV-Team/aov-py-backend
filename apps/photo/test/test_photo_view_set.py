@@ -34,7 +34,7 @@ class TestPhotoViewSetGET(TestCase):
         gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
         gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
 
-        for number in range(1, 101):
+        for number in range(1, 13):
             photo1 = photo_models.Photo(coordinates=Point(-116, 43),
                                         image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
                                         user=user)
@@ -44,12 +44,6 @@ class TestPhotoViewSetGET(TestCase):
             photo1.votes = number
             photo1.photo_feed.add(1)
             photo1.save()
-
-        # photo2 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
-        # photo2.save()
-        # photo2.votes = 12
-        # photo2.category.add(category)
-        # photo2.save()
 
     def tearDown(self):
         """
@@ -89,21 +83,21 @@ class TestPhotoViewSetGET(TestCase):
         self.assertEquals(results[1]['gear'][0], gear_1.id)
         self.assertEquals(results[1]['latitude'], 43.0)
         self.assertEquals(results[1]['longitude'], -116.0)
-        self.assertEquals(results[1]['votes'], 99)
+        self.assertEquals(results[1]['votes'], 11)
         self.assertEquals(results[1]['rank']['Night'], 2)
         self.assertEquals(results[1]['rank']['overall'], 2)
         self.assertEqual(results[1]['votes_behind']['Night'], 1)
         self.assertIsNotNone(results[0]['image_blurred'])
         self.assertIsNotNone(results[0]['scaled_render'])
-        # self.assertIsNotNone(results[0]['image_medium'])
-        # self.assertIsNotNone(results[0]['image_small'])
-        # self.assertIsNotNone(results[0]['image_small_2'])
-        # self.assertIsNotNone(results[0]['image_tiny_246'])
-        # self.assertIsNotNone(results[0]['image_tiny_272'])
+        self.assertIsNotNone(results[0]['image_medium'])
+        self.assertIsNotNone(results[0]['image_small'])
+        self.assertIsNotNone(results[0]['image_small_2'])
+        self.assertIsNotNone(results[0]['image_tiny_246'])
+        self.assertIsNotNone(results[0]['image_tiny_272'])
         self.assertEquals(results[0]['user_details']['location'], user.location)
         self.assertEquals(results[0]['user_details']['social_name'], user.social_name)
         self.assertEquals(results[0]['user_details']['username'], user.username)
-        self.assertEquals(results[0]['votes'], 100)
+        self.assertEquals(results[0]['votes'], 12)
         self.assertEquals(results[0]['rank']['Night'], 1)
         self.assertEquals(results[0]['rank']['overall'], 1)
 
@@ -114,15 +108,7 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), public=False, user=user)
-        photo1.save()
-
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
-        photo2.save()
+        user = account_models.User.objects.get(username='aov1')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -134,7 +120,7 @@ class TestPhotoViewSetGET(TestCase):
         request = client.get('/api/photos')
         results = request.data['results']
 
-        self.assertEquals(len(results), 1)
+        self.assertEquals(len(results), 12)
 
     def test_photo_view_set_get_classification(self):
         """
@@ -143,19 +129,7 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
-                                                                             classification_type='category')
-
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
-        photo1.save()
-        photo1.category = [category]
-        photo1.save()
-
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
-        photo2.save()
+        user = account_models.User.objects.get(username='aov1')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -167,7 +141,7 @@ class TestPhotoViewSetGET(TestCase):
         request = client.get('/api/photos?classification=night')
         results = request.data['results']
 
-        self.assertEquals(len(results), 1)
+        self.assertEquals(len(results), 12)
 
     def test_photo_view_set_get_classification_does_not_exist(self):
         """
@@ -176,15 +150,7 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
-                                                                             classification_type='category')
-
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
-        photo1.save()
-        photo1.category = [category]
-        photo1.save()
+        user = account_models.User.objects.get(username='aov1')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -205,19 +171,8 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
-                                                                             classification_type='category')
-
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
-        photo1.save()
-        photo1.category = [category]
-        photo1.save()
-
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
-        photo2.save()
+        user = account_models.User.objects.get(username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Night', classification_type="category")
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -229,7 +184,7 @@ class TestPhotoViewSetGET(TestCase):
         request = client.get('/api/photos?classification={}'.format(category.id))
         results = request.data['results']
 
-        self.assertEquals(len(results), 1)
+        self.assertEquals(len(results), 12)
 
     def test_photo_view_set_get_filtered(self):
         """
@@ -238,21 +193,12 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
-        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
-                                                                             classification_type='category')
+        user = account_models.User.objects.get(username='aov1')
+        category = photo_models.PhotoClassification.objects.get(name='Night', classification_type="category")
 
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
-                   location='Boise', user=user)
-        photo1.save()
-        photo1.category = [category]
-        photo1.save()
-
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')),
-                   location='Boise', user=user)
-        photo2.save()
+        for photo in photo_models.Photo.objects.all().iterator():
+            photo.location = "boise"
+            photo.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -262,10 +208,10 @@ class TestPhotoViewSetGET(TestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token)
 
         # Case insensitive
-        request = client.get('/api/photos?classification=night&location=boise')
+        request = client.get('/api/photos?classification={}&location=boise'.format(category.id))
         results = request.data['results']
 
-        self.assertEquals(len(results), 1)
+        self.assertEquals(len(results), 12)
 
     def test_photo_view_set_get_geo_location(self):
         """
@@ -274,26 +220,23 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(username='aov1')
+        photo_models.Photo.objects.all().delete()
 
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
-                   location='boise', user=user)
+        photo1 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                                    location='boise', user=user)
         photo1.geo_location = 'POINT (-116.21 43.62)'
         photo1.save()
 
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.geo_location = 'POINT (-116.25 43.61699)'
         photo2.save()
 
-        photo3 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo3 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo3.geo_location = 'POINT (-118.25 45.61699)'
         photo3.save()
 
-        photo4 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo4 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo4.save()
 
         # Simulate auth
@@ -316,7 +259,7 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(username='aov1')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -337,7 +280,7 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(username='aov1')
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -358,15 +301,16 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(username='aov1')
+        
+        # Delete the setUp function objects to create specific entities for this test
+        photo_models.Photo.objects.all().delete()
 
-        photo1 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
-                   location='boise', user=user)
+        photo1 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
+                                    location='boise', user=user)
         photo1.save()
 
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
 
         # Simulate auth
@@ -389,33 +333,10 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(username='aov1')
         user.location = 'Boise'
         user.social_name = '@theaov'
         user.save()
-        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
-                                                                             classification_type='category')
-
-        # Create some gear
-        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
-
-        photo1 = photo_models \
-            .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
-                   user=user)
-        photo1.save()
-        photo1.gear.add(gear_1, gear_2)
-        photo1.category.add(category)
-        photo1.votes = 1
-        photo1.photo_feed.add(1)
-        photo1.save()
-
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
-        photo2.save()
-        photo2.votes = 12
-        photo2.category.add(category)
-        photo2.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -428,23 +349,23 @@ class TestPhotoViewSetGET(TestCase):
         results = request.data['results']
 
         self.assertIn('next', request.data)
-        self.assertEquals(len(results), 2)
-        self.assertTrue('gear' not in results[0])
-        self.assertTrue('latitude' not in results[0])
-        self.assertTrue('longitude' not in results[0])
-        self.assertTrue('votes' not in results[0])
-        self.assertTrue('votes_behind' not in results[0])
-        self.assertTrue('user' not in results[0])
-        self.assertTrue('user_details' not in results[0])
-        self.assertTrue('category' not in results[0])
-        self.assertTrue('comments' not in results[0])
-        self.assertTrue('image' in results[0])
-        self.assertTrue('image_blurred' in results[0])
-        self.assertTrue('image_medium' in results[0])
-        self.assertTrue('image_small' in results[0])
-        self.assertTrue('image_small_2' in results[0])
-        self.assertTrue('image_tiny_246' in results[0])
-        self.assertTrue('image_tiny_272' in results[0])
+        self.assertEquals(len(results), 12)
+        self.assertNotIn('gear', results[0])
+        self.assertNotIn('latitude', results[0])
+        self.assertNotIn('longitude', results[0])
+        self.assertNotIn('votes', results[0])
+        self.assertNotIn('votes_behind', results[0])
+        self.assertNotIn('user', results[0])
+        self.assertNotIn('user_details', results[0])
+        self.assertNotIn('category', results[0])
+        self.assertNotIn('comments', results[0])
+        self.assertIn('image', results[0])
+        self.assertIn('image_blurred', results[0])
+        self.assertIn('image_medium', results[0])
+        self.assertIn('image_small', results[0])
+        self.assertIn('image_small_2', results[0])
+        self.assertIn('image_tiny_246', results[0])
+        self.assertIn('image_tiny_272', results[0])
 
     def test_photo_view_set_get_details_only(self):
         """
@@ -453,33 +374,10 @@ class TestPhotoViewSetGET(TestCase):
         :return: None
         """
         # Test data
-        user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aov1')
+        user = account_models.User.objects.get(username='aov1')
         user.location = 'Boise'
         user.social_name = '@theaov'
         user.save()
-        category = photo_models.PhotoClassification.objects.create_or_update(name='Night',
-                                                                             classification_type='category')
-
-        # Create some gear
-        gear_1 = account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II')
-        gear_2 = account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')
-
-        photo1 = photo_models \
-            .Photo(coordinates=Point(-116, 43), image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')),
-                   user=user)
-        photo1.save()
-        photo1.gear.add(gear_1, gear_2)
-        photo1.category.add(category)
-        photo1.votes = 1
-        photo1.photo_feed.add(1)
-        photo1.save()
-
-        photo2 = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
-        photo2.save()
-        photo2.votes = 12
-        photo2.category.add(category)
-        photo2.save()
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -492,23 +390,23 @@ class TestPhotoViewSetGET(TestCase):
         results = request.data['results']
 
         self.assertIn('next', request.data)
-        self.assertEquals(len(results), 2)
-        self.assertTrue('gear' in results[0])
-        self.assertTrue('latitude' in results[0])
-        self.assertTrue('longitude' in results[0])
-        self.assertTrue('votes' in results[0])
-        self.assertTrue('votes_behind' in results[0])
-        self.assertTrue('user' in results[0])
-        self.assertTrue('user_details' in results[0])
-        self.assertTrue('category' in results[0])
-        self.assertTrue('comments' in results[0])
-        self.assertTrue('image' not in results[0])
-        self.assertTrue('image_blurred' not in results[0])
-        self.assertTrue('image_medium' not in results[0])
-        self.assertTrue('image_small' not in results[0])
-        self.assertTrue('image_small_2' not in results[0])
-        self.assertTrue('image_tiny_246' not in results[0])
-        self.assertTrue('image_tiny_272' not in results[0])
+        self.assertEquals(len(results), 12)
+        self.assertIn('gear', results[0])
+        self.assertIn('latitude', results[0])
+        self.assertIn('longitude', results[0])
+        self.assertIn('votes', results[0])
+        self.assertIn('votes_behind', results[0])
+        self.assertIn('user', results[0])
+        self.assertIn('user_details', results[0])
+        self.assertIn('category', results[0])
+        self.assertIn('comments', results[0])
+        self.assertNotIn('image', results[0])
+        self.assertNotIn('image_blurred', results[0])
+        self.assertNotIn('image_medium', results[0])
+        self.assertNotIn('image_small', results[0])
+        self.assertNotIn('image_small_2', results[0])
+        self.assertNotIn('image_tiny_246', results[0])
+        self.assertNotIn('image_tiny_272', results[0])
 
 
 class TestPhotoViewSetPOST(TestCase):

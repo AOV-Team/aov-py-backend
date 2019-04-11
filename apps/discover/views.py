@@ -2,9 +2,54 @@ from apps.common.exceptions import MissingRequiredFieldException
 from apps.common.views import get_default_response, DefaultResultsSetPagination
 from apps.discover import models as discover_models
 from apps.discover import serializers as discover_serializers
+from apps.photo.serializers import PhotoRenderSerializer, PhotoCustomRenderSerializer
+from datetime import timedelta
 from django.utils import timezone
 from rest_framework import generics, permissions
 from rest_framework.exceptions import ValidationError
+
+
+class MobileAppTopPhotosView(generics.ListAPIView):
+    """
+    Endpoint to retrieve the top images from the Mobile app for display on the web
+    """
+    permission_classes = (permissions.AllowAny,)
+
+    def get_serializer_class(self):
+        """
+        Determine which serializer class to use based on a combination of URL path and query parameters provided
+
+        :return: Appropriate Photo serializer class
+        """
+        # Check if it's a custom render request
+        if "width" in self.request.query_params and "height" in self.request.query_params:
+            return PhotoCustomRenderSerializer
+        else:
+            return PhotoRenderSerializer
+
+    def get_queryset(self):
+        """
+        Override of DRF method to specify custom QuerySet of Photo objects to be returned by the View
+
+        :return: QuerySet of Photo objects
+        """
+        data = self.request.query_params.get("data", None)
+        page = self.request.query_params.get("display_page", None)
+        cutoff = timezone.now() - timedelta(days=30)
+
+        if page == "aov-web-all":
+            aov_web_images = photo_models.Photo.objects.filter(public=True, category__isnull=False).distinct().annotate(
+                images_order=(Count("user_action") + (Count("photo_comment", distinct=True) * 5))
+            ).order_by("-images_order")
+            return aov_web_images
+
+        if page == "aov-web-weekly":
+            cutoff = timezone.now() - timedelta(days=7)
+            aov_web_images = photo_models.Photo.objects.filter(public=True, category__isnull=False,
+                                                               created_at__gte=cutoff).distinct().annotate(
+                images_order=(Count("user_action") + (Count("photo_comment", distinct=True) * 5))
+            ).order_by("-images_order")
+            return aov_web_images
 
 
 class DownloaderView(generics.CreateAPIView):
@@ -128,6 +173,6 @@ class StatePhotoView(generics.ListAPIView):
     def get_queryset(self):
         state = int(self.kwargs.get("pk"))
         if 1 <= state <= 50:
-            return discover_models.StatePhoto.objects.filter(state=state)
+            return discover_models.StatePhoto.objects.filter(state=state).order_by("-created_at")
         else:
             return discover_models.StatePhoto.objects.none()
