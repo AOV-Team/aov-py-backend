@@ -490,6 +490,28 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
     photo_feed = None
     serializer_class = photo_serializers.PhotoSerializer
 
+    def get_serializer_class(self):
+        url_path = self.request.get_full_path()
+
+        if "aov-web" in url_path:
+            if "width" in self.request.query_params and "height" in self.request.query_params:
+                return photo_serializers.PhotoCustomRenderSerializer
+            else:
+                return photo_serializers.PhotoRenderSerializer
+        else:
+            data = self.request.query_params.get("data", None)
+            if data:
+                if data == "renders":
+                    self.serializer_class = photo_serializers.PhotoRenderSerializer
+
+                elif data == "details":
+                    self.serializer_class = photo_serializers.PhotoDetailsSerializer
+
+                else:
+                    self.serializer_class = photo_serializers.PhotoSerializer
+
+        return self.serializer_class
+
     @setup_eager_loading
     def get_queryset(self):
         """
@@ -497,27 +519,18 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
 
         :return: Queryset
         """
-        data = self.request.query_params.get("data", None)
+        # data = self.request.query_params.get("data", None)
         page = self.request.query_params.get("display_page", None)
         cutoff = timezone.now() - timedelta(days=30)
+        url_path = self.request.get_full_path()
 
-        if data:
-            if data == "renders":
-                self.serializer_class = photo_serializers.PhotoRenderSerializer
-
-            elif data == "details":
-                self.serializer_class = photo_serializers.PhotoDetailsSerializer
-
-            else:
-                self.serializer_class = photo_serializers.PhotoSerializer
-
-        if page == "aov-web-all":
+        if page == "all" and "aov-web" in url_path:
             aov_web_images = photo_models.Photo.objects.filter(public=True, category__isnull=False).distinct().annotate(
                 images_order=(Count("user_action") + (Count("photo_comment", distinct=True) * 5))
             ).order_by("-images_order")
             return aov_web_images
 
-        if page == "aov-web-weekly":
+        if page == "weekly" and "aov-web" in url_path:
             cutoff = timezone.now() - timedelta(days=7)
             aov_web_images = photo_models.Photo.objects.filter(public=True, category__isnull=False,
                                                                created_at__gte=cutoff).distinct().annotate(

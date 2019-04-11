@@ -72,6 +72,7 @@ urlpatterns = [
     url(r'api/users/(?P<pk>[0-9^/]+)/messages/(?P<message_pk>[0-9^/]+)/read$', communication_views.DirectMessageMarkReadViewSet.as_view()),
 
     # photo
+    url(r'api/aov-web/photos/top$', photo_views.PhotoAppTopPhotosViewSet.as_view()),
     url(r'api/photo_classifications$', photo_views.PhotoClassificationViewSet.as_view()),
     url(r'api/photo_classifications/search$', photo_views.TagSearchViewSet.as_view()),
     url(r'api/photo_classifications/(?P<photo_classification_id>[0-9^/]+)/photos$',
