@@ -95,7 +95,8 @@ class User(AbstractBaseUser, common_models.EditMixin, PermissionsMixin):
     )
     SIGNUP_SOURCE_CHOICES = (
         ('ST', 'Standard'),
-        ('MK', 'Marketplace')
+        ('MK', 'Marketplace'),
+        ('WS', 'Website')
     )
 
     follower = models.ManyToManyField('User', related_name='followers')
