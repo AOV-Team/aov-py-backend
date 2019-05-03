@@ -21,9 +21,9 @@ def statistics_admin(request):
     """
 
     # Age
-    users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count('photo'))
+    users = account_models.User.objects.filter(is_active=True, age__isnull=False, age__gte=1).annotate(Count('photo_user'))
     age_stats = users.aggregate(Avg('age'), Max('age'), Min('age'))
-    photos = users.aggregate(Avg('photo__count'))
+    photos = users.aggregate(Avg('photo_user__count'))
 
     # Feed stats
     feeds = photo_models.PhotoFeed.objects.filter(public=True)
@@ -42,7 +42,7 @@ def statistics_admin(request):
         'age_avg': round(age_stats["age__avg"], 2),
         'age_high': age_stats["age__max"],
         'age_low': age_stats["age__min"],
-        'avg_photos': round(photos["photo__count__avg"], 2),
+        'avg_photos': round(photos["photo_user__count__avg"], 2),
         'feeds': feeds,
         'power_users': power_users_display,
         'power_users_count': power_users_display.count()
