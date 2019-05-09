@@ -18,6 +18,9 @@ Base URL: `https://www.staging.artofvisuals.com/api/aov-web/auth`
 }
 ```
 
+In the above, `access_token` is a token received from Facebook's API, generally attained using their
+[Facebook Login integration.](https://developers.facebook.com/docs/facebook-login/web)
+
 **Response**
 
 A 200 status code with a response object.
@@ -32,3 +35,4 @@ A 200 status code with a response object.
 
 **409** User already exists and requires login
 **400** Bad request data
+
