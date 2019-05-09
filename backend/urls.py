@@ -33,7 +33,7 @@ urlpatterns = [
     # account
     url(r'api/auth$', account_views.AuthenticateViewSet.as_view()),
     url(r'api/auth/reset$', account_views.AuthenticateResetViewSet.as_view()),
-    url(r'api/auth/social$', account_views.SocialSignUpViewSet.as_view()),
+    # url(r'api/auth/social$', account_views.SocialSignUpViewSet.as_view()),
     url(r'api/gear$', account_views.GearViewSet.as_view()),
     url(r'api/gear/(?P<pk>[0-9^/]+)$', account_views.GearSingleViewSet.as_view()),
     url(r'api/me$', account_views.MeViewSet.as_view()),
@@ -128,6 +128,9 @@ urlpatterns = [
     url(r'^admin/statistics/$', analytic_views.statistics_admin),
 
     ## AOV-WEB
+
+    # auth
+    url(r'api/aov-web/auth/social$', account_views.SocialSignUpViewSet.as_view()),
 
     # podcast
     url(r'api/aov-web/podcast/get_featured$', podcast_views.GetFeaturedRequestView.as_view()),

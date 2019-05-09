@@ -843,7 +843,7 @@ class SocialSignUpViewSet(generics.CreateAPIView):
     queryset = account_models.User.objects.all()
     serializer_class = account_serializers.UserSerializer
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         """
         POST method to authenticate a user via third party OAuth and then create a user if doesn't already exist
         See link for more info:
