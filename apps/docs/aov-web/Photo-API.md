@@ -1,8 +1,6 @@
-# Photo API
+## Photo API
 
 Base Url: `https://www.staging.artofvisuals.com/api/photos`
-
-## ENDPOINTS
 
 ### Photos Top
 **URL** - `/top`
@@ -33,8 +31,8 @@ A 200 status code with a response object.
 
 ```json
    {
-       "next": <paginated url>
-       "previous": <paginated url>
+       "next": <paginated url>,
+       "previous": <paginated url>,
        "count": int,
        "results": [
            {
@@ -52,7 +50,7 @@ A 200 status code with a response object.
                "image_blurred": <image url>,
                "image_small": <image url>,
                "image_small_2": <image url>,
-               "image_tiny_246": <image url>
+               "image_tiny_246": <image url>,
                "image_tiny_272": <image url>,
                "latitude": float,
                "longitude": float,
@@ -91,7 +89,7 @@ A 200 status code with a response object.
                "bts_camera_make": "",
                "bts_camera_model": "",
                "bts_photo_editor": "",
-               "scaled_render": <image url>
+               "scaled_render": <image url>,
                "rank": {
                    "overall": int,
                    "<category name>": int

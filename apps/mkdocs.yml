@@ -1,0 +1,24 @@
+site_name: AoV API Documentation
+pages:
+    - Home: 'index.md'
+    - Web API:
+        - 'Auth': './aov-web/Auth-API.md'
+        - 'Discover': './aov-web/Discover-API.md'
+        - 'Web Photo': './aov-web/Photo-API.md'
+        - 'Podcast': './aov-web/Podcast-API.md'
+        - 'Quote': './aov-web/Quote-API.md'
+        - 'User': './aov-web/User-API.md'
+        - 'Web-Photo': './aov-web/Web-Photo-API.md'
+    - Mobile API:
+        - 'Auth': './aov-mobile/Mobile-Auth-API.md'
+        - 'Conversations': './aov-mobile/Mobile-Conversations-API.md'
+        - 'Devices': './aov-mobile/Device-API.md'
+        - 'Gear': './aov-mobile/Gear-API.md'
+        - 'Me': './aov-mobile/Me-API.md'
+        - 'Mobile Photo': './aov-mobile/Mobile-Photo-API.md'
+        - 'Search': './aov-mobile/Search-API.md'
+        - 'Statistics': './aov-mobile/Statistics-API.md'
+        - 'Users': './aov-mobile/Mobile-User-API.md'
+        - 'Utils': './aov-mobile/Util-API.md'
+
+theme: readthedocs

@@ -1,8 +1,6 @@
-# Web Photo API
+## Web Photo API
 
 Base Url: `https://www.staging.artofvisuals.com/api/aov-web/photos`
-
-## ENDPOINTS
 
 ### Photos Top
 **URL** - `/top`
@@ -35,8 +33,8 @@ A 200 status code with a response object.
 **Sample Response Without Width and Height**
 ```json
    {
-       "next": <paginated url>
-       "previous": <paginated url>
+       "next": <paginated url>,
+       "previous": <paginated url>,
        "count": int,
        "results": [
            {
@@ -45,7 +43,7 @@ A 200 status code with a response object.
                "image_blurred": <image url>,
                "image_small": <image url>,
                "image_small_2": <image url>,
-               "image_tiny_246": <image url>
+               "image_tiny_246": <image url>,
                "image_tiny_272": <image url>,
            }
        ]
@@ -55,8 +53,8 @@ A 200 status code with a response object.
 **Sample Response With Width and Height**
 ```json
    {
-       "next": <paginated url>
-       "previous": <paginated url>
+       "next": <paginated url>,
+       "previous": <paginated url>,
        "count": int,
        "results": [
            {

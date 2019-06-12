@@ -1,8 +1,6 @@
-# Podcast API
+## Podcast API
 
 Base URL: `https://www.staging.artofvisuals.com/api/aov-web/podcast`
-
-## ENDPOINTS
 
 ### Get Featured
 **URL** - `/get_featured`
@@ -11,12 +9,12 @@ Base URL: `https://www.staging.artofvisuals.com/api/aov-web/podcast`
 - POST - JSON/Multipart
 
 **Accepted Data**
-```javascript
+```json
 {
    // Required fields
    "email": "",
    "full_name": "",
-   "location": ""
+   "location": "",
    
    // Optional Fields
    "story": "",
@@ -59,9 +57,9 @@ returned data detailing what failed.
 
 **Response**
 
-```javascript
+```json
 {
-	"count": int //Integer value representing number of total results
+	"count": int, //Integer value representing number of total results
 	"next": "", //Full URL for the next page of results
 	"previous": "", //Full URL for the previous page of results
 	"results": [] //Array of Episode objects, default length of 12, max length of 90
