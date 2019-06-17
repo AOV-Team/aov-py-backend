@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Conversations - AoV API Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Conversations";
+    var mkdocs_page_input_path = "aov-mobile/Mobile-Conversations-API.md";
+    var mkdocs_page_url = "/aov-mobile/Mobile-Conversations-API/index.html";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="icon icon-home"> AoV API Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../index.html">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Web API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Auth-API/index.html">Auth</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Discover-API/index.html">Discover</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Photo-API/index.html">Web Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Podcast-API/index.html">Podcast</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Quote-API/index.html">Quote</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/User-API/index.html">User</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Web-Photo-API/index.html">Web-Photo</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Mobile API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Mobile-Auth-API/index.html">Auth</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="index.html">Conversations</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#conversations">Conversations</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Device-API/index.html">Devices</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Gear-API/index.html">Gear</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Me-API/index.html">Me</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-Photo-API/index.html">Mobile Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Search-API/index.html">Search</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Statistics-API/index.html">Statistics</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-User-API/index.html">Users</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Util-API/index.html">Utils</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">AoV API Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Mobile API &raquo;</li>
+        
+      
+    
+    <li>Conversations</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="conversations">Conversations</h2>
+<p><strong>URL</strong> - <code>https://www.staging.artofvisuals.com/api/conversations</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Functionality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>participants</td>
+<td>Populated with the IDs of users in the conversation.</td>
+<td>Returns all conversations that the participants are party to. Can be included multiple times.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+    &quot;count&quot;: int, //Integer value representing number of total results
+    &quot;next&quot;: &quot;&quot;, //Full URL for the next page of results
+    &quot;previous&quot;: &quot;&quot;, //Full URL for the previous page of results
+    &quot;results&quot;: [
+      {
+        &quot;id&quot;: int,
+        &quot;participants&quot;: [{
+          &quot;id&quot;: int, 
+          &quot;age&quot;: int, 
+          &quot;first_name&quot;: &quot;&quot;,
+          &quot;last_name&quot;: &quot;&quot;, 
+          &quot;gender&quot;: &quot;&quot;, 
+          &quot;is_admin&quot;: bool, 
+          &quot;social_name&quot;: &quot;&quot;, 
+          &quot;avatar&quot;: &lt;image url&gt;, 
+          &quot;social_url&quot;: &quot;&quot;, 
+          &quot;username&quot;: &quot;&quot;, 
+          &quot;email&quot;: &quot;&quot;, 
+          &quot;gear&quot;: [int], 
+          &quot;website_url&quot;: &quot;&quot;, 
+          &quot;last_login&quot;: datetime, 
+          &quot;location&quot;: &quot;&quot;
+        }],
+        &quot;latest&quot;: {
+          &quot;id&quot;: int, 
+          &quot;sender&quot;: int, 
+          &quot;recipient&quot;: int, 
+          &quot;message&quot;: &quot;&quot;, 
+          &quot;index&quot;: int, 
+          &quot;conversation&quot;: int, 
+          &quot;created_at&quot;: datetime, 
+          &quot;read&quot;: bool
+        },
+        &quot;message_count&quot;: int
+      }
+    ] 
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>In the event of making a request that has no related data, a response of 200 will be returned with an empty result set.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Device-API/index.html" class="btn btn-neutral float-right" title="Devices">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Mobile-Auth-API/index.html" class="btn btn-neutral" title="Auth"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../Mobile-Auth-API/index.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Device-API/index.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/require.js"></script>
+      <script src="../../search/search.js"></script>
+
+</body>
+</html>

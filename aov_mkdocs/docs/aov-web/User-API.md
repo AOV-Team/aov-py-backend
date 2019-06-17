@@ -1,8 +1,6 @@
-# User API
+## User API
 
 Base Url: `https://www.staging.artofvisuals.com/api/aov-web/`
-
-## ENDPOINTS
 
 ### Users Single
 **URL** - `/users/<id>`
@@ -75,7 +73,7 @@ None
 ```json
    {
        "count": int,
-       "next": <resource url>
+       "next": <resource url>,
        "previous": <resource url>
        "results": [
           {

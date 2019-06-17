@@ -1,8 +1,6 @@
-# Discover API
+## Discover
 
 Base Url: `https://www.staging.artofvisuals.com/api/aov-web/discover`
-
-## ENDPOINTS
 
 ### Downloaders
 **URL** - `/downloaders`
@@ -11,7 +9,7 @@ Base Url: `https://www.staging.artofvisuals.com/api/aov-web/discover`
 - POST - JSON
 
 **Accepted Data**
-```javascript
+```json
 {
    // Required fields
    "email": "",
@@ -25,7 +23,7 @@ Base Url: `https://www.staging.artofvisuals.com/api/aov-web/discover`
 
 A 200 status code with a response object.
 
-```javascript
+```json
    {
        "downloadable_file": <resource url>
    }
@@ -47,7 +45,7 @@ None
 
 **Response**
 
-```javascript
+```json
    {
        "next": None,
        "previous": None,
@@ -61,7 +59,7 @@ None
                "fun_fact_3": "",
                "fun_fact_4": "",
                "fun_fact_5": "",
-               "icon": <image_url>
+               "icon": <image_url>,
                "video_url": <resource_url>
            },
        ]
@@ -84,7 +82,7 @@ None
 
 **Response**
 
-```javascript
+```json
    {
        "next": None,
        "previous": None,
@@ -104,7 +102,7 @@ None
                    "fun_fact_3": "",
                    "fun_fact_4": "",
                    "fun_fact_5": "",
-                   "icon": <image_url>
+                   "icon": <image_url>,
                    "video_url": <resource_url>
                },
                "feature_start": datetime,
@@ -131,10 +129,10 @@ None
 
 **Response**
 
-```javascript
+```json
    {
-       "next": <paginated url>
-       "previous": <paginated url>
+       "next": <paginated url>,
+       "previous": <paginated url>,
        "count": int,
        "results": [
            {
@@ -146,7 +144,7 @@ None
                    "fun_fact_3": "",
                    "fun_fact_4": "",
                    "fun_fact_5": "",
-                   "icon": <image_url>
+                   "icon": <image_url>,
                    "video_url": <resource_url>
                },
                "photo": {
@@ -164,7 +162,7 @@ None
                    "image_blurred": <image url>,
                    "image_small": <image url>,
                    "image_small_2": <image url>,
-                   "image_tiny_246": <image url>
+                   "image_tiny_246": <image url>,
                    "image_tiny_272": <image url>,
                    "latitude": float,
                    "longitude": float,
@@ -203,7 +201,7 @@ None
                    "bts_camera_make": "",
                    "bts_camera_model": "",
                    "bts_photo_editor": "",
-                   "scaled_render": <image url>
+                   "scaled_render": <image url>,
                    "rank": {
                        "overall": int,
                        "<category name>": int
@@ -231,7 +229,7 @@ None
 
 **Response**
 
-```javascript
+```json
    {
        "next": None,
        "previous": None,
@@ -252,7 +250,7 @@ None
                    "fun_fact_3": "",
                    "fun_fact_4": "",
                    "fun_fact_5": "",
-                   "icon": <image_url>
+                   "icon": <image_url>,
                    "video_url": <resource_url>
                },
                "sponsorship_start": datetime,

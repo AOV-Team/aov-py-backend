@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Users - AoV API Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Users";
+    var mkdocs_page_input_path = "aov-mobile/Mobile-User-API.md";
+    var mkdocs_page_url = "/aov-mobile/Mobile-User-API/index.html";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="icon icon-home"> AoV API Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../index.html">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Web API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Auth-API/index.html">Auth</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Discover-API/index.html">Discover</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Photo-API/index.html">Web Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Podcast-API/index.html">Podcast</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Quote-API/index.html">Quote</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/User-API/index.html">User</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Web-Photo-API/index.html">Web-Photo</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Mobile API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Mobile-Auth-API/index.html">Auth</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-Conversations-API/index.html">Conversations</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Device-API/index.html">Devices</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Gear-API/index.html">Gear</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Me-API/index.html">Me</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-Photo-API/index.html">Mobile Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Search-API/index.html">Search</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Statistics-API/index.html">Statistics</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="index.html">Users</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#users">Users</a></li>
+    
+
+    <li class="toctree-l3"><a href="#user-single">User Single</a></li>
+    
+
+    <li class="toctree-l3"><a href="#user-single-blocked">User Single Blocked</a></li>
+    
+
+    <li class="toctree-l3"><a href="#user-conversations">User Conversations</a></li>
+    
+
+    <li class="toctree-l3"><a href="#user-conversations-single">User Conversations Single</a></li>
+    
+
+    <li class="toctree-l3"><a href="#user-single-following">User Single Following</a></li>
+    
+
+    <li class="toctree-l3"><a href="#followers">Followers</a></li>
+    
+
+    <li class="toctree-l3"><a href="#follower-single">Follower Single</a></li>
+    
+
+    <li class="toctree-l3"><a href="#user-galleries">User Galleries</a></li>
+    
+
+    <li class="toctree-l3"><a href="#user-galleries-single">User Galleries Single</a></li>
+    
+
+    <li class="toctree-l3"><a href="#gallery-photos">Gallery Photos</a></li>
+    
+
+    <li class="toctree-l3"><a href="#location">Location</a></li>
+    
+
+    <li class="toctree-l3"><a href="#messages">Messages</a></li>
+    
+
+    <li class="toctree-l3"><a href="#direct-message-read">Direct Message Read</a></li>
+    
+
+    <li class="toctree-l3"><a href="#user-photos">User Photos</a></li>
+    
+
+    <li class="toctree-l3"><a href="#profile">Profile</a></li>
+    
+
+    <li class="toctree-l3"><a href="#starred-users">Starred Users</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Util-API/index.html">Utils</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">AoV API Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Mobile API &raquo;</li>
+        
+      
+    
+    <li>Users</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="users">Users</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+    &quot;age&quot;: int,
+    &quot;avatar&quot;: &lt;image&gt;,
+    &quot;email&quot;: &quot;&quot;,
+    &quot;first_name&quot;: &quot;&quot;,
+    &quot;last_name&quot;: &quot;&quot;,
+    &quot;location&quot;: &quot;&quot;,
+    &quot;password&quot;: &quot;&quot;,
+    &quot;social_name&quot;: &quot;&quot;,
+    &quot;social_url&quot;: &quot;&quot;,
+    &quot;username&quot;: &quot;&quot;,
+    &quot;website_url&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;age&quot;: int, 
+  &quot;first_name&quot;: &quot;&quot;,
+  &quot;last_name&quot;: &quot;&quot;, 
+  &quot;gender&quot;: &quot;&quot;, 
+  &quot;is_admin&quot;: bool, 
+  &quot;social_name&quot;: &quot;&quot;, 
+  &quot;avatar&quot;: &lt;image url&gt;, 
+  &quot;social_url&quot;: &quot;&quot;, 
+  &quot;username&quot;: &quot;&quot;, 
+  &quot;email&quot;: &quot;&quot;, 
+  &quot;gear&quot;: [int], 
+  &quot;website_url&quot;: &quot;&quot;, 
+  &quot;last_login&quot;: datetime, 
+  &quot;location&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>400</strong> Bad request data</p>
+<p><strong>409</strong> User already exists</p>
+<h2 id="user-single">User Single</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>username</td>
+<td>Query String</td>
+<td>Returns the user that matches the ID and username.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;age&quot;: int, 
+  &quot;first_name&quot;: &quot;&quot;,
+  &quot;last_name&quot;: &quot;&quot;, 
+  &quot;gender&quot;: &quot;&quot;, 
+  &quot;is_admin&quot;: bool, 
+  &quot;social_name&quot;: &quot;&quot;, 
+  &quot;avatar&quot;: &lt;image url&gt;, 
+  &quot;social_url&quot;: &quot;&quot;, 
+  &quot;username&quot;: &quot;&quot;, 
+  &quot;email&quot;: &quot;&quot;, 
+  &quot;gear&quot;: [int], 
+  &quot;website_url&quot;: &quot;&quot;, 
+  &quot;last_login&quot;: datetime, 
+  &quot;location&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="user-single-blocked">User Single Blocked</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/blocked</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;user_id&quot;: int
+}
+</code></pre>
+
+<pre><code class="json">{
+  &quot;remove&quot;: true
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>POST</p>
+<pre><code class="json">{
+  &quot;user&quot;: {
+      &quot;id&quot;: int, 
+      &quot;age&quot;: int, 
+      &quot;first_name&quot;: &quot;&quot;,
+      &quot;last_name&quot;: &quot;&quot;, 
+      &quot;gender&quot;: &quot;&quot;, 
+      &quot;is_admin&quot;: bool, 
+      &quot;social_name&quot;: &quot;&quot;, 
+      &quot;avatar&quot;: &lt;image url&gt;, 
+      &quot;social_url&quot;: &quot;&quot;, 
+      &quot;username&quot;: &quot;&quot;, 
+      &quot;email&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [int], 
+      &quot;website_url&quot;: &quot;&quot;, 
+      &quot;last_login&quot;: datetime, 
+      &quot;location&quot;: &quot;&quot;
+  },
+  &quot;blocked_by&quot;: int
+}
+</code></pre>
+
+<p>GET </p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+      &quot;id&quot;: int, 
+      &quot;age&quot;: int, 
+      &quot;first_name&quot;: &quot;&quot;,
+      &quot;last_name&quot;: &quot;&quot;, 
+      &quot;gender&quot;: &quot;&quot;, 
+      &quot;is_admin&quot;: bool, 
+      &quot;social_name&quot;: &quot;&quot;, 
+      &quot;avatar&quot;: &lt;image url&gt;, 
+      &quot;social_url&quot;: &quot;&quot;, 
+      &quot;username&quot;: &quot;&quot;, 
+      &quot;email&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [int], 
+      &quot;website_url&quot;: &quot;&quot;, 
+      &quot;last_login&quot;: datetime, 
+      &quot;location&quot;: &quot;&quot;
+  }]
+}
+</code></pre>
+
+<h2 id="user-conversations">User Conversations</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/user/&lt;id&gt;/conversations</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>participants</td>
+<td>int</td>
+<td>Returns all conversations in which the provided participants are contributing. Can be used multiple times in a single url.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+    &quot;id&quot;: int,
+    &quot;participants&quot;: [{
+      &quot;id&quot;: int, 
+      &quot;age&quot;: int, 
+      &quot;first_name&quot;: &quot;&quot;,
+      &quot;last_name&quot;: &quot;&quot;, 
+      &quot;gender&quot;: &quot;&quot;, 
+      &quot;is_admin&quot;: bool, 
+      &quot;social_name&quot;: &quot;&quot;, 
+      &quot;avatar&quot;: &lt;image url&gt;, 
+      &quot;social_url&quot;: &quot;&quot;, 
+      &quot;username&quot;: &quot;&quot;, 
+      &quot;email&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [int], 
+      &quot;website_url&quot;: &quot;&quot;, 
+      &quot;last_login&quot;: datetime, 
+      &quot;location&quot;: &quot;&quot;
+    }],
+    &quot;latest&quot;: {
+      &quot;id&quot;: int, 
+      &quot;sender&quot;: int, 
+      &quot;recipient&quot;: int, 
+      &quot;message&quot;: &quot;&quot;, 
+      &quot;index&quot;: int, 
+      &quot;conversation&quot;: int, 
+      &quot;created_at&quot;: datetime, 
+      &quot;read&quot;: bool
+    },
+    &quot;message_count&quot;: int
+  }]
+}
+</code></pre>
+
+<h2 id="user-conversations-single">User Conversations Single</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/conversations/&lt;id&gt;</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>DELETE</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DELETE</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are accepted for this endpoint.</p>
+<p><strong>Response</strong></p>
+<p>A standard HTTP Response with a status code of 200 will be returned.</p>
+<p><strong>Errors</strong></p>
+<p><strong>409</strong> Conversation already deleted</p>
+<h2 id="user-single-following">User Single Following</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/following</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+      &quot;id&quot;: int, 
+      &quot;age&quot;: int, 
+      &quot;first_name&quot;: &quot;&quot;,
+      &quot;last_name&quot;: &quot;&quot;, 
+      &quot;gender&quot;: &quot;&quot;, 
+      &quot;is_admin&quot;: bool, 
+      &quot;social_name&quot;: &quot;&quot;, 
+      &quot;avatar&quot;: &lt;image url&gt;, 
+      &quot;social_url&quot;: &quot;&quot;, 
+      &quot;username&quot;: &quot;&quot;, 
+      &quot;email&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [int], 
+      &quot;website_url&quot;: &quot;&quot;, 
+      &quot;last_login&quot;: datetime, 
+      &quot;location&quot;: &quot;&quot;
+  }]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="followers">Followers</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/followers</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint</p>
+<p><strong>Response</strong></p>
+<p>Standard HTTP Response with a status code of 201</p>
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>409</strong> Already following</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="follower-single">Follower Single</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/followers/&lt;id&gt;</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>DELETE</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DELETE</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Response</strong></p>
+<p>Standard HTTP Response with a status code of 200</p>
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="user-galleries">User Galleries</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/galleries</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>Query String</td>
+<td>Returns Galleries for the specified User with the provided string contained in the Gallery name.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;name&quot;: &quot;&quot;,
+  &quot;photos&quot;: [int] // Optional
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+    &quot;id&quot;: int, 
+    &quot;name&quot;: &quot;&quot;, 
+    &quot;photo_count&quot;: int, 
+    &quot;public&quot;: bool
+  }]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<h2 id="user-galleries-single">User Galleries Single</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/galleries/&lt;id&gt;</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>PUT - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PUT</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Accepted Data</strong></p>
+<p>Any of the following can be done separately or together</p>
+<pre><code class="json">{
+  &quot;name&quot;: &quot;&quot;,
+  &quot;photos&quot;: [int],
+  &quot;public&quot;: bool
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;results&quot;: {
+    &quot;id&quot;: int, 
+    &quot;name&quot;: &quot;&quot;, 
+    &quot;photo_count&quot;: int, 
+    &quot;public&quot;: bool
+  }
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>400</strong> Bad request data</p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="gallery-photos">Gallery Photos</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/galleries/&lt;id&gt;/photos</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+      &quot;id&quot;: int,
+      &quot;category&quot;: int,
+       &quot;gear&quot;: [int],
+       &quot;tag&quot;: [],
+       &quot;user&quot;: int,
+       &quot;attribution_name&quot;: &quot;&quot;,
+       &quot;dimensions&quot;: {
+           &quot;width&quot;: int,
+           &quot;height&quot;: int
+       },
+       &quot;image&quot;: &lt;image url&gt;,
+       &quot;image_blurred&quot;: &lt;image url&gt;,
+       &quot;image_small&quot;: &lt;image url&gt;,
+       &quot;image_small_2&quot;: &lt;image url&gt;,
+       &quot;image_tiny_246&quot;: &lt;image url&gt;,
+       &quot;image_tiny_272&quot;: &lt;image url&gt;,
+       &quot;latitude&quot;: float,
+       &quot;longitude&quot;: float,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;photo_data&quot;: &quot;&quot;,
+       &quot;photo_feed&quot;: [int],
+       &quot;user_details&quot;: {
+           &quot;id&quot;: int,
+           &quot;age&quot;: int,
+           &quot;email&quot;: &quot;&quot;,
+           &quot;first_name&quot;: &quot;&quot;,
+           &quot;last_name&quot;: &quot;&quot;,
+           &quot;location&quot;: &quot;&quot;,
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;username&quot;: &quot;&quot;
+       },
+       &quot;magazine_authorized&quot;: bool,
+       &quot;caption&quot;: &quot;&quot;,
+       &quot;votes_behind&quot;: {
+           &quot;&lt;category name&gt;&quot;: int
+       },
+       &quot;comments&quot;: int,
+       &quot;votes&quot;: int,
+       &quot;user_voted&quot;: {
+           &quot;voted&quot;: bool
+       },
+       &quot;user_starred&quot;: {
+           &quot;starred&quot;: bool
+       },
+       &quot;bts_lens&quot;: &quot;&quot;,
+       &quot;bts_shutter&quot;: &quot;&quot;,
+       &quot;bts_iso&quot;: &quot;&quot;,
+       &quot;bts_aperture&quot;: &quot;&quot;,
+       &quot;bts_camera_settings&quot;: &quot;&quot;,
+       &quot;bts_time_of_day&quot;: &quot;&quot;,
+       &quot;bts_camera_make&quot;: &quot;&quot;,
+       &quot;bts_camera_model&quot;: &quot;&quot;,
+       &quot;bts_photo_editor&quot;: &quot;&quot;,
+       &quot;scaled_render&quot;: &lt;image url&gt;,
+       &quot;rank&quot;: {
+           &quot;overall&quot;: int,
+           &quot;&lt;category name&gt;&quot;: int
+       }
+  }]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>In the event of no Photos in a Gallery, an empty results set will be returned</p>
+<h2 id="location">Location</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/location</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>geo_location</td>
+<td>Coordinates in the form: SW LONG,SW LAT,NE LONG, NE LAT</td>
+<td>Creates a geographical box based on coordinates provided and returns all Photos for the Gallery that have a geo_location contained within.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;location&quot;: &quot;&quot;,
+  &quot;geo_location&quot;: &quot;POINT (LONG, LAT)&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int,
+  &quot;user&quot;: int, 
+  &quot;latitude&quot;: float, 
+  &quot;location&quot;: &quot;&quot;, 
+  &quot;longitude&quot;: float, 
+  &quot;coordinates&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>400</strong> Bad request data</p>
+<p><strong>401</strong> Authentication failed</p>
+<h2 id="messages">Messages</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/messages</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>conversation_id</td>
+<td>integer</td>
+<td>Returns all messages for the associated Conversation ID.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;message&quot;: &quot;&quot;,
+  &quot;conversation_id&quot;: int // Required for sending message in an existing conversation
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>GET</p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+      &quot;id&quot;: int, 
+      &quot;sender&quot;: int, 
+      &quot;recipient&quot;: int, 
+      &quot;message&quot;: &quot;&quot;, 
+      &quot;index&quot;: int, 
+      &quot;conversation&quot;: int, 
+      &quot;created_at&quot;: datetime, 
+      &quot;read&quot;: bool
+  }]
+}
+</code></pre>
+
+<p>POST</p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;sender&quot;: int, 
+  &quot;recipient&quot;: int, 
+  &quot;message&quot;: &quot;&quot;, 
+  &quot;index&quot;: int, 
+  &quot;conversation&quot;: int, 
+  &quot;created_at&quot;: datetime, 
+  &quot;read&quot;: bool
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>400</strong> Bad request data</p>
+<p><strong>401</strong> Authentication failed</p>
+<h2 id="direct-message-read">Direct Message Read</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/messages/&lt;id&gt;/read</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;sender&quot;: int, 
+  &quot;recipient&quot;: int, 
+  &quot;message&quot;: &quot;&quot;, 
+  &quot;index&quot;: int, 
+  &quot;conversation&quot;: int, 
+  &quot;created_at&quot;: datetime, 
+  &quot;read&quot;: bool
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="user-photos">User Photos</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/photos</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td><code>renders</code> or <code>details</code></td>
+<td>Returns either all media or all non-media data for the Photos.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+       &quot;id&quot;: int,
+       &quot;category&quot;: int,
+       &quot;gear&quot;: [int],
+       &quot;tag&quot;: [],
+       &quot;user&quot;: int,
+       &quot;attribution_name&quot;: &quot;&quot;,
+       &quot;dimensions&quot;: {
+           &quot;width&quot;: int,
+           &quot;height&quot;: int
+       },
+       &quot;image&quot;: &lt;image url&gt;,
+       &quot;image_blurred&quot;: &lt;image url&gt;,
+       &quot;image_small&quot;: &lt;image url&gt;,
+       &quot;image_small_2&quot;: &lt;image url&gt;,
+       &quot;image_tiny_246&quot;: &lt;image url&gt;,
+       &quot;image_tiny_272&quot;: &lt;image url&gt;,
+       &quot;latitude&quot;: float,
+       &quot;longitude&quot;: float,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;photo_data&quot;: &quot;&quot;,
+       &quot;photo_feed&quot;: [int],
+       &quot;user_details&quot;: {
+           &quot;id&quot;: int,
+           &quot;age&quot;: int,
+           &quot;email&quot;: &quot;&quot;,
+           &quot;first_name&quot;: &quot;&quot;,
+           &quot;last_name&quot;: &quot;&quot;,
+           &quot;location&quot;: &quot;&quot;,
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;username&quot;: &quot;&quot;
+       },
+       &quot;magazine_authorized&quot;: bool,
+       &quot;caption&quot;: &quot;&quot;,
+       &quot;votes_behind&quot;: {
+           &quot;&lt;category name&gt;&quot;: int
+       },
+       &quot;comments&quot;: int,
+       &quot;votes&quot;: int,
+       &quot;user_voted&quot;: {
+           &quot;voted&quot;: bool
+       },
+       &quot;user_starred&quot;: {
+           &quot;starred&quot;: bool
+       },
+       &quot;bts_lens&quot;: &quot;&quot;,
+       &quot;bts_shutter&quot;: &quot;&quot;,
+       &quot;bts_iso&quot;: &quot;&quot;,
+       &quot;bts_aperture&quot;: &quot;&quot;,
+       &quot;bts_camera_settings&quot;: &quot;&quot;,
+       &quot;bts_time_of_day&quot;: &quot;&quot;,
+       &quot;bts_camera_make&quot;: &quot;&quot;,
+       &quot;bts_camera_model&quot;: &quot;&quot;,
+       &quot;bts_photo_editor&quot;: &quot;&quot;,
+       &quot;scaled_render&quot;: &lt;image url&gt;,
+       &quot;rank&quot;: {
+           &quot;overall&quot;: int,
+           &quot;&lt;category name&gt;&quot;: int
+       }
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Response for Renders</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;image&quot;: &lt;image url&gt;, 
+      &quot;image_blurred&quot;: &lt;image url&gt;, 
+      &quot;image_medium&quot;: &lt;image url&gt;, 
+      &quot;image_small&quot;: &lt;image url&gt;, 
+      &quot;image_small_2&quot;: &lt;image url&gt;, 
+      &quot;image_tiny_246&quot;: &lt;image url&gt;,
+      &quot;image_tiny_272&quot;: &lt;image url&gt;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Response for Details</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;user&quot;: int, 
+      &quot;category&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [], 
+      &quot;tag&quot;: &quot;&quot;, 
+      &quot;latitude&quot;: float, 
+      &quot;location&quot;: &quot;&quot;, 
+      &quot;longitude&quot;: float, 
+      &quot;photo_data&quot;: &quot;&quot;,
+      &quot;photo_feed&quot;: &quot;&quot;, 
+      &quot;caption&quot;: &quot;&quot;, 
+      &quot;bts_lens&quot;: &quot;&quot;, 
+      &quot;bts_shutter&quot;: &quot;&quot;, 
+      &quot;bts_iso&quot;: &quot;&quot;, 
+      &quot;bts_aperture&quot;: &quot;&quot;,
+      &quot;bts_camera_settings&quot;: &quot;&quot;, 
+      &quot;bts_time_of_day&quot;: &quot;&quot;, 
+      &quot;bts_camera_make&quot;: &quot;&quot;, 
+      &quot;bts_camera_model&quot;: &quot;&quot;,
+      &quot;bts_photo_editor&quot;: &quot;&quot;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<h2 id="profile">Profile</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/profile</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;user&quot;: int, 
+  &quot;bio&quot;: &quot;&quot;, 
+  &quot;cover_image&quot;: &lt;image url&gt;
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="starred-users">Starred Users</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/users/&lt;id&gt;/stars</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>DELETE</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters supported by this endpoint.</p>
+<p><strong>Response</strong></p>
+<p>Standard HTTP Response with a status code of 200 for DELETE and 201 for POST.</p>
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>404</strong> Object not found</p>
+<p><strong>409</strong> User already starred</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Util-API/index.html" class="btn btn-neutral float-right" title="Utils">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Statistics-API/index.html" class="btn btn-neutral" title="Statistics"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../Statistics-API/index.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Util-API/index.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/require.js"></script>
+      <script src="../../search/search.js"></script>
+
+</body>
+</html>

@@ -1,8 +1,6 @@
-# Quote API
+## Quote API
 
 Base Url: `https://staging.artofvisuals.com/api/aov-web`
-
-## ENDPOINTS
 
 ### Quote
 **URL** - `/quotes`
@@ -60,7 +58,7 @@ A 201 status code with a response object.
    {
        "id": 123,
        "email": "",
-       "created_at": datetime
+       "created_at": datetime,
        "modified_at": datetime
    }
 ```

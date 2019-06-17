@@ -1,10 +1,9 @@
-# Auth API
+## Authentication
 
 Base URL: `https://www.staging.artofvisuals.com/api/aov-web/auth`
 
-## Endpoints
-
 ### Social Authentication
+
 **URL** - `/social`
 
 **Accepted Methods**

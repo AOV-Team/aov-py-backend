@@ -109,7 +109,6 @@ class ConversationViewSet(generics.ListAPIView):
             conversations = Conversation.objects.filter(
                     participants__in=participants).distinct().annotate(
                     num_participants=Count('participants')).filter(num_participants__gte=participants.count())
-            print(conversations)
 
         if user.exists():
             conversations = Conversation.objects.filter(participants=user)

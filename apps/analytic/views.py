@@ -50,6 +50,8 @@ def statistics_admin(request):
 
     return render(request, 'statistics.html', context)
 
+from mkdocs.commands import serve
+
 
 class StatisticsViewSet(APIView):
     """
