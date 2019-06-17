@@ -280,6 +280,7 @@ STATIC_ROOT = '/var/media/backend/static'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
+    DOCUMENTATION_HTML_ROOT,
 )
 
 
