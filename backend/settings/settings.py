@@ -21,7 +21,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCUMENTATION_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'aov_mkdocs'))
 DOCUMENTATION_HTML_ROOT = DOCUMENTATION_ROOT + "/site/"
 DOCUMENTATION_ACCESS_FUNCTION = lambda user: user.is_staff
-DOCUMENTATION_XSENDFILE = DOCUMENTATION_XSENDFILE
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
