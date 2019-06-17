@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+    <url>
+     <loc>/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+        
+    <url>
+     <loc>/aov-web/Auth-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-web/Discover-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-web/Photo-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-web/Podcast-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-web/Quote-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-web/User-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-web/Web-Photo-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/aov-mobile/Mobile-Auth-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Mobile-Conversations-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Device-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Gear-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Me-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Mobile-Photo-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Search-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Statistics-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Mobile-User-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/aov-mobile/Util-API/index.html</loc>
+     <lastmod>2019-06-13</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+</urlset>

@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Me - AoV API Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Me";
+    var mkdocs_page_input_path = "aov-mobile/Me-API.md";
+    var mkdocs_page_url = "/aov-mobile/Me-API/index.html";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="icon icon-home"> AoV API Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../index.html">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Web API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Auth-API/index.html">Auth</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Discover-API/index.html">Discover</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Photo-API/index.html">Web Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Podcast-API/index.html">Podcast</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Quote-API/index.html">Quote</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/User-API/index.html">User</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Web-Photo-API/index.html">Web-Photo</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Mobile API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Mobile-Auth-API/index.html">Auth</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-Conversations-API/index.html">Conversations</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Device-API/index.html">Devices</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Gear-API/index.html">Gear</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="index.html">Me</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#me">Me</a></li>
+    
+
+    <li class="toctree-l3"><a href="#actions">Actions</a></li>
+    
+
+    <li class="toctree-l3"><a href="#following-photos">Following Photos</a></li>
+    
+
+    <li class="toctree-l3"><a href="#galleries">Galleries</a></li>
+    
+
+    <li class="toctree-l3"><a href="#push-notifications">Push Notifications</a></li>
+    
+
+    <li class="toctree-l3"><a href="#push-notifications-view">Push Notifications View</a></li>
+    
+
+    <li class="toctree-l3"><a href="#profile">Profile</a></li>
+    
+
+    <li class="toctree-l3"><a href="#starred-photos">Starred Photos</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-Photo-API/index.html">Mobile Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Search-API/index.html">Search</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Statistics-API/index.html">Statistics</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-User-API/index.html">Users</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Util-API/index.html">Utils</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">AoV API Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Mobile API &raquo;</li>
+        
+      
+    
+    <li>Me</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="me">Me</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/me</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+<li>PATCH - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Token</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<p>PATCH</p>
+<pre><code class="json">{
+  &quot;email&quot;: &quot;&quot;,
+  &quot;age&quot;: int,
+  &quot;gear&quot;: [],
+  &quot;username&quot;: &quot;&quot;,
+  &quot;gender&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;age&quot;: int, 
+  &quot;avatar&quot;: &lt;image url&gt;, 
+  &quot;email&quot;: &quot;&quot;, 
+  &quot;first_name&quot;: &quot;&quot;, 
+  &quot;gear&quot;: [], 
+  &quot;gender&quot;: &quot;&quot;, 
+  &quot;is_admin&quot;: true | false, 
+  &quot;last_login&quot;: datetime,
+  &quot;last_name&quot;: &quot;&quot;, 
+  &quot;location&quot;: &quot;&quot;, 
+  &quot;social_name&quot;: &quot;&quot;, 
+  &quot;social_url&quot;: &quot;&quot;, 
+  &quot;username&quot;: &quot;&quot;, 
+  &quot;website_url&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Token Authentication failed</p>
+<h2 id="actions">Actions</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/me/actions</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int,  // ID of the Photo the action is on
+  &quot;action&quot;: &quot;photo_click | photo_flag | photo_imp&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>A standard HTTP response with status code 200.</p>
+<p><strong>Errors</strong></p>
+<p><strong>404</strong> Object not found</p>
+<p><strong>400</strong> Action not supported and/or Bad Request data</p>
+<h2 id="following-photos">Following Photos</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/me/following/photos</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No extra parameters are supported for this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+       &quot;id&quot;: int,
+       &quot;category&quot;: int,
+       &quot;gear&quot;: [int],
+       &quot;tag&quot;: [],
+       &quot;user&quot;: int,
+       &quot;attribution_name&quot;: &quot;&quot;,
+       &quot;dimensions&quot;: {
+           &quot;width&quot;: int,
+           &quot;height&quot;: int
+       },
+       &quot;image&quot;: &lt;image url&gt;,
+       &quot;image_blurred&quot;: &lt;image url&gt;,
+       &quot;image_small&quot;: &lt;image url&gt;,
+       &quot;image_small_2&quot;: &lt;image url&gt;,
+       &quot;image_tiny_246&quot;: &lt;image url&gt;,
+       &quot;image_tiny_272&quot;: &lt;image url&gt;,
+       &quot;latitude&quot;: float,
+       &quot;longitude&quot;: float,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;photo_data&quot;: &quot;&quot;,
+       &quot;photo_feed&quot;: [int],
+       &quot;user_details&quot;: {
+           &quot;id&quot;: int,
+           &quot;age&quot;: int,
+           &quot;email&quot;: &quot;&quot;,
+           &quot;first_name&quot;: &quot;&quot;,
+           &quot;last_name&quot;: &quot;&quot;,
+           &quot;location&quot;: &quot;&quot;,
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;username&quot;: &quot;&quot;
+       },
+       &quot;magazine_authorized&quot;: bool,
+       &quot;caption&quot;: &quot;&quot;,
+       &quot;votes_behind&quot;: {
+           &quot;&lt;category name&gt;&quot;: int
+       },
+       &quot;comments&quot;: int,
+       &quot;votes&quot;: int,
+       &quot;user_voted&quot;: {
+           &quot;voted&quot;: bool
+       },
+       &quot;user_starred&quot;: {
+           &quot;starred&quot;: bool
+       },
+       &quot;bts_lens&quot;: &quot;&quot;,
+       &quot;bts_shutter&quot;: &quot;&quot;,
+       &quot;bts_iso&quot;: &quot;&quot;,
+       &quot;bts_aperture&quot;: &quot;&quot;,
+       &quot;bts_camera_settings&quot;: &quot;&quot;,
+       &quot;bts_time_of_day&quot;: &quot;&quot;,
+       &quot;bts_camera_make&quot;: &quot;&quot;,
+       &quot;bts_camera_model&quot;: &quot;&quot;,
+       &quot;bts_photo_editor&quot;: &quot;&quot;,
+       &quot;scaled_render&quot;: &lt;image url&gt;,
+       &quot;rank&quot;: {
+           &quot;overall&quot;: int,
+           &quot;&lt;category name&gt;&quot;: int
+       }
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>404</strong> Object does not exist</p>
+<h2 id="galleries">Galleries</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/me/galleries</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+<li>PUT - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>Query string</td>
+<td>Returns all Galleries whose names contain the string provided.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;name&quot;: &quot;&quot;,
+  &quot;photos&quot;: [] // Array of Photo IDs to include in the Gallery
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>GET</p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int,
+      &quot;photo_count&quot;: int,
+      &quot;name&quot;: &quot;&quot;,
+      &quot;public&quot;: bool,
+      &quot;user&quot;: int
+    }
+  ]
+}
+</code></pre>
+
+<p>POST, PUT</p>
+<pre><code class="json">{
+  &quot;results&quot;: {
+    &quot;id&quot;: int,
+    &quot;photo_count&quot;: int,
+    &quot;name&quot;: &quot;&quot;,
+    &quot;public&quot;: bool,
+    &quot;user&quot;: int
+  }
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>400</strong> Bad request data</p>
+<h2 id="push-notifications">Push Notifications</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/me/notifications</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No extra parameters are supported for this endpoint</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;message&quot;: &quot;&quot;, 
+      &quot;sender&quot;: {}, // Dependent on action value, detailed below
+      &quot;created_at&quot;: datetime, 
+      &quot;viewed&quot;: bool, 
+      &quot;action&quot;: &quot;A | C | D | F | R | T | U&quot;, 
+      &quot;related_object&quot;: {} // Dependent on action value detailed below
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Sender for Actions A</strong></p>
+<p>NONE</p>
+<p><strong>Sender for Actions C, D, F, R, T, U</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;age&quot;: int, 
+  &quot;avatar&quot;: &lt;image url&gt;, 
+  &quot;email&quot;: &quot;&quot;, 
+  &quot;first_name&quot;: &quot;&quot;, 
+  &quot;gear&quot;: [], 
+  &quot;last_name&quot;: &quot;&quot;, 
+  &quot;location&quot;: &quot;&quot;,
+  &quot;social_name&quot;: &quot;&quot;,
+  &quot;social_url&quot;: &quot;&quot;, 
+  &quot;username&quot;: &quot;&quot;,
+  &quot;website_url&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Related Objects for Actions A, C, T, U</strong></p>
+<pre><code class="json">{
+   &quot;id&quot;: int,
+   &quot;category&quot;: int,
+   &quot;gear&quot;: [int],
+   &quot;tag&quot;: [],
+   &quot;user&quot;: int,
+   &quot;attribution_name&quot;: &quot;&quot;,
+   &quot;dimensions&quot;: {
+       &quot;width&quot;: int,
+       &quot;height&quot;: int
+   },
+   &quot;image&quot;: &lt;image url&gt;,
+   &quot;image_blurred&quot;: &lt;image url&gt;,
+   &quot;image_small&quot;: &lt;image url&gt;,
+   &quot;image_small_2&quot;: &lt;image url&gt;,
+   &quot;image_tiny_246&quot;: &lt;image url&gt;,
+   &quot;image_tiny_272&quot;: &lt;image url&gt;,
+   &quot;latitude&quot;: float,
+   &quot;longitude&quot;: float,
+   &quot;location&quot;: &quot;&quot;,
+   &quot;photo_data&quot;: &quot;&quot;,
+   &quot;photo_feed&quot;: [int],
+   &quot;user_details&quot;: {
+       &quot;id&quot;: int,
+       &quot;age&quot;: int,
+       &quot;email&quot;: &quot;&quot;,
+       &quot;first_name&quot;: &quot;&quot;,
+       &quot;last_name&quot;: &quot;&quot;,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;social_name&quot;: &quot;&quot;,
+       &quot;username&quot;: &quot;&quot;
+   },
+   &quot;magazine_authorized&quot;: bool,
+   &quot;caption&quot;: &quot;&quot;,
+   &quot;votes_behind&quot;: {
+       &quot;&lt;category name&gt;&quot;: int
+   },
+   &quot;comments&quot;: int,
+   &quot;votes&quot;: int,
+   &quot;user_voted&quot;: {
+       &quot;voted&quot;: bool
+   },
+   &quot;user_starred&quot;: {
+       &quot;starred&quot;: bool
+   },
+   &quot;bts_lens&quot;: &quot;&quot;,
+   &quot;bts_shutter&quot;: &quot;&quot;,
+   &quot;bts_iso&quot;: &quot;&quot;,
+   &quot;bts_aperture&quot;: &quot;&quot;,
+   &quot;bts_camera_settings&quot;: &quot;&quot;,
+   &quot;bts_time_of_day&quot;: &quot;&quot;,
+   &quot;bts_camera_make&quot;: &quot;&quot;,
+   &quot;bts_camera_model&quot;: &quot;&quot;,
+   &quot;bts_photo_editor&quot;: &quot;&quot;,
+   &quot;scaled_render&quot;: &lt;image url&gt;,
+   &quot;rank&quot;: {
+       &quot;overall&quot;: int,
+       &quot;&lt;category name&gt;&quot;: int
+   }
+}
+</code></pre>
+
+<p><strong>Related Objects for Action F</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;age&quot;: int, 
+  &quot;avatar&quot;: &lt;image url&gt;, 
+  &quot;email&quot;: &quot;&quot;, 
+  &quot;first_name&quot;: &quot;&quot;, 
+  &quot;gear&quot;: [], 
+  &quot;last_name&quot;: &quot;&quot;, 
+  &quot;location&quot;: &quot;&quot;,
+  &quot;social_name&quot;: &quot;&quot;,
+  &quot;social_url&quot;: &quot;&quot;, 
+  &quot;username&quot;: &quot;&quot;,
+  &quot;website_url&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Related Objects for Action D</strong></p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;sender&quot;: int, 
+  &quot;recipient&quot;: int, 
+  &quot;message&quot;: &quot;&quot;, 
+  &quot;index&quot;: int, 
+  &quot;conversation&quot;: int, 
+  &quot;created_at&quot;: datetime, 
+  &quot;read&quot;: bool
+}
+</code></pre>
+
+<h2 id="push-notifications-view">Push Notifications View</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/notifications/&lt;id&gt;/view</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<p>Standard HTTP Response with a status code of 200.</p>
+<p><strong>Errors</strong></p>
+<h2 id="profile">Profile</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/me/profile</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+<li>PATCH - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Token</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No extra parameters are supported for this endpoint.</p>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;bio&quot;: &quot;&quot;,
+  &quot;cover_image&quot;: &lt;image&gt;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;user&quot;: int,
+  &quot;bio&quot;: &quot;&quot;,
+  &quot;cover_image&quot;: &lt;image url&gt;
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>404</strong> Object does not exist
+<strong>400</strong> Bad request data</p>
+<h2 id="starred-photos">Starred Photos</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/me/starred/photos</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No extra parameters are supported for this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+       &quot;id&quot;: int,
+       &quot;category&quot;: int,
+       &quot;gear&quot;: [int],
+       &quot;tag&quot;: [],
+       &quot;user&quot;: int,
+       &quot;attribution_name&quot;: &quot;&quot;,
+       &quot;dimensions&quot;: {
+           &quot;width&quot;: int,
+           &quot;height&quot;: int
+       },
+       &quot;image&quot;: &lt;image url&gt;,
+       &quot;image_blurred&quot;: &lt;image url&gt;,
+       &quot;image_small&quot;: &lt;image url&gt;,
+       &quot;image_small_2&quot;: &lt;image url&gt;,
+       &quot;image_tiny_246&quot;: &lt;image url&gt;,
+       &quot;image_tiny_272&quot;: &lt;image url&gt;,
+       &quot;latitude&quot;: float,
+       &quot;longitude&quot;: float,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;photo_data&quot;: &quot;&quot;,
+       &quot;photo_feed&quot;: [int],
+       &quot;user_details&quot;: {
+           &quot;id&quot;: int,
+           &quot;age&quot;: int,
+           &quot;email&quot;: &quot;&quot;,
+           &quot;first_name&quot;: &quot;&quot;,
+           &quot;last_name&quot;: &quot;&quot;,
+           &quot;location&quot;: &quot;&quot;,
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;username&quot;: &quot;&quot;
+       },
+       &quot;magazine_authorized&quot;: bool,
+       &quot;caption&quot;: &quot;&quot;,
+       &quot;votes_behind&quot;: {
+           &quot;&lt;category name&gt;&quot;: int
+       },
+       &quot;comments&quot;: int,
+       &quot;votes&quot;: int,
+       &quot;user_voted&quot;: {
+           &quot;voted&quot;: bool
+       },
+       &quot;user_starred&quot;: {
+           &quot;starred&quot;: bool
+       },
+       &quot;bts_lens&quot;: &quot;&quot;,
+       &quot;bts_shutter&quot;: &quot;&quot;,
+       &quot;bts_iso&quot;: &quot;&quot;,
+       &quot;bts_aperture&quot;: &quot;&quot;,
+       &quot;bts_camera_settings&quot;: &quot;&quot;,
+       &quot;bts_time_of_day&quot;: &quot;&quot;,
+       &quot;bts_camera_make&quot;: &quot;&quot;,
+       &quot;bts_camera_model&quot;: &quot;&quot;,
+       &quot;bts_photo_editor&quot;: &quot;&quot;,
+       &quot;scaled_render&quot;: &lt;image url&gt;,
+       &quot;rank&quot;: {
+           &quot;overall&quot;: int,
+           &quot;&lt;category name&gt;&quot;: int
+       }
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>If there are no starred photos, a 200 response with an empty results set will be returned.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Mobile-Photo-API/index.html" class="btn btn-neutral float-right" title="Mobile Photo">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Gear-API/index.html" class="btn btn-neutral" title="Gear"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../Gear-API/index.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Mobile-Photo-API/index.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/require.js"></script>
+      <script src="../../search/search.js"></script>
+
+</body>
+</html>

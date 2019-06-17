@@ -17,6 +17,11 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Mkdocs Documentation Settings
+DOCUMENTATION_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'aov_mkdocs'))
+DOCUMENTATION_HTML_ROOT = DOCUMENTATION_ROOT + "/site/"
+DOCUMENTATION_ACCESS_FUNCTION = lambda user: user.is_staff
+DOCUMENTATION_XSENDFILE = DOCUMENTATION_XSENDFILE
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -35,7 +40,6 @@ INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
 ALLOWED_HOSTS = ['*']
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 
 # Application definition
 
@@ -72,6 +76,7 @@ INSTALLED_APPS = [
     'rest_framework_tracking',
     'fcm_django',
     'rangefilter',
+    'aov_mkdocs',
 ]
 
 if DEBUG:

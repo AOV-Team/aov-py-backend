@@ -13,6 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+
+from aov_mkdocs import views as doc_views
 from apps.account import views as account_views
 from apps.analytic import views as analytic_views
 from apps.communication import views as communication_views
@@ -126,6 +128,10 @@ urlpatterns = [
     url(r'^admin/power_users/$', account_views.power_users_admin),
     url(r'^admin/push/$', communication_views.push_notification_manager),
     url(r'^admin/statistics/$', analytic_views.statistics_admin),
+
+    # Docs
+    url(r'^docs$', doc_views.documentation),
+    url(r'^docs/(?P<path>.*)$', doc_views.documentation),
 
     ## AOV-WEB
 

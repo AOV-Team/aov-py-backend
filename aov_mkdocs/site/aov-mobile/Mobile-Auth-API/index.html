@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Auth - AoV API Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Auth";
+    var mkdocs_page_input_path = "aov-mobile/Mobile-Auth-API.md";
+    var mkdocs_page_url = "/aov-mobile/Mobile-Auth-API/index.html";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="icon icon-home"> AoV API Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../index.html">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Web API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Auth-API/index.html">Auth</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Discover-API/index.html">Discover</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Photo-API/index.html">Web Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Podcast-API/index.html">Podcast</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Quote-API/index.html">Quote</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/User-API/index.html">User</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Web-Photo-API/index.html">Web-Photo</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Mobile API</span>
+    <ul class="subnav">
+                <li class=" current">
+                    
+    <a class="current" href="index.html">Auth</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#authentication">Authentication</a></li>
+    
+
+    <li class="toctree-l3"><a href="#reset">Reset</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-Conversations-API/index.html">Conversations</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Device-API/index.html">Devices</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Gear-API/index.html">Gear</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Me-API/index.html">Me</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-Photo-API/index.html">Mobile Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Search-API/index.html">Search</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Statistics-API/index.html">Statistics</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-User-API/index.html">Users</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Util-API/index.html">Utils</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">AoV API Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Mobile API &raquo;</li>
+        
+      
+    
+    <li>Auth</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="authentication">Authentication</h2>
+<p><strong>URL</strong> - <code>https://www.staging.artofvisuals.com/api/auth</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>
+<p>POST - JSON</p>
+</li>
+<li>
+<p>DELETE</p>
+</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Not Required</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<p>POST</p>
+<pre><code class="json">{
+   &quot;email&quot;: &quot;&quot;,  
+   &quot;password&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>A 200 status code with a response object.</p>
+<pre><code class="json">   {
+       &quot;token&quot;: &quot;&quot;  // Internal token
+   }
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>409</strong> User already exists and requires login</p>
+<p><strong>400</strong> Bad request data</p>
+<h2 id="reset">Reset</h2>
+<p><strong>URL</strong> - <code>https://www.staging.artofvisuals.com/api/auth/reset</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>
+<p>POST - JSON</p>
+</li>
+<li>
+<p>PATCH - JSON</p>
+</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Not Required</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<p>POST - Request a password reset code</p>
+<pre><code class="json">{
+  &quot;email&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p>PATCH - Submit code with new password to assign</p>
+<pre><code class="json">{
+   &quot;code&quot;: &quot;&quot;,
+   &quot;password&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>A 201 status code. Additionally, an email with the password reset code will be sent to the provided email.</p>
+<p>PATCH</p>
+<p>A 200 response.</p>
+<p><strong>Errors</strong></p>
+<p>POST</p>
+<p><strong>400</strong> Bad request</p>
+<p>PATCH</p>
+<p><strong>403</strong> Invalid reset code</p>
+<p><strong>404</strong> User does not exist</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Mobile-Conversations-API/index.html" class="btn btn-neutral float-right" title="Conversations">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../aov-web/Web-Photo-API/index.html" class="btn btn-neutral" title="Web-Photo"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../../aov-web/Web-Photo-API/index.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Mobile-Conversations-API/index.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/require.js"></script>
+      <script src="../../search/search.js"></script>
+
+</body>
+</html>

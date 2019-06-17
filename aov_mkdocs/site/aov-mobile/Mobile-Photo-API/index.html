@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Mobile Photo - AoV API Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Mobile Photo";
+    var mkdocs_page_input_path = "aov-mobile/Mobile-Photo-API.md";
+    var mkdocs_page_url = "/aov-mobile/Mobile-Photo-API/index.html";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="icon icon-home"> AoV API Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../index.html">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Web API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Auth-API/index.html">Auth</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Discover-API/index.html">Discover</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Photo-API/index.html">Web Photo</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Podcast-API/index.html">Podcast</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Quote-API/index.html">Quote</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/User-API/index.html">User</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../aov-web/Web-Photo-API/index.html">Web-Photo</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Mobile API</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Mobile-Auth-API/index.html">Auth</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-Conversations-API/index.html">Conversations</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Device-API/index.html">Devices</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Gear-API/index.html">Gear</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Me-API/index.html">Me</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="index.html">Mobile Photo</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#classifications">Classifications</a></li>
+    
+
+    <li class="toctree-l3"><a href="#classifications-search">Classifications Search</a></li>
+    
+
+    <li class="toctree-l3"><a href="#classification-photos">Classification Photos</a></li>
+    
+
+    <li class="toctree-l3"><a href="#feeds">Feeds</a></li>
+    
+
+    <li class="toctree-l3"><a href="#feed-photos">Feed Photos</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photos">Photos</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single">Photo Single</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-caption">Photo Single Caption</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-comments">Photo Single Comments</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-replies">Photo Single Replies</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-details">Photo Single Details</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-flags">Photo Single Flags</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-media">Photo Single Media</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-likes">Photo Single Likes</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-stars">Photo Single Stars</a></li>
+    
+
+    <li class="toctree-l3"><a href="#top-photos">Top Photos</a></li>
+    
+
+    <li class="toctree-l3"><a href="#photo-single-votes">Photo Single Votes</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Search-API/index.html">Search</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Statistics-API/index.html">Statistics</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Mobile-User-API/index.html">Users</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Util-API/index.html">Utils</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">AoV API Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Mobile API &raquo;</li>
+        
+      
+    
+    <li>Mobile Photo</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="classifications">Classifications</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photo_classifications</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>classification</td>
+<td><code>category</code> or <code>tag</code></td>
+<td>Returns all classifications of the specified type.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;name&quot;: &quot;&quot;,
+  &quot;classification_type&quot;: &quot;tag | category&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>GET</p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;name&quot;: &quot;&quot;, 
+      &quot;classification_type&quot;: &quot;tag | category&quot;, 
+      &quot;icon&quot;: &lt;image url&gt;, 
+      &quot;category_image&quot;: &lt;image_url&gt;,
+      &quot;feed_id&quot;: int
+    }
+  ]
+}
+</code></pre>
+
+<p>POST</p>
+<pre><code class="json">{
+  &quot;id&quot;: int, 
+  &quot;name&quot;: &quot;&quot;, 
+  &quot;classification_type&quot;: &quot;tag | category&quot;, 
+  &quot;icon&quot;: &lt;image url&gt;, 
+  &quot;category_image&quot;: &lt;image_url&gt;,
+  &quot;feed_id&quot;: int
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>GET </p>
+<p><strong>400</strong> Bad request data</p>
+<p>POST</p>
+<p><strong>400</strong> Bad request data</p>
+<p><strong>401</strong> Token Authentication failed</p>
+<h2 id="classifications-search">Classifications Search</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photo_classifications/search</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>q</td>
+<td>Query string</td>
+<td>Returns any PhotoClassification object which is of type <code>tag</code> and whose name contains the provided query string.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;name&quot;: &quot;&quot;, 
+      &quot;classification_type&quot;: &quot;tag&quot;, 
+      &quot;icon&quot;: &lt;image url&gt;, 
+      &quot;category_image&quot;: &lt;image_url&gt;,
+      &quot;feed_id&quot;: int
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>If no matching objects found, an empty results set will be returned.</p>
+<h2 id="classification-photos">Classification Photos</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photo_classificiations/&lt;id&gt;/photos</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td><code>renders</code> or <code>details</code></td>
+<td>Returns all Photos for the PhotoClassification. If <code>renders</code>, will only return media. If <code>details</code>, will only return non-media.</td>
+</tr>
+<tr>
+<td>classification</td>
+<td><code>tag</code> or <code>category</code></td>
+<td>Returns Photos for the PhotoClassification with the provided ID and type.</td>
+</tr>
+<tr>
+<td>order_by</td>
+<td>Value to order result set by</td>
+<td>Can be set to any field in the object. Defaults to <code>votes</code>, descending.</td>
+</tr>
+<tr>
+<td>length</td>
+<td>Integer value to determine size of page</td>
+<td>Parameter that allows user to determine size of one page of results. Default is 12, max is 90.</td>
+</tr>
+<tr>
+<td>display_tab</td>
+<td>Can be None or <code>recent</code></td>
+<td>If <code>recent</code>, ignores length argument and sets order_by to <code>created_at</code>, descending. Always returns 100 objects.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+       &quot;id&quot;: int,
+       &quot;category&quot;: int,
+       &quot;gear&quot;: [int],
+       &quot;tag&quot;: [],
+       &quot;user&quot;: int,
+       &quot;attribution_name&quot;: &quot;&quot;,
+       &quot;dimensions&quot;: {
+           &quot;width&quot;: int,
+           &quot;height&quot;: int
+       },
+       &quot;image&quot;: &lt;image url&gt;,
+       &quot;image_blurred&quot;: &lt;image url&gt;,
+       &quot;image_small&quot;: &lt;image url&gt;,
+       &quot;image_small_2&quot;: &lt;image url&gt;,
+       &quot;image_tiny_246&quot;: &lt;image url&gt;,
+       &quot;image_tiny_272&quot;: &lt;image url&gt;,
+       &quot;latitude&quot;: float,
+       &quot;longitude&quot;: float,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;photo_data&quot;: &quot;&quot;,
+       &quot;photo_feed&quot;: [int],
+       &quot;user_details&quot;: {
+           &quot;id&quot;: int,
+           &quot;age&quot;: int,
+           &quot;email&quot;: &quot;&quot;,
+           &quot;first_name&quot;: &quot;&quot;,
+           &quot;last_name&quot;: &quot;&quot;,
+           &quot;location&quot;: &quot;&quot;,
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;username&quot;: &quot;&quot;
+       },
+       &quot;magazine_authorized&quot;: bool,
+       &quot;caption&quot;: &quot;&quot;,
+       &quot;votes_behind&quot;: {
+           &quot;&lt;category name&gt;&quot;: int
+       },
+       &quot;comments&quot;: int,
+       &quot;votes&quot;: int,
+       &quot;user_voted&quot;: {
+           &quot;voted&quot;: bool
+       },
+       &quot;user_starred&quot;: {
+           &quot;starred&quot;: bool
+       },
+       &quot;bts_lens&quot;: &quot;&quot;,
+       &quot;bts_shutter&quot;: &quot;&quot;,
+       &quot;bts_iso&quot;: &quot;&quot;,
+       &quot;bts_aperture&quot;: &quot;&quot;,
+       &quot;bts_camera_settings&quot;: &quot;&quot;,
+       &quot;bts_time_of_day&quot;: &quot;&quot;,
+       &quot;bts_camera_make&quot;: &quot;&quot;,
+       &quot;bts_camera_model&quot;: &quot;&quot;,
+       &quot;bts_photo_editor&quot;: &quot;&quot;,
+       &quot;scaled_render&quot;: &lt;image url&gt;,
+       &quot;rank&quot;: {
+           &quot;overall&quot;: int,
+           &quot;&lt;category name&gt;&quot;: int
+       }
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Response for Renders</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;image&quot;: &lt;image url&gt;, 
+      &quot;image_blurred&quot;: &lt;image url&gt;, 
+      &quot;image_medium&quot;: &lt;image url&gt;, 
+      &quot;image_small&quot;: &lt;image url&gt;, 
+      &quot;image_small_2&quot;: &lt;image url&gt;, 
+      &quot;image_tiny_246&quot;: &lt;image url&gt;,
+      &quot;image_tiny_272&quot;: &lt;image url&gt;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Response for Details</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;user&quot;: int, 
+      &quot;category&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [], 
+      &quot;tag&quot;: &quot;&quot;, 
+      &quot;latitude&quot;: float, 
+      &quot;location&quot;: &quot;&quot;, 
+      &quot;longitude&quot;: float, 
+      &quot;photo_data&quot;: &quot;&quot;,
+      &quot;photo_feed&quot;: &quot;&quot;, 
+      &quot;caption&quot;: &quot;&quot;, 
+      &quot;bts_lens&quot;: &quot;&quot;, 
+      &quot;bts_shutter&quot;: &quot;&quot;, 
+      &quot;bts_iso&quot;: &quot;&quot;, 
+      &quot;bts_aperture&quot;: &quot;&quot;,
+      &quot;bts_camera_settings&quot;: &quot;&quot;, 
+      &quot;bts_time_of_day&quot;: &quot;&quot;, 
+      &quot;bts_camera_make&quot;: &quot;&quot;, 
+      &quot;bts_camera_model&quot;: &quot;&quot;,
+      &quot;bts_photo_editor&quot;: &quot;&quot;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>404</strong> Object does not exist</p>
+<h2 id="feeds">Feeds</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photo_feeds</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No extra parameters are supported for this endpoint</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int,
+      &quot;name&quot;: &quot;&quot;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>If no Feeds exist, an empty results set will be returned.</p>
+<h2 id="feed-photos">Feed Photos</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photo_feeds/&lt;id&gt;/photos</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No extra parameters are supported for this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+       &quot;id&quot;: int,
+       &quot;category&quot;: int,
+       &quot;gear&quot;: [int],
+       &quot;tag&quot;: [],
+       &quot;user&quot;: int,
+       &quot;attribution_name&quot;: &quot;&quot;,
+       &quot;dimensions&quot;: {
+           &quot;width&quot;: int,
+           &quot;height&quot;: int
+       },
+       &quot;image&quot;: &lt;image url&gt;,
+       &quot;image_blurred&quot;: &lt;image url&gt;,
+       &quot;image_small&quot;: &lt;image url&gt;,
+       &quot;image_small_2&quot;: &lt;image url&gt;,
+       &quot;image_tiny_246&quot;: &lt;image url&gt;,
+       &quot;image_tiny_272&quot;: &lt;image url&gt;,
+       &quot;latitude&quot;: float,
+       &quot;longitude&quot;: float,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;photo_data&quot;: &quot;&quot;,
+       &quot;photo_feed&quot;: [int],
+       &quot;user_details&quot;: {
+           &quot;id&quot;: int,
+           &quot;age&quot;: int,
+           &quot;email&quot;: &quot;&quot;,
+           &quot;first_name&quot;: &quot;&quot;,
+           &quot;last_name&quot;: &quot;&quot;,
+           &quot;location&quot;: &quot;&quot;,
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;username&quot;: &quot;&quot;
+       },
+       &quot;magazine_authorized&quot;: bool,
+       &quot;caption&quot;: &quot;&quot;,
+       &quot;votes_behind&quot;: {
+           &quot;&lt;category name&gt;&quot;: int
+       },
+       &quot;comments&quot;: int,
+       &quot;votes&quot;: int,
+       &quot;user_voted&quot;: {
+           &quot;voted&quot;: bool
+       },
+       &quot;user_starred&quot;: {
+           &quot;starred&quot;: bool
+       },
+       &quot;bts_lens&quot;: &quot;&quot;,
+       &quot;bts_shutter&quot;: &quot;&quot;,
+       &quot;bts_iso&quot;: &quot;&quot;,
+       &quot;bts_aperture&quot;: &quot;&quot;,
+       &quot;bts_camera_settings&quot;: &quot;&quot;,
+       &quot;bts_time_of_day&quot;: &quot;&quot;,
+       &quot;bts_camera_make&quot;: &quot;&quot;,
+       &quot;bts_camera_model&quot;: &quot;&quot;,
+       &quot;bts_photo_editor&quot;: &quot;&quot;,
+       &quot;scaled_render&quot;: &lt;image url&gt;,
+       &quot;rank&quot;: {
+           &quot;overall&quot;: int,
+           &quot;&lt;category name&gt;&quot;: int
+       }
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>404</strong> Object does not exist</p>
+<h2 id="photos">Photos</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - MULTIPART</li>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data</td>
+<td><code>renders</code> or <code>details</code></td>
+<td>Returns Photos. If <code>renders</code>, will return only media. If <code>details</code>, will only return non-media data.</td>
+</tr>
+<tr>
+<td>classification</td>
+<td>Integer or name of a category</td>
+<td>Returns all Photos that have a matching PhotoClassification name or ID.</td>
+</tr>
+<tr>
+<td>geo_location</td>
+<td>Coordinates in the form: SW LONG,SW LAT,NE LONG, NE LAT</td>
+<td>Creates a geographical box based on coordinates provided and returns all Photos that have a geo_location contained within.</td>
+</tr>
+<tr>
+<td>location</td>
+<td>Name of a location for photos</td>
+<td>Returns all Photos whose location field is an exact match for string provided.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;category&quot;: int, // PhotoClassification ID
+  &quot;gear&quot;: [int],
+  &quot;geo_location&quot;: &quot;POINT (Long, Lat)&quot;,
+  &quot;image&quot;: &lt;image file&gt;,
+  &quot;tags&quot;: &quot;#&lt;tag1&gt; #&lt;tag2&gt; | tag1 tag2 tag3&quot;,
+  &quot;bts_lens&quot;: &quot;&quot;,
+  &quot;bts_shutter&quot;: &quot;&quot;,
+  &quot;bts_iso&quot;: &quot;&quot;,
+  &quot;bts_aperture&quot;: &quot;&quot;,
+  &quot;bts_camera_settings&quot;: &quot;&quot;,
+  &quot;bts_time_of_day&quot;: &quot;&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>POST</p>
+<pre><code class="json">{
+   &quot;id&quot;: int,
+   &quot;category&quot;: int,
+   &quot;gear&quot;: [int],
+   &quot;tag&quot;: [],
+   &quot;user&quot;: int,
+   &quot;attribution_name&quot;: &quot;&quot;,
+   &quot;dimensions&quot;: {
+       &quot;width&quot;: int,
+       &quot;height&quot;: int
+   },
+   &quot;image&quot;: &lt;image url&gt;,
+   &quot;image_blurred&quot;: &lt;image url&gt;,
+   &quot;image_small&quot;: &lt;image url&gt;,
+   &quot;image_small_2&quot;: &lt;image url&gt;,
+   &quot;image_tiny_246&quot;: &lt;image url&gt;,
+   &quot;image_tiny_272&quot;: &lt;image url&gt;,
+   &quot;latitude&quot;: float,
+   &quot;longitude&quot;: float,
+   &quot;location&quot;: &quot;&quot;,
+   &quot;photo_data&quot;: &quot;&quot;,
+   &quot;photo_feed&quot;: [int],
+   &quot;user_details&quot;: {
+       &quot;id&quot;: int,
+       &quot;age&quot;: int,
+       &quot;email&quot;: &quot;&quot;,
+       &quot;first_name&quot;: &quot;&quot;,
+       &quot;last_name&quot;: &quot;&quot;,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;social_name&quot;: &quot;&quot;,
+       &quot;username&quot;: &quot;&quot;
+   },
+   &quot;magazine_authorized&quot;: bool,
+   &quot;caption&quot;: &quot;&quot;,
+   &quot;votes_behind&quot;: {
+       &quot;&lt;category name&gt;&quot;: int
+   },
+   &quot;comments&quot;: int,
+   &quot;votes&quot;: int,
+   &quot;user_voted&quot;: {
+       &quot;voted&quot;: bool
+   },
+   &quot;user_starred&quot;: {
+       &quot;starred&quot;: bool
+   },
+   &quot;bts_lens&quot;: &quot;&quot;,
+   &quot;bts_shutter&quot;: &quot;&quot;,
+   &quot;bts_iso&quot;: &quot;&quot;,
+   &quot;bts_aperture&quot;: &quot;&quot;,
+   &quot;bts_camera_settings&quot;: &quot;&quot;,
+   &quot;bts_time_of_day&quot;: &quot;&quot;,
+   &quot;bts_camera_make&quot;: &quot;&quot;,
+   &quot;bts_camera_model&quot;: &quot;&quot;,
+   &quot;bts_photo_editor&quot;: &quot;&quot;,
+   &quot;scaled_render&quot;: &lt;image url&gt;,
+   &quot;rank&quot;: {
+       &quot;overall&quot;: int,
+       &quot;&lt;category name&gt;&quot;: int
+   }
+}
+</code></pre>
+
+<p>GET</p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+       &quot;id&quot;: int,
+       &quot;category&quot;: int,
+       &quot;gear&quot;: [int],
+       &quot;tag&quot;: [],
+       &quot;user&quot;: int,
+       &quot;attribution_name&quot;: &quot;&quot;,
+       &quot;dimensions&quot;: {
+           &quot;width&quot;: int,
+           &quot;height&quot;: int
+       },
+       &quot;image&quot;: &lt;image url&gt;,
+       &quot;image_blurred&quot;: &lt;image url&gt;,
+       &quot;image_small&quot;: &lt;image url&gt;,
+       &quot;image_small_2&quot;: &lt;image url&gt;,
+       &quot;image_tiny_246&quot;: &lt;image url&gt;,
+       &quot;image_tiny_272&quot;: &lt;image url&gt;,
+       &quot;latitude&quot;: float,
+       &quot;longitude&quot;: float,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;photo_data&quot;: &quot;&quot;,
+       &quot;photo_feed&quot;: [int],
+       &quot;user_details&quot;: {
+           &quot;id&quot;: int,
+           &quot;age&quot;: int,
+           &quot;email&quot;: &quot;&quot;,
+           &quot;first_name&quot;: &quot;&quot;,
+           &quot;last_name&quot;: &quot;&quot;,
+           &quot;location&quot;: &quot;&quot;,
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;username&quot;: &quot;&quot;
+       },
+       &quot;magazine_authorized&quot;: bool,
+       &quot;caption&quot;: &quot;&quot;,
+       &quot;votes_behind&quot;: {
+           &quot;&lt;category name&gt;&quot;: int
+       },
+       &quot;comments&quot;: int,
+       &quot;votes&quot;: int,
+       &quot;user_voted&quot;: {
+           &quot;voted&quot;: bool
+       },
+       &quot;user_starred&quot;: {
+           &quot;starred&quot;: bool
+       },
+       &quot;bts_lens&quot;: &quot;&quot;,
+       &quot;bts_shutter&quot;: &quot;&quot;,
+       &quot;bts_iso&quot;: &quot;&quot;,
+       &quot;bts_aperture&quot;: &quot;&quot;,
+       &quot;bts_camera_settings&quot;: &quot;&quot;,
+       &quot;bts_time_of_day&quot;: &quot;&quot;,
+       &quot;bts_camera_make&quot;: &quot;&quot;,
+       &quot;bts_camera_model&quot;: &quot;&quot;,
+       &quot;bts_photo_editor&quot;: &quot;&quot;,
+       &quot;scaled_render&quot;: &lt;image url&gt;,
+       &quot;rank&quot;: {
+           &quot;overall&quot;: int,
+           &quot;&lt;category name&gt;&quot;: int
+       }
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Response for Renders</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;image&quot;: &lt;image url&gt;, 
+      &quot;image_blurred&quot;: &lt;image url&gt;, 
+      &quot;image_medium&quot;: &lt;image url&gt;, 
+      &quot;image_small&quot;: &lt;image url&gt;, 
+      &quot;image_small_2&quot;: &lt;image url&gt;, 
+      &quot;image_tiny_246&quot;: &lt;image url&gt;,
+      &quot;image_tiny_272&quot;: &lt;image url&gt;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Response for Details</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;user&quot;: int, 
+      &quot;category&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [], 
+      &quot;tag&quot;: &quot;&quot;, 
+      &quot;latitude&quot;: float, 
+      &quot;location&quot;: &quot;&quot;, 
+      &quot;longitude&quot;: float, 
+      &quot;photo_data&quot;: &quot;&quot;,
+      &quot;photo_feed&quot;: &quot;&quot;, 
+      &quot;caption&quot;: &quot;&quot;, 
+      &quot;bts_lens&quot;: &quot;&quot;, 
+      &quot;bts_shutter&quot;: &quot;&quot;, 
+      &quot;bts_iso&quot;: &quot;&quot;, 
+      &quot;bts_aperture&quot;: &quot;&quot;,
+      &quot;bts_camera_settings&quot;: &quot;&quot;, 
+      &quot;bts_time_of_day&quot;: &quot;&quot;, 
+      &quot;bts_camera_make&quot;: &quot;&quot;, 
+      &quot;bts_camera_model&quot;: &quot;&quot;,
+      &quot;bts_photo_editor&quot;: &quot;&quot;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>400</strong> Bad request data</p>
+<h2 id="photo-single">Photo Single</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+<li>DELETE</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No extra parameters are supported for this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+   &quot;id&quot;: int,
+   &quot;category&quot;: int,
+   &quot;gear&quot;: [int],
+   &quot;tag&quot;: [],
+   &quot;user&quot;: int,
+   &quot;attribution_name&quot;: &quot;&quot;,
+   &quot;dimensions&quot;: {
+       &quot;width&quot;: int,
+       &quot;height&quot;: int
+   },
+   &quot;image&quot;: &lt;image url&gt;,
+   &quot;image_blurred&quot;: &lt;image url&gt;,
+   &quot;image_small&quot;: &lt;image url&gt;,
+   &quot;image_small_2&quot;: &lt;image url&gt;,
+   &quot;image_tiny_246&quot;: &lt;image url&gt;,
+   &quot;image_tiny_272&quot;: &lt;image url&gt;,
+   &quot;latitude&quot;: float,
+   &quot;longitude&quot;: float,
+   &quot;location&quot;: &quot;&quot;,
+   &quot;photo_data&quot;: &quot;&quot;,
+   &quot;photo_feed&quot;: [int],
+   &quot;user_details&quot;: {
+       &quot;id&quot;: int,
+       &quot;age&quot;: int,
+       &quot;email&quot;: &quot;&quot;,
+       &quot;first_name&quot;: &quot;&quot;,
+       &quot;last_name&quot;: &quot;&quot;,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;social_name&quot;: &quot;&quot;,
+       &quot;username&quot;: &quot;&quot;
+   },
+   &quot;magazine_authorized&quot;: bool,
+   &quot;caption&quot;: &quot;&quot;,
+   &quot;votes_behind&quot;: {
+       &quot;&lt;category name&gt;&quot;: int
+   },
+   &quot;comments&quot;: int,
+   &quot;votes&quot;: int,
+   &quot;user_voted&quot;: {
+       &quot;voted&quot;: bool
+   },
+   &quot;user_starred&quot;: {
+       &quot;starred&quot;: bool
+   },
+   &quot;bts_lens&quot;: &quot;&quot;,
+   &quot;bts_shutter&quot;: &quot;&quot;,
+   &quot;bts_iso&quot;: &quot;&quot;,
+   &quot;bts_aperture&quot;: &quot;&quot;,
+   &quot;bts_camera_settings&quot;: &quot;&quot;,
+   &quot;bts_time_of_day&quot;: &quot;&quot;,
+   &quot;bts_camera_make&quot;: &quot;&quot;,
+   &quot;bts_camera_model&quot;: &quot;&quot;,
+   &quot;bts_photo_editor&quot;: &quot;&quot;,
+   &quot;scaled_render&quot;: &lt;image url&gt;,
+   &quot;rank&quot;: {
+       &quot;overall&quot;: int,
+       &quot;&lt;category name&gt;&quot;: int
+   }
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>DELETE</p>
+<p><strong>401</strong> Token Authentication failed</p>
+<p><strong>403</strong> User does not own the Photo</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="photo-single-caption">Photo Single Caption</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/caption</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>PATCH - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PATCH</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported for this endpoint.</p>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;caption&quot;: &quot;&quot;,
+  &quot;tags&quot;: &quot;#tag1 #tag2 | tag1 tag2 tag3&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+   &quot;id&quot;: int,
+   &quot;category&quot;: int,
+   &quot;gear&quot;: [int],
+   &quot;tag&quot;: [],
+   &quot;user&quot;: int,
+   &quot;attribution_name&quot;: &quot;&quot;,
+   &quot;dimensions&quot;: {
+       &quot;width&quot;: int,
+       &quot;height&quot;: int
+   },
+   &quot;image&quot;: &lt;image url&gt;,
+   &quot;image_blurred&quot;: &lt;image url&gt;,
+   &quot;image_small&quot;: &lt;image url&gt;,
+   &quot;image_small_2&quot;: &lt;image url&gt;,
+   &quot;image_tiny_246&quot;: &lt;image url&gt;,
+   &quot;image_tiny_272&quot;: &lt;image url&gt;,
+   &quot;latitude&quot;: float,
+   &quot;longitude&quot;: float,
+   &quot;location&quot;: &quot;&quot;,
+   &quot;photo_data&quot;: &quot;&quot;,
+   &quot;photo_feed&quot;: [int],
+   &quot;user_details&quot;: {
+       &quot;id&quot;: int,
+       &quot;age&quot;: int,
+       &quot;email&quot;: &quot;&quot;,
+       &quot;first_name&quot;: &quot;&quot;,
+       &quot;last_name&quot;: &quot;&quot;,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;social_name&quot;: &quot;&quot;,
+       &quot;username&quot;: &quot;&quot;
+   },
+   &quot;magazine_authorized&quot;: bool,
+   &quot;caption&quot;: &quot;&quot;,
+   &quot;votes_behind&quot;: {
+       &quot;&lt;category name&gt;&quot;: int
+   },
+   &quot;comments&quot;: int,
+   &quot;votes&quot;: int,
+   &quot;user_voted&quot;: {
+       &quot;voted&quot;: bool
+   },
+   &quot;user_starred&quot;: {
+       &quot;starred&quot;: bool
+   },
+   &quot;bts_lens&quot;: &quot;&quot;,
+   &quot;bts_shutter&quot;: &quot;&quot;,
+   &quot;bts_iso&quot;: &quot;&quot;,
+   &quot;bts_aperture&quot;: &quot;&quot;,
+   &quot;bts_camera_settings&quot;: &quot;&quot;,
+   &quot;bts_time_of_day&quot;: &quot;&quot;,
+   &quot;bts_camera_make&quot;: &quot;&quot;,
+   &quot;bts_camera_model&quot;: &quot;&quot;,
+   &quot;bts_photo_editor&quot;: &quot;&quot;,
+   &quot;scaled_render&quot;: &lt;image url&gt;,
+   &quot;rank&quot;: {
+       &quot;overall&quot;: int,
+       &quot;&lt;category name&gt;&quot;: int
+   }
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>400</strong> Bad request data</p>
+<p><strong>404</strong> Object does not exist</p>
+<h2 id="photo-single-comments">Photo Single Comments</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/comments</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported for this endpoint.</p>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;comment&quot;: &quot;&quot;,
+  &quot;mentions&quot;: [&quot;&quot;] // List of mentioned usernames
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<p>GET</p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+     {
+      &quot;id&quot;: int, 
+      &quot;comment&quot;: &quot;&quot;, 
+      &quot;user&quot;: {}, 
+      &quot;photo&quot;: &quot;&quot;,  // String of the Photo ID 
+      &quot;created_at&quot;: datetime, 
+      &quot;replies&quot;: [
+         {
+            &quot;id&quot;: int, 
+            &quot;comment&quot;: &quot;&quot;, 
+            &quot;user&quot;: {
+               &quot;id&quot;: int, 
+               &quot;age&quot;: int, 
+               &quot;avatar&quot;: &lt;image url&gt;, 
+               &quot;email&quot;: &quot;&quot;, 
+               &quot;first_name&quot;: &quot;&quot;, 
+               &quot;gear&quot;: [int], 
+               &quot;last_name&quot;: &quot;&quot;, 
+               &quot;location&quot;: &quot;&quot;, 
+               &quot;social_name&quot;: &quot;&quot;,
+               &quot;social_url&quot;: &quot;&quot;, 
+               &quot;username&quot;: &quot;&quot;, 
+               &quot;website_url&quot;: &quot;&quot;
+            }, 
+            &quot;created_at&quot;: datetime
+         }
+     ], 
+     &quot;mentions&quot;: [
+        {
+           &quot;id&quot;: int, 
+           &quot;age&quot;: int, 
+           &quot;avatar&quot;: &lt;image url&gt;, 
+           &quot;email&quot;: &quot;&quot;, 
+           &quot;first_name&quot;: &quot;&quot;, 
+           &quot;gear&quot;: [int], 
+           &quot;last_name&quot;: &quot;&quot;, 
+           &quot;location&quot;: &quot;&quot;, 
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;social_url&quot;: &quot;&quot;, 
+           &quot;username&quot;: &quot;&quot;, 
+           &quot;website_url&quot;: &quot;&quot;
+        }
+     ] 
+   }]
+}
+</code></pre>
+
+<p>POST</p>
+<pre><code class="json">{
+   &quot;id&quot;: int, 
+   &quot;comment&quot;: &quot;&quot;, 
+   &quot;user&quot;: {}, 
+   &quot;photo&quot;: &quot;&quot;,  // String of the Photo ID 
+   &quot;created_at&quot;: datetime, 
+   &quot;replies&quot;: [
+   {
+      &quot;id&quot;: int, 
+         &quot;comment&quot;: &quot;&quot;, 
+         &quot;user&quot;: {
+            &quot;id&quot;: int, 
+            &quot;age&quot;: int, 
+            &quot;avatar&quot;: &lt;image url&gt;, 
+            &quot;email&quot;: &quot;&quot;, 
+            &quot;first_name&quot;: &quot;&quot;, 
+            &quot;gear&quot;: [int], 
+            &quot;last_name&quot;: &quot;&quot;, 
+            &quot;location&quot;: &quot;&quot;, 
+            &quot;social_name&quot;: &quot;&quot;,
+            &quot;social_url&quot;: &quot;&quot;, 
+            &quot;username&quot;: &quot;&quot;, 
+            &quot;website_url&quot;: &quot;&quot;
+         }, 
+         &quot;created_at&quot;: datetime
+      }
+   ], 
+   &quot;mentions&quot;: [
+      {
+         &quot;id&quot;: int, 
+         &quot;age&quot;: int, 
+         &quot;avatar&quot;: &lt;image url&gt;, 
+         &quot;email&quot;: &quot;&quot;, 
+         &quot;first_name&quot;: &quot;&quot;, 
+         &quot;gear&quot;: [int], 
+         &quot;last_name&quot;: &quot;&quot;, 
+         &quot;location&quot;: &quot;&quot;, 
+         &quot;social_name&quot;: &quot;&quot;,
+         &quot;social_url&quot;: &quot;&quot;, 
+         &quot;username&quot;: &quot;&quot;, 
+         &quot;website_url&quot;: &quot;&quot;
+      }
+   ] 
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>GET</p>
+<p><strong>404</strong> Object not found</p>
+<p>POST</p>
+<p><strong>400</strong> Bad request data</p>
+<h2 id="photo-single-replies">Photo Single Replies</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/comments/&lt;id&gt;/replies</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;reply&quot;: &quot;&quot;,
+  &quot;mentions&quot;: [&quot;&quot;] // Array of mentioned usernames
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+   &quot;id&quot;: int, 
+   &quot;comment&quot;: &quot;&quot;, 
+   &quot;user&quot;: {}, 
+   &quot;photo&quot;: &quot;&quot;,  // String of the Photo ID 
+   &quot;created_at&quot;: datetime, 
+   &quot;replies&quot;: [
+   {
+      &quot;id&quot;: int, 
+         &quot;comment&quot;: &quot;&quot;, 
+         &quot;user&quot;: {
+            &quot;id&quot;: int, 
+            &quot;age&quot;: int, 
+            &quot;avatar&quot;: &lt;image url&gt;, 
+            &quot;email&quot;: &quot;&quot;, 
+            &quot;first_name&quot;: &quot;&quot;, 
+            &quot;gear&quot;: [int], 
+            &quot;last_name&quot;: &quot;&quot;, 
+            &quot;location&quot;: &quot;&quot;, 
+            &quot;social_name&quot;: &quot;&quot;,
+            &quot;social_url&quot;: &quot;&quot;, 
+            &quot;username&quot;: &quot;&quot;, 
+            &quot;website_url&quot;: &quot;&quot;
+         }, 
+         &quot;created_at&quot;: datetime
+      }
+   ], 
+   &quot;mentions&quot;: [
+      {
+         &quot;id&quot;: int, 
+         &quot;age&quot;: int, 
+         &quot;avatar&quot;: &lt;image url&gt;, 
+         &quot;email&quot;: &quot;&quot;, 
+         &quot;first_name&quot;: &quot;&quot;, 
+         &quot;gear&quot;: [int], 
+         &quot;last_name&quot;: &quot;&quot;, 
+         &quot;location&quot;: &quot;&quot;, 
+         &quot;social_name&quot;: &quot;&quot;,
+         &quot;social_url&quot;: &quot;&quot;, 
+         &quot;username&quot;: &quot;&quot;, 
+         &quot;website_url&quot;: &quot;&quot;
+      }
+   ] 
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>400</strong> Bad request data</p>
+<h2 id="photo-single-details">Photo Single Details</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/details</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported by this endpoint.</p>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;user&quot;: int, 
+      &quot;category&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [int], 
+      &quot;tag&quot;: [int], 
+      &quot;latitude&quot;: float, 
+      &quot;location&quot;: &quot;&quot;, 
+      &quot;longitude&quot;: float, 
+      &quot;photo_data&quot;: &quot;&quot;,
+      &quot;photo_feed&quot;: [int], 
+      &quot;caption&quot;: &quot;&quot;, 
+      &quot;bts_lens&quot;: &quot;&quot;, 
+      &quot;bts_shutter&quot;: &quot;&quot;, 
+      &quot;bts_iso&quot;: &quot;&quot;, 
+      &quot;bts_aperture&quot;: &quot;&quot;,
+      &quot;bts_camera_settings&quot;: &quot;&quot;, 
+      &quot;bts_time_of_day&quot;: &quot;&quot;, 
+      &quot;bts_camera_make&quot;: &quot;&quot;, 
+      &quot;bts_camera_model&quot;: &quot;&quot;,
+      &quot;bts_photo_editor&quot;: &quot;&quot;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>If an invalid ID is requested, returns an empty results set</p>
+<h2 id="photo-single-flags">Photo Single Flags</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/flags</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters supported for this endpoint.</p>
+<p><strong>Response</strong></p>
+<p>Standard HTTP Response with status 200 or 201.</p>
+<p><strong>Errors</strong></p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="photo-single-media">Photo Single Media</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/media</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>height</td>
+<td>int</td>
+<td>Specifies the height for a custom scaled image render. Requires width.</td>
+</tr>
+<tr>
+<td>width</td>
+<td>int</td>
+<td>Specifies the width for a custom scaled image render. Requires height.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+    &quot;id&quot;: int, 
+    &quot;image&quot;: &lt;image url&gt;, 
+    &quot;image_blurred&quot;: &lt;image url&gt;, 
+    &quot;image_medium&quot;: &lt;image url&gt;, 
+    &quot;image_small&quot;: &lt;image url&gt;, 
+    &quot;image_small_2&quot;: &lt;image url&gt;, 
+    &quot;image_tiny_246&quot;: &lt;image url&gt;,
+    &quot;image_tiny_272&quot;: &lt;image url&gt;
+  }]
+}
+</code></pre>
+
+<p><strong>Response for Custom Render Dimensions</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+    &quot;id&quot;: int,
+    &quot;image&quot;: &lt;image url&gt;
+  }]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>If an invalid ID is requested an empty results set will be returned.</p>
+<h2 id="photo-single-likes">Photo Single Likes</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/likes</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>DELETE</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported for this endpoint.</p>
+<p><strong>Response</strong></p>
+<p>Standard HTTP Response with status of 200 or 201</p>
+<p><strong>Errors</strong></p>
+<p><strong>409</strong> Duplicate exists</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="photo-single-stars">Photo Single Stars</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/stars</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>POST - JSON</li>
+<li>DELETE</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>Session, Token</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported for this endpoint.</p>
+<p><strong>Response</strong></p>
+<p>Standard HTTP Response with status of 200 or 201</p>
+<p><strong>Errors</strong></p>
+<p><strong>409</strong> Duplicate exists</p>
+<p><strong>404</strong> Object not found</p>
+<h2 id="top-photos">Top Photos</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/top</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>GET</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Not Required</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None</td>
+<td>--</td>
+<td>Returns the most 100 most popular Photos.</td>
+</tr>
+<tr>
+<td>data</td>
+<td><code>renders</code> or <code>details</code></td>
+<td>Returns either the media only or non-media only data for the top Photos.</td>
+</tr>
+<tr>
+<td>display_page</td>
+<td><code>picks</code> or <code>popular</code></td>
+<td>If set to <code>picks</code>, will return the curated Photos hand-picked by AoV. If set to <code>popular</code>, will return the most popular Photos in the community.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [{
+       &quot;id&quot;: int,
+       &quot;category&quot;: int,
+       &quot;gear&quot;: [int],
+       &quot;tag&quot;: [],
+       &quot;user&quot;: int,
+       &quot;attribution_name&quot;: &quot;&quot;,
+       &quot;dimensions&quot;: {
+           &quot;width&quot;: int,
+           &quot;height&quot;: int
+       },
+       &quot;image&quot;: &lt;image url&gt;,
+       &quot;image_blurred&quot;: &lt;image url&gt;,
+       &quot;image_small&quot;: &lt;image url&gt;,
+       &quot;image_small_2&quot;: &lt;image url&gt;,
+       &quot;image_tiny_246&quot;: &lt;image url&gt;,
+       &quot;image_tiny_272&quot;: &lt;image url&gt;,
+       &quot;latitude&quot;: float,
+       &quot;longitude&quot;: float,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;photo_data&quot;: &quot;&quot;,
+       &quot;photo_feed&quot;: [int],
+       &quot;user_details&quot;: {
+           &quot;id&quot;: int,
+           &quot;age&quot;: int,
+           &quot;email&quot;: &quot;&quot;,
+           &quot;first_name&quot;: &quot;&quot;,
+           &quot;last_name&quot;: &quot;&quot;,
+           &quot;location&quot;: &quot;&quot;,
+           &quot;social_name&quot;: &quot;&quot;,
+           &quot;username&quot;: &quot;&quot;
+       },
+       &quot;magazine_authorized&quot;: bool,
+       &quot;caption&quot;: &quot;&quot;,
+       &quot;votes_behind&quot;: {
+           &quot;&lt;category name&gt;&quot;: int
+       },
+       &quot;comments&quot;: int,
+       &quot;votes&quot;: int,
+       &quot;user_voted&quot;: {
+           &quot;voted&quot;: bool
+       },
+       &quot;user_starred&quot;: {
+           &quot;starred&quot;: bool
+       },
+       &quot;bts_lens&quot;: &quot;&quot;,
+       &quot;bts_shutter&quot;: &quot;&quot;,
+       &quot;bts_iso&quot;: &quot;&quot;,
+       &quot;bts_aperture&quot;: &quot;&quot;,
+       &quot;bts_camera_settings&quot;: &quot;&quot;,
+       &quot;bts_time_of_day&quot;: &quot;&quot;,
+       &quot;bts_camera_make&quot;: &quot;&quot;,
+       &quot;bts_camera_model&quot;: &quot;&quot;,
+       &quot;bts_photo_editor&quot;: &quot;&quot;,
+       &quot;scaled_render&quot;: &lt;image url&gt;,
+       &quot;rank&quot;: {
+           &quot;overall&quot;: int,
+           &quot;&lt;category name&gt;&quot;: int
+       }
+    }]
+}
+</code></pre>
+
+<p><strong>Response for Renders</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;image&quot;: &lt;image url&gt;, 
+      &quot;image_blurred&quot;: &lt;image url&gt;, 
+      &quot;image_medium&quot;: &lt;image url&gt;, 
+      &quot;image_small&quot;: &lt;image url&gt;, 
+      &quot;image_small_2&quot;: &lt;image url&gt;, 
+      &quot;image_tiny_246&quot;: &lt;image url&gt;,
+      &quot;image_tiny_272&quot;: &lt;image url&gt;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Response for Details</strong></p>
+<pre><code class="json">{
+  &quot;count&quot;: int,
+  &quot;next&quot;: &lt;resource_url&gt;,
+  &quot;previous&quot;: &lt;resource_url&gt;,
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: int, 
+      &quot;user&quot;: int, 
+      &quot;category&quot;: &quot;&quot;, 
+      &quot;gear&quot;: [], 
+      &quot;tag&quot;: &quot;&quot;, 
+      &quot;latitude&quot;: float, 
+      &quot;location&quot;: &quot;&quot;, 
+      &quot;longitude&quot;: float, 
+      &quot;photo_data&quot;: &quot;&quot;,
+      &quot;photo_feed&quot;: &quot;&quot;, 
+      &quot;caption&quot;: &quot;&quot;, 
+      &quot;bts_lens&quot;: &quot;&quot;, 
+      &quot;bts_shutter&quot;: &quot;&quot;, 
+      &quot;bts_iso&quot;: &quot;&quot;, 
+      &quot;bts_aperture&quot;: &quot;&quot;,
+      &quot;bts_camera_settings&quot;: &quot;&quot;, 
+      &quot;bts_time_of_day&quot;: &quot;&quot;, 
+      &quot;bts_camera_make&quot;: &quot;&quot;, 
+      &quot;bts_camera_model&quot;: &quot;&quot;,
+      &quot;bts_photo_editor&quot;: &quot;&quot;
+    }
+  ]
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p>None</p>
+<h2 id="photo-single-votes">Photo Single Votes</h2>
+<p><strong>URL</strong> - <code>https://staging.artofvisuals.com/api/photos/&lt;id&gt;/votes</code></p>
+<p><strong>Accepted Methods</strong></p>
+<ul>
+<li>PATCH - JSON</li>
+</ul>
+<p><strong>Authentication</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accepted Authentication Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PATCH</td>
+<td>Session, Token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Accepted Parameters</strong></p>
+<p>No additional parameters are supported for this endpoint.</p>
+<p><strong>Accepted Data</strong></p>
+<pre><code class="json">{
+  &quot;operation&quot;: &quot;increment | decrement&quot;
+}
+</code></pre>
+
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+   &quot;id&quot;: int,
+   &quot;category&quot;: int,
+   &quot;gear&quot;: [int],
+   &quot;tag&quot;: [],
+   &quot;user&quot;: int,
+   &quot;attribution_name&quot;: &quot;&quot;,
+   &quot;dimensions&quot;: {
+       &quot;width&quot;: int,
+       &quot;height&quot;: int
+   },
+   &quot;image&quot;: &lt;image url&gt;,
+   &quot;image_blurred&quot;: &lt;image url&gt;,
+   &quot;image_small&quot;: &lt;image url&gt;,
+   &quot;image_small_2&quot;: &lt;image url&gt;,
+   &quot;image_tiny_246&quot;: &lt;image url&gt;,
+   &quot;image_tiny_272&quot;: &lt;image url&gt;,
+   &quot;latitude&quot;: float,
+   &quot;longitude&quot;: float,
+   &quot;location&quot;: &quot;&quot;,
+   &quot;photo_data&quot;: &quot;&quot;,
+   &quot;photo_feed&quot;: [int],
+   &quot;user_details&quot;: {
+       &quot;id&quot;: int,
+       &quot;age&quot;: int,
+       &quot;email&quot;: &quot;&quot;,
+       &quot;first_name&quot;: &quot;&quot;,
+       &quot;last_name&quot;: &quot;&quot;,
+       &quot;location&quot;: &quot;&quot;,
+       &quot;social_name&quot;: &quot;&quot;,
+       &quot;username&quot;: &quot;&quot;
+   },
+   &quot;magazine_authorized&quot;: bool,
+   &quot;caption&quot;: &quot;&quot;,
+   &quot;votes_behind&quot;: {
+       &quot;&lt;category name&gt;&quot;: int
+   },
+   &quot;comments&quot;: int,
+   &quot;votes&quot;: int,
+   &quot;user_voted&quot;: {
+       &quot;voted&quot;: bool
+   },
+   &quot;user_starred&quot;: {
+       &quot;starred&quot;: bool
+   },
+   &quot;bts_lens&quot;: &quot;&quot;,
+   &quot;bts_shutter&quot;: &quot;&quot;,
+   &quot;bts_iso&quot;: &quot;&quot;,
+   &quot;bts_aperture&quot;: &quot;&quot;,
+   &quot;bts_camera_settings&quot;: &quot;&quot;,
+   &quot;bts_time_of_day&quot;: &quot;&quot;,
+   &quot;bts_camera_make&quot;: &quot;&quot;,
+   &quot;bts_camera_model&quot;: &quot;&quot;,
+   &quot;bts_photo_editor&quot;: &quot;&quot;,
+   &quot;scaled_render&quot;: &lt;image url&gt;,
+   &quot;rank&quot;: {
+       &quot;overall&quot;: int,
+       &quot;&lt;category name&gt;&quot;: int
+   }
+}
+</code></pre>
+
+<p><strong>Errors</strong></p>
+<p><strong>400</strong> Bad request data</p>
+<p><strong>401</strong> Authentication failed</p>
+<p><strong>404</strong> Object not found</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Search-API/index.html" class="btn btn-neutral float-right" title="Search">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Me-API/index.html" class="btn btn-neutral" title="Me"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../Me-API/index.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Search-API/index.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/require.js"></script>
+      <script src="../../search/search.js"></script>
+
+</body>
+</html>
