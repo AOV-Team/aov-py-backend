@@ -129,10 +129,6 @@ urlpatterns = [
     url(r'^admin/push/$', communication_views.push_notification_manager),
     url(r'^admin/statistics/$', analytic_views.statistics_admin),
 
-    # Docs
-    url(r'^docs$', doc_views.documentation),
-    url(r'^docs/(?P<path>.*)$', doc_views.documentation),
-
     ## AOV-WEB
 
     # auth
