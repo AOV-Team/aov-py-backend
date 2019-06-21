@@ -5,7 +5,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from unittest import skip
 
-
 class TestAuthenticateViewSetDELETE(TestCase):
     def test_authenticate_view_set_delete_successful(self):
         """

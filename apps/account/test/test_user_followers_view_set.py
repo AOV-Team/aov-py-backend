@@ -2,6 +2,7 @@ from apps.account import models as account_models
 from apps.common.test import helpers as test_helpers
 from apps.communication.models import PushNotificationRecord
 from django.test import TestCase, override_settings
+from fcm_django.models import FCMDevice
 from push_notifications.models import APNSDevice
 from rest_framework.test import APIClient
 from unittest import mock
@@ -133,6 +134,9 @@ class TestUserFollowersViewSetGET(TestCase):
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class TestUserFollowersViewSetPOST(TestCase):
+    def tearDown(self):
+        APNSDevice.objects.all().delete()
+
     def test_user_followers_view_set_post_successful(self):
         """
         Test that we can follow a user
@@ -145,9 +149,9 @@ class TestUserFollowersViewSetPOST(TestCase):
         user_1 = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
 
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
-        device = APNSDevice.objects \
-            .create(registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50',
-                    user=target_user)
+        device = FCMDevice.objects.create(
+            registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50', user=target_user,
+            type="ios")
 
         # Follow target user
         target_user.follower = [user_1]
@@ -156,7 +160,9 @@ class TestUserFollowersViewSetPOST(TestCase):
         # Simulate auth
         token = test_helpers.get_token_for_user(access_user)
 
-        with mock.patch('push_notifications.apns.apns_send_bulk_message') as p:
+        # Wrap the call in a mock so we aren't sending real push notifications during tests
+        with mock.patch('fcm_django.fcm.fcm_send_bulk_message') as p:
+
             # Get data from endpoint
             client = APIClient()
             client.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -164,9 +170,11 @@ class TestUserFollowersViewSetPOST(TestCase):
             request = client.post('/api/users/{}/followers'.format(target_user.id), format='json')
 
             self.assertEquals(request.status_code, 201)
-            p.assert_called_with(
-                alert="{} started following you, {}.".format(access_user.username, target_user.username),
-                registration_ids=[device.registration_id])
+
+            # Assert the mocked call for push notification occurred.
+            p.assert_called_with(api_key=None, badge=None, data=None, icon=None,
+                                 registration_ids=[device.registration_id], sound=None, title=None,
+                                 body='mr started following you, aov_hov.')
 
         # Check for entry
         followers = target_user.follower.all()

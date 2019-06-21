@@ -9,7 +9,7 @@ from apps.common.serializers import setup_eager_loading
 from apps.common.views import get_default_response, DefaultResultsSetPagination, LargeResultsSetPagination, \
     MediumResultsSetPagination, remove_pks_from_payload, query_dict_to_dict
 from apps.communication.models import PushNotificationRecord
-from apps.communication.tasks import send_push_notification
+from apps.communication.tasks import send_push_notification, update_device
 from apps.photo import models as photo_models
 from apps.photo import serializers as photo_serializers
 from apps.photo.photo import Photo
@@ -26,8 +26,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Count
 from django.shortcuts import render
 from django.utils import timezone
+from fcm_django.models import FCMDevice
+from fcm_django.fcm import FCMError
 from json.decoder import JSONDecodeError
-from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -945,21 +946,28 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
 
                     # Send a push notification to the followed user
                     followed_device = APNSDevice.objects.filter(user=user)
+
+                    # Check for an existing FCM registry
+                    fcm_device = FCMDevice.objects.filter(user=user)
+                    if not fcm_device.exists() and followed_device.exists():
+                        fcm_token = update_device(followed_device)
+                        if fcm_token:
+                            fcm_device = FCMDevice.objects.create(user=user.first(),
+                                                                  type="ios", registration_id=fcm_token)
+                            fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
+
                     message = "{} started following you, {}.".format(auth_user.username, user.username)
 
                     # This check is here to make sure the record is only created for devices that we have. No APNS means no
                     # permission for notifications on the device.
-                    if followed_device.exists():
-                        # To ensure we have the most recent APNSDevice entry, get a QuerySet of only the first item
-                        followed_device = APNSDevice.objects.filter(id=followed_device.first().id)
-
+                    if fcm_device.exists():
                         try:
-                            send_push_notification(message, followed_device.values_list("id", flat=True))
+                            send_push_notification(message, fcm_device.values_list("id", flat=True))
 
                             # Add history of the notification.
                             PushNotificationRecord.objects.create(message=message, receiver=followed_device.first(), action="F",
                                                                   content_object=user, sender=auth_user)
-                        except APNSServerError:
+                        except FCMError:
                             pass
 
                     return get_default_response('201')
