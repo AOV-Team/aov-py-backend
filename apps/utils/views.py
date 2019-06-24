@@ -68,7 +68,7 @@ class FeedbackViewSet(generics.CreateAPIView):
         feedback_type = request.data.get("feedback_type")
         response = get_default_response('400')
         update_data = {
-            "user": user,
+            "user": user.id,
             "message": request.data.get("message"),
         }
 
