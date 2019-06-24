@@ -129,9 +129,10 @@ class TestEpisodeViewSetGET(TestCase):
 
         # Filter by publish date, greater than
         episode = podcast_models.Episode.objects.first()
-        episode.published_date = datetime.datetime(2019, 3, 12)
+        episode.published_date = datetime.datetime.now() + datetime.timedelta(days=1)
         episode.save()
-        response = client.get("/api/aov-web/podcast/episodes?published_after=2019-03-01")
+        response = client.get("/api/aov-web/podcast/episodes?published_after={}".format(
+            episode.published_date.strftime("%Y-%m-%d")))
         episodes = response.data["results"]
 
         self.assertEqual(response.status_code, 200)
