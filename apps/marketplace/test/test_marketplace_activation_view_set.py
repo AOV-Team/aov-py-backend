@@ -2,8 +2,10 @@ from apps.account import authenticate
 from apps.account import models as account_models
 from django.test import override_settings, TestCase
 from rest_framework.test import APIClient
+from unittest import skip
 
 
+@skip("Urls turned off. Remove if featured turned back on.")
 @override_settings(EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend')
 class TestMarketplaceActivationViewSetPOST(TestCase):
     """
