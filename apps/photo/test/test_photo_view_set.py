@@ -577,7 +577,7 @@ class TestPhotoViewSetPOST(TestCase):
         self.assertIn('image_blurred', result)
         self.assertIn('scaled_render', result)
         self.assertNotIn('original_image_url', result)
-        self.assertNotIn('image', result)
+        self.assertIn('image', result)
 
         # Query for entry
         photos = photo_models.Photo.objects.all()

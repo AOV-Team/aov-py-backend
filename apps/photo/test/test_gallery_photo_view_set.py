@@ -67,4 +67,4 @@ class TestGalleryPhotoViewSetGET(TestCase):
         self.assertEquals(results[1]['latitude'], 43.0)
         self.assertEquals(results[1]['longitude'], -116.0)
         self.assertIsNotNone(results[0]['image_blurred'])
-        self.assertNotIn('image', results[0])
+        self.assertIn('image', results[0])
