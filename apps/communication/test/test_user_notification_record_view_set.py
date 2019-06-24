@@ -129,7 +129,6 @@ class TestUserNotificationRecordViewSetGET(TestCase):
         for record in results:
             related_object = record["related_object"][0]
 
-
             if related_object["id"] == dm.id:
                 dm_found = True
 
@@ -137,10 +136,10 @@ class TestUserNotificationRecordViewSetGET(TestCase):
                 photo_found = True
                 photo_found_count += 1
 
-            if all([photo_found, dm_found, photo_found_count == 3]):
+            if all([photo_found, dm_found, photo_found_count == 2]):
                 break
 
-        self.assertTrue(all([photo_found, dm_found, photo_found_count == 3]))
+        self.assertTrue(all([photo_found, dm_found, photo_found_count == 2]))
 
 
 class TestUserNotificationRecordViewSetPOST(TestCase):
