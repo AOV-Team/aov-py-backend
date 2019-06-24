@@ -68,56 +68,56 @@ class TestStatisticsViewSetGET(TestCase):
         category_1 = photo_models.PhotoClassification.objects.get(name='Other')
         category_2 = photo_models.PhotoClassification.objects.get(name='Urban')
 
-        photo_1 = photo_models.Photo.objects\
-            .create(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_1 = photo_models.Photo.objects.create(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')),
+                                                    user=user_1)
         photo_1.category = [category_1]
         photo_1.created_at = datetime(year=2017, month=1, day=10)
         photo_1.save()
 
-        photo_2 = photo_models.Photo.objects \
-            .create(user=user_1, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_2 = photo_models.Photo.objects.create(
+            user=user_1, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_2.category = [category_1]
         photo_2.created_at = datetime(year=2017, month=1, day=12)
         photo_2.save()
 
-        photo_3 = photo_models.Photo.objects \
-            .create(user=user_2, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_3 = photo_models.Photo.objects.create(
+            user=user_2, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_3.category = [category_2]
         photo_3.created_at = datetime(year=2017, month=1, day=16)
         photo_3.save()
 
-        photo_4 = photo_models.Photo.objects \
-            .create(user=user_3, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_4 = photo_models.Photo.objects.create(
+            user=user_3, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_4.category = [category_1]
         photo_4.created_at = datetime(year=2017, month=1, day=31)
         photo_4.save()
 
-        photo_5 = photo_models.Photo.objects \
-            .create(user=user_4, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_5 = photo_models.Photo.objects.create(
+            user=user_4, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_5.category = [category_1]
         photo_5.created_at = datetime(year=2017, month=2, day=2)
         photo_5.save()
 
-        photo_6 = photo_models.Photo.objects \
-            .create(user=user_5, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_6 = photo_models.Photo.objects.create(
+            user=user_5, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_6.category = [category_1]
         photo_6.created_at = datetime(year=2017, month=2, day=18)
         photo_6.save()
 
-        photo_7 = photo_models.Photo.objects \
-            .create(user=user_6, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_7 = photo_models.Photo.objects.create(
+            user=user_6, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_7.category = [category_1]
         photo_7.created_at = datetime(year=2017, month=2, day=23)
         photo_7.save()
 
-        photo_8 = photo_models.Photo.objects \
-            .create(user=user_7, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_8 = photo_models.Photo.objects.create(
+            user=user_7, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_8.category = [category_2]
         photo_8.created_at = datetime(year=2017, month=3, day=1)
         photo_8.save()
 
-        photo_9 = photo_models.Photo.objects \
-            .create(user=user_7, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
+        photo_9 = photo_models.Photo.objects.create(
+            user=user_7, image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_9.category = [category_2]
         photo_9.created_at = datetime(year=2017, month=3, day=2)
         photo_9.save()
