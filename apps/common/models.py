@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models as geo_models
 from django.db import models
+from os.path import splitext
 import datetime
 import random
 
@@ -116,7 +117,7 @@ def get_uploaded_file_path(instance, filename):
     file_ext = filename.split('.')[-1]
     instance_class = instance.__str__()
 
-    if hasattr(instance, "user"):
+    if hasattr(instance, "user") and instance.user:
         filename = 'u{}.{}'.format(instance.user.id, file_ext)
 
     elif hasattr(instance, "requester_fk"):
@@ -139,6 +140,9 @@ def get_uploaded_file_path(instance, filename):
 
     elif instance_class == "Photographer":
         filename = "PHOTOGRAPHER_PROFILE.{}".format(file_ext)
+
+    else:
+        filename = "{}.{}".format(splitext(filename)[0], file_ext)
 
     # Date stamp
     current_time = get_date_stamp_str()

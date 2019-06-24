@@ -68,8 +68,7 @@ class TestStatisticsViewSetGET(TestCase):
         category_1 = photo_models.PhotoClassification.objects.get(name='Other')
         category_2 = photo_models.PhotoClassification.objects.get(name='Urban')
 
-        photo_1 = photo_models.Photo.objects.create(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')),
-                                                    user=user_1)
+        photo_1 = photo_models.Photo.objects.create(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')))
         photo_1.category = [category_1]
         photo_1.created_at = datetime(year=2017, month=1, day=10)
         photo_1.save()
