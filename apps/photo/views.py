@@ -3,7 +3,7 @@ from apps.account import serializers as account_serializers
 from apps.common import models as common_models
 from apps.common.serializers import setup_eager_loading
 from apps.common.views import (DefaultResultsSetPagination, get_default_response, handle_jquery_empty_array,
-                               MediumResultsSetPagination, remove_pks_from_payload)
+                               MediumResultsSetPagination, remove_pks_from_payload, query_dict_to_dict)
 from apps.communication.models import PushNotificationRecord
 from apps.communication import tasks as communication_tasks
 from apps.photo import models as photo_models
@@ -422,7 +422,7 @@ class PhotoViewSet(generics.ListCreateAPIView):
         """
         authenticated_user = TokenAuthentication().authenticate(request)[0]
         # user_logged_in.send(sender=self, request=request, user=user)
-        payload = request.data
+        payload = query_dict_to_dict(request.data)
         payload['user'] = authenticated_user.id
         # tags = payload.getlist("tags")
         tags = payload.get("tags")
