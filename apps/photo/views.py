@@ -239,7 +239,7 @@ class GalleryRetrieveViewSet(generics.ListAPIView):
                 "name__icontains": name
             })
 
-        galleries = self.queryset.filter(user=gallery_user, **query_params)
+        galleries = self.queryset.filter(user=gallery_user, **query_params).order_by("id")
 
         return galleries
 
@@ -333,7 +333,7 @@ class GalleryPhotoViewSet(generics.ListAPIView):
 
         if gallery.exists():
             gallery = gallery.first()
-            return gallery.photos.all()
+            return gallery.photos.all().order_by("id")
 
         return photo_models.Photo.objects.none()
 
@@ -749,7 +749,7 @@ class PhotoSingleViewSet(generics.RetrieveDestroyAPIView, generics.UpdateAPIView
 
     @setup_eager_loading
     def get_queryset(self):
-        return photo_models.Photo.objects.all()
+        return photo_models.Photo.objects.all().order_by("id")
 
     def delete(self, request, *args, **kwargs):
         """
@@ -1475,7 +1475,7 @@ class PhotoSingleMediaView(generics.ListAPIView):
 
         pk = self.kwargs.get("pk")
         if pk:
-            return photo_models.Photo.objects.filter(id=pk)
+            return photo_models.Photo.objects.filter(id=pk).order_by("id")
         else:
             return photo_models.Photo.objects.none()
 
@@ -1498,7 +1498,7 @@ class PhotoSingleDetailsView(generics.ListAPIView):
 
         pk = self.kwargs.get("pk")
         if pk:
-            return photo_models.Photo.objects.filter(id=pk)
+            return photo_models.Photo.objects.filter(id=pk).order_by("id")
         else:
             return photo_models.Photo.objects.none()
 

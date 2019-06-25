@@ -82,7 +82,7 @@ class AOVWebUsersView(generics.ListAPIView):
 
         user_id = self.kwargs.get("pk", None)
         if user_id:
-            return account_models.User.objects.filter(id=user_id, is_active=True)
+            return account_models.User.objects.filter(id=user_id, is_active=True).order_by("id")
         else:
             return account_models.User.objects.none()
 
@@ -106,7 +106,7 @@ class AOVWebUserProfileView(generics.ListAPIView):
         user_id = self.kwargs.get("pk", None)
         if user_id:
             user = account_models.User.objects.filter(id=user_id, is_active=True)
-            return account_models.Profile.objects.filter(user=user)
+            return account_models.Profile.objects.filter(user=user).order_by("id")
         else:
             return account_models.Profile.objects.none()
 
@@ -285,7 +285,7 @@ class BlockUserViewSet(generics.ListCreateAPIView):
         if blocking_user.exists() and accessing_user.id == int(blocking_user_pk):
             blocked_user_entries = account_models.Blocked.objects.filter(blocked_by=blocking_user)
             blocked_users = account_models.User.objects.filter(
-                id__in=blocked_user_entries.values_list("user", flat=True))
+                id__in=blocked_user_entries.values_list("user", flat=True)).order_by("id")
 
         return blocked_users
 
@@ -338,7 +338,7 @@ class GearSingleViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
 
         :return: QuerySet
         """
-        return account_models.Gear.objects.filter(public=True)
+        return account_models.Gear.objects.filter(public=True).order_by("id")
 
     def patch(self, request, **kwargs):
         """
@@ -916,7 +916,7 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
         """
         try:
             user = account_models.User.objects.get(id=self.kwargs.get('user_id'))
-            return user.follower.all()
+            return user.follower.all().order_by("id")
 
         except ObjectDoesNotExist:
             raise NotFound('User does not exist')
@@ -1044,7 +1044,7 @@ class UserLocationViewSet(generics.ListCreateAPIView):
             query_params['coordinates__contained'] = rectangle
             del query_params["user_id"]
 
-        user_location = account_models.UserLocation.objects.filter(**query_params)
+        user_location = account_models.UserLocation.objects.filter(**query_params).order_by("id")
         return user_location
 
     def post(self, request, **kwargs):
@@ -1087,7 +1087,7 @@ class UserPhotosViewSet(generics.ListAPIView):
 
     @setup_eager_loading
     def get_queryset(self):
-        return photo_models.Photo.objects.all()
+        return photo_models.Photo.objects.all().order_by("id")
 
     def get(self, request, **kwargs):
         """
@@ -1417,7 +1417,8 @@ class UserStarredPhotosViewSet(generics.ListAPIView):
         auth_user = TokenAuthentication().authenticate(self.request)[0]
         stars = account_models.UserInterest.objects.filter(interest_type="star", user=auth_user)
 
-        return photo_models.Photo.objects.filter(id__in=stars.values_list("object_id", flat=True).distinct("object_id"))
+        return photo_models.Photo.objects.filter(
+            id__in=stars.values_list("object_id", flat=True).distinct("object_id")).order_by("id")
 
 
 class UserViewSet(generics.CreateAPIView):

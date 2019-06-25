@@ -48,7 +48,7 @@ class DevicesViewSet(LoggingMixin, FCMDeviceViewSet):
                 Q(user__last_name__icontains=query) | Q(user__social_name__icontains=query) |
                 Q(user__username__icontains=query))
 
-        return queryset
+        return queryset.order_by("id")
 
     def post(self, request):
         """
@@ -105,7 +105,7 @@ class ConversationViewSet(generics.ListAPIView):
 
         if not user_pk and not conversation_id and participants is not None:
             participants = User.objects.filter(id__in=participants)
-            # print(participants)
+
             conversations = Conversation.objects.filter(
                     participants__in=participants).distinct().annotate(
                     num_participants=Count('participants')).filter(num_participants__gte=participants.count())
@@ -116,7 +116,7 @@ class ConversationViewSet(generics.ListAPIView):
             if conversation_id:
                 conversations = conversations.filter(id=conversation_id)
 
-        return conversations
+        return conversations.order_by("id")
 
     def delete(self, request, **kwargs):
         """
