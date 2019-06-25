@@ -422,7 +422,14 @@ class PhotoViewSet(generics.ListCreateAPIView):
         """
         authenticated_user = TokenAuthentication().authenticate(request)[0]
         # user_logged_in.send(sender=self, request=request, user=user)
-        payload = query_dict_to_dict(request.data)
+        if "image" in request.data:
+            image = request.data["image"]
+            del request.data["image"]
+            payload = request.data.copy()
+            payload["image"] = image
+        else:
+            payload = request.data.copy()
+
         payload['user'] = authenticated_user.id
         # tags = payload.getlist("tags")
         tags = payload.get("tags")
