@@ -24,13 +24,13 @@ class TestPhotoSingleLikesViewSetDELETE(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
-        photo2.category = [category]
+        photo2.category.set([category])
         photo2.save()
 
         account_models.UserInterest.objects.create(content_object=photo1, user=user, interest_type='like')
@@ -67,7 +67,7 @@ class TestPhotoSingleLikesViewSetDELETE(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
         # Simulate auth
@@ -100,7 +100,7 @@ class TestPhotoSingleLikesViewSetDELETE(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
         # Simulate auth
@@ -163,13 +163,13 @@ class TestPhotoSingleLikesViewSetPOST(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
-        photo2.category = [category]
+        photo2.category.set([category])
         photo2.save()
 
         # Simulate auth
@@ -203,7 +203,7 @@ class TestPhotoSingleLikesViewSetPOST(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
         # Simulate auth
@@ -236,7 +236,7 @@ class TestPhotoSingleLikesViewSetPOST(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
         # Simulate auth

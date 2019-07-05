@@ -36,8 +36,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
-from social.apps.django_app.utils import load_strategy
-from social.apps.django_app.utils import load_backend
+from social_django.utils import load_strategy
+from social_django.utils import load_backend
 from social.exceptions import AuthAlreadyAssociated
 from urllib.parse import quote_plus
 import json
@@ -105,7 +105,7 @@ class AOVWebUserProfileView(generics.ListAPIView):
 
         user_id = self.kwargs.get("pk", None)
         if user_id:
-            user = account_models.User.objects.filter(id=user_id, is_active=True)
+            user = account_models.User.objects.filter(id=user_id, is_active=True).first()
             return account_models.Profile.objects.filter(user=user).order_by("id")
         else:
             return account_models.Profile.objects.none()
@@ -157,23 +157,6 @@ class AuthenticateViewSet(APIView):
             password = new_payload['password']
 
         if email and password:
-            # TODO remove this a few weeks after transition to Django backend
-            # This is for smoothly transitioning users to the new backend
-            try:
-                if 'set' in payload and 'auth' in payload:
-                    if payload['set'] and payload['auth'] == 'okgo':
-                        user = account_models.User.objects.get(email=payload['email'].lower())
-
-                        if not user.password:
-                            user.set_password(payload['password'])
-                            user.save()
-            except ObjectDoesNotExist:
-                response = get_default_response('401')
-                response.data['message'] = 'Authentication failed'
-                response.data['userMessage'] = 'Email or password incorrect. Please try again.'
-                return response
-            # END TODO
-
             try:
                 # Have to do this manually since authenticate does not support case insensitive email
                 user_model = get_user_model()
@@ -276,13 +259,12 @@ class BlockUserViewSet(generics.ListCreateAPIView):
         :return: Queryset of Blocked Users for a given User
         """
 
-
         accessing_user = TokenAuthentication().authenticate(self.request)[0]
         blocking_user_pk = self.kwargs.get("pk")
-        blocking_user = account_models.User.objects.filter(id=blocking_user_pk)
+        blocking_user = account_models.User.objects.filter(id=blocking_user_pk).first()
         blocked_users = account_models.User.objects.none()
 
-        if blocking_user.exists() and accessing_user.id == int(blocking_user_pk):
+        if blocking_user and accessing_user.id == int(blocking_user_pk):
             blocked_user_entries = account_models.Blocked.objects.filter(blocked_by=blocking_user)
             blocked_users = account_models.User.objects.filter(
                 id__in=blocked_user_entries.values_list("user", flat=True)).order_by("id")
@@ -299,15 +281,12 @@ class BlockUserViewSet(generics.ListCreateAPIView):
         """
 
         blocking_user_pk = kwargs.get("pk")
-        blocking_user = account_models.User.objects.filter(id=blocking_user_pk)
+        blocking_user = account_models.User.objects.filter(id=blocking_user_pk).first()
         user_getting_blocked = request.data.get("user_id")
         remove_block = request.data.get("remove")
         response = get_default_response('200')
 
-        if blocking_user.exists():
-            # Check if the user the block is for is already blocked by the blocking user
-            blocking_user = blocking_user.first()
-
+        if blocking_user:
             # If this is a request to remove the block, process that
             if remove_block:
                 blocked_entry = account_models.Blocked.objects.filter(
@@ -451,7 +430,6 @@ class GearViewSet(generics.ListCreateAPIView):
         return response
 
 
-# class MeViewSet(generics.RetrieveAPIView, generics.UpdateAPIView):
 class MeViewSet(generics.GenericAPIView):
     """
     /api/me
@@ -553,7 +531,11 @@ class MeViewSet(generics.GenericAPIView):
 
         # Update user
         for item in payload:
-            setattr(user, item, payload[item])
+            # Can't do a direct assignment to forward side of M2M, have to use obj.set() instead
+            if item == "gear":
+                user.gear.set(payload[item])
+            else:
+                setattr(user, item, payload[item])
         user.save()
 
         serializer = account_serializers.UserSerializer(user)
@@ -892,9 +874,9 @@ class UserFollowingViewSet(generics.ListAPIView):
 
         :return: Queryset
         """
-        accessing_user = account_models.User.objects.filter(id=self.kwargs.get('user_id'))
+        accessing_user = account_models.User.objects.filter(id=self.kwargs.get('user_id')).first()
 
-        if accessing_user.exists():
+        if accessing_user:
             # Gather the users he is following
             following = account_models.User.objects.filter(follower=accessing_user).order_by('-created_at')
             return following
@@ -1233,7 +1215,7 @@ class UserProfileViewSet(generics.RetrieveAPIView):
         :param kwargs:
         :return: Response object
         """
-        user = account_models.User.objects.filter(id=kwargs.get('pk'))
+        user = account_models.User.objects.filter(id=kwargs.get('pk')).first()
         profile = account_models.Profile.objects.filter(user=user).first()
 
         if profile and user:

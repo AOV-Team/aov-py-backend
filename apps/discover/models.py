@@ -66,8 +66,8 @@ class StateSponsor(common_models.EditMixin):
     Model to link individual Sponsors to a State.
     """
 
-    sponsor = models.ForeignKey(Sponsor)
-    state = models.ForeignKey(State)
+    sponsor = models.ForeignKey(Sponsor, on_delete=models.CASCADE)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
     sponsorship_start = models.DateTimeField()
     sponsorship_end = models.DateTimeField()
 
@@ -86,7 +86,7 @@ class Downloader(common_models.EditMixin):
     name = models.CharField(max_length=64)
     email = models.EmailField()
     location = models.CharField(max_length=128)
-    state_sponsor = models.ForeignKey(StateSponsor)
+    state_sponsor = models.ForeignKey(StateSponsor, on_delete=models.CASCADE)
 
     def __str__(self):
         return "{} - {}".format(self.email, self.name)
@@ -117,8 +117,8 @@ class StatePhotographer(common_models.EditMixin):
     Model to link individual Photographers to the different States they will be featured for
     """
 
-    photographer = models.ForeignKey(Photographer)
-    state = models.ForeignKey(State)
+    photographer = models.ForeignKey(Photographer, on_delete=models.CASCADE)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
     feature_start = models.DateTimeField()
     feature_end = models.DateTimeField()
 
@@ -135,8 +135,8 @@ class StatePhoto(common_models.EditMixin):
     Model to link AoV app Photos a State on discover tab of website
     """
 
-    state = models.ForeignKey(State)
-    photo = models.ForeignKey(Photo)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    photo = models.ForeignKey(Photo, on_delete=models.CASCADE)
 
     def __str__(self):
         return "Photo for {}".format(self.state.name)

@@ -115,8 +115,8 @@ class TestPhotoSingleViewSetGET(TestCase):
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
-                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
+        photo.gear.set([account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
+                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')])
         photo.save()
 
         # Simulate auth
@@ -197,8 +197,8 @@ class TestPhotoSingleViewSetGET(TestCase):
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
-                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')]
+        photo.gear.set([account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II'),
+                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II')])
         photo.save()
 
         # Simulate auth
@@ -241,7 +241,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
+        photo.category.set([category])
         photo.save()
 
         # Create some gear
@@ -294,7 +294,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
+        photo.category.set([category])
         photo.save()
 
         # Simulate auth
@@ -337,8 +337,8 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
-        photo.photo_feed = [feed]
+        photo.category.set([category])
+        photo.photo_feed.set([feed])
         photo.save()
 
         # Simulate auth
@@ -379,9 +379,9 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
-        photo.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II Test'),
-                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II Test')]
+        photo.category.set([category])
+        photo.gear.set([account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II Test'),
+                      account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II Test')])
         photo.save()
 
         # Create some gear
@@ -433,10 +433,9 @@ class TestPhotoSingleViewSetPATCH(TestCase):
             .create_or_update(name='Landscape', classification_type='category')
         feed = photo_models.PhotoFeed.objects.create_or_update(name='Night')
 
-        photo = photo_models \
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
+        photo.category.set([category])
         photo.save()
 
         # Simulate auth
@@ -471,14 +470,14 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         # Test data
         user = account_models.User.objects.create_user(email='mrtest@mypapaya.io', password='WhoAmI', username='aovyy')
 
-        category = photo_models.PhotoClassification.objects \
-            .create_or_update(name='Landscape', classification_type='category')
+        category = photo_models.PhotoClassification.objects.create_or_update(
+            name='Landscape', classification_type='category')
         feed = photo_models.PhotoFeed.objects.create_or_update(name='Night')
 
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
+        photo.category.set([category])
         photo.save()
 
         # Simulate auth
@@ -518,7 +517,7 @@ class TestPhotoSingleViewSetPATCH(TestCase):
         photo = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
+        photo.category.set([category])
         photo.save()
 
         # Create some gear

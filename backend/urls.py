@@ -14,7 +14,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 
-from aov_mkdocs import views as doc_views
 from apps.account import views as account_views
 from apps.analytic import views as analytic_views
 from apps.communication import views as communication_views
@@ -120,6 +119,7 @@ urlpatterns = [
     url(r'api/logging/user_photos/(?P<user_id>[0-9^/]+)$', account_views.LoggedUserPhotosViewSet.as_view()),
 
     # admin
+
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     url(r'^admin/', admin.site.urls),
@@ -157,8 +157,8 @@ urlpatterns = [
 
 # DEBUG URLs
 if settings.DEBUG:
-    import debug_toolbar
+    # import debug_toolbar
 
-    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
+    # urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += [url(r'api/(?P<user_id>[0-9^/]+)/sample_login$', account_views.SampleLoginViewSet.as_view())]
+    # urlpatterns += [url(r'api/(?P<user_id>[0-9^/]+)/sample_login$', account_views.SampleLoginViewSet.as_view())]

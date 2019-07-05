@@ -23,7 +23,6 @@ from django.shortcuts import render
 from django.utils import timezone
 from fcm_django.models import FCMDevice
 from fcm_django.fcm import FCMError
-from push_notifications.apns import APNSServerError
 from push_notifications.models import APNSDevice
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -227,7 +226,7 @@ class GalleryRetrieveViewSet(generics.ListAPIView):
         }
 
         if user_id:
-            gallery_user = account_models.User.objects.filter(id=user_id)
+            gallery_user = account_models.User.objects.filter(id=user_id).first()
         else:
             gallery_user = authenticated_user
             query_params["public"] = False
@@ -546,7 +545,7 @@ class PhotoAppTopPhotosViewSet(generics.ListAPIView):
             return aov_web_images
 
         if page == "picks":
-            picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks")
+            picks_feed = photo_models.PhotoFeed.objects.filter(name="AOV Picks").first()
             aov_picks = photo_models.Photo.objects.filter(
                 photo_feed=picks_feed, public=True,
                 aov_feed_add_date__isnull=False).distinct().order_by("-aov_feed_add_date")
@@ -685,14 +684,16 @@ class PhotoClassificationPhotosViewSet(generics.ListAPIView):
             photo_classification_id = self.kwargs.get('photo_classification_id')
 
             if classification_type and classification_type == "tag":
-                classification = photo_models.PhotoClassification.objects.filter(id=photo_classification_id,
-                                                                              classification_type=classification_type)
-                return photo_models.Photo.objects.filter(
-                    tag=classification, public=True).distinct().order_by(order_by)[:length]
+                classification = photo_models.PhotoClassification.objects.filter(
+                    id=photo_classification_id, classification_type=classification_type).first()
+                if classification:
+                    return photo_models.Photo.objects.filter(
+                        tag=classification, public=True).distinct().order_by(order_by)[:length]
+                return photo_models.Photo.objects.none().order_by("id")
 
             elif classification_type and classification_type == "category":
-                classification = photo_models.PhotoClassification.objects.filter(id=photo_classification_id,
-                                                                              classification_type=classification_type)
+                classification = photo_models.PhotoClassification.objects.filter(
+                    id=photo_classification_id, classification_type=classification_type).first()
                 return photo_models.Photo.objects.filter(
                     category=classification, public=True).distinct().order_by(order_by)[:length]
 
@@ -978,7 +979,7 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             new_comment = photo_models.PhotoComment.objects.create_or_update(**serializer_payload)
 
             # After creating the comment, send a push notification to the photo owner
-            owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
+            owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True)).first()
             owning_apns = APNSDevice.objects.filter(user=owning_user)
 
             # Check for an existing FCM registry
@@ -986,15 +987,15 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
             if not fcm_device.exists() and owning_apns.exists():
                 fcm_token = communication_tasks.update_device(owning_apns)
                 if fcm_token:
-                    fcm_device = FCMDevice.objects.create(user=owning_user.first(),
+                    fcm_device = FCMDevice.objects.create(user=owning_user,
                                                           type="ios", registration_id=fcm_token)
                     fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
-            message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
+            message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.username)
 
             # This check is here to make sure the record is only created for devices that we have. No APNS means no
             # permission for notifications on the device.
-            if fcm_device.exists() and auth_user.username != owning_user.first().username:
+            if fcm_device.exists() and auth_user.username != owning_user.username:
 
                 try:
                     communication_tasks.send_push_notification(message, fcm_device)
@@ -1013,20 +1014,20 @@ class PhotoSingleCommentViewSet(generics.ListCreateAPIView):
                 new_comment.save()
 
                 for mentioned_user in mentioned:
-                    mentioned_user = account_models.User.objects.filter(username=mentioned_user)
+                    mentioned_user = account_models.User.objects.filter(username=mentioned_user).first()
                     mentioned_device = APNSDevice.objects.filter(user=mentioned_user)
                     mentioned_fcm_device = FCMDevice.objects.filter(user=mentioned_user)
 
                     if not mentioned_fcm_device.exists() and mentioned_device.exists():
                         fcm_token = communication_tasks.update_device(mentioned_device)
                         if fcm_token:
-                            mentioned_fcm_device = FCMDevice.objects.create(user=mentioned_user.first(), type="ios",
+                            mentioned_fcm_device = FCMDevice.objects.create(user=mentioned_user, type="ios",
                                                                   registration_id=fcm_token)
                             mentioned_fcm_device = FCMDevice.objects.filter(id=mentioned_fcm_device.id)
 
-                    if mentioned_fcm_device.exists() and (mentioned_user.first().username != auth_user.username):
+                    if mentioned_fcm_device.exists() and (mentioned_user.username != auth_user.username):
                         message = "{} mentioned you in a comment, {}.".format(auth_user.username,
-                                                                              mentioned_user.first().username)
+                                                                              mentioned_user.username)
 
                         try:
                             communication_tasks.send_push_notification(message, mentioned_fcm_device)
@@ -1080,7 +1081,7 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
         mentioned = data.get('mentions', None)
 
 
-        photo = photo_models.Photo.objects.filter(id=photo_id)
+        photo = photo_models.Photo.objects.filter(id=photo_id).first()
         photo_comment = photo_models.PhotoComment.objects.filter(photo=photo, id=comment_id)
 
         if photo_comment.exists() and reply:
@@ -1094,7 +1095,7 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
             new_comment = photo_models.PhotoComment.objects.create_or_update(**serializer_payload)
 
             # After creating the comment, send a push notification to the photo owner
-            owning_user = account_models.User.objects.filter(id__in=photo.values_list("user", flat=True))
+            owning_user = account_models.User.objects.filter(id=photo.user.id).first()
             owning_apns = APNSDevice.objects.filter(user=owning_user)
 
             # Check for an existing FCM registry
@@ -1102,14 +1103,14 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
             if not fcm_device.exists() and owning_apns.exists():
                 fcm_token = communication_tasks.update_device(owning_apns)
                 if fcm_token:
-                    fcm_device = FCMDevice.objects.create(user=owning_user.first(),
+                    fcm_device = FCMDevice.objects.create(user=owning_user,
                                                           type="ios", registration_id=fcm_token)
                     fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
-            message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.first().username)
+            message = "{} has commented on your artwork, {}.".format(auth_user.username, owning_user.username)
 
             if fcm_device.exists():
-                if auth_user.username != owning_user.first().username:
+                if auth_user.username != owning_user.username:
                     try:
                         communication_tasks.send_push_notification(message, fcm_device)
 
@@ -1124,7 +1125,8 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
                         pass
 
             # Send a push notification to the person being replied to, as well.
-            original_commenter = account_models.User.objects.filter(id__in=photo_comment.values_list("user", flat=True))
+            original_commenter = account_models.User.objects.filter(
+                id__in=photo_comment.values_list("user", flat=True)).first()
             original_commenter_apns = APNSDevice.objects.filter(user=original_commenter)
 
             # Check for an existing FCM registry
@@ -1132,19 +1134,19 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
             if not original_commenter_fcm_device.exists() and original_commenter_apns.exists():
                 fcm_token = communication_tasks.update_device(original_commenter_apns)
                 if fcm_token:
-                    original_commenter_fcm_device = FCMDevice.objects.create(user=original_commenter.first(),
+                    original_commenter_fcm_device = FCMDevice.objects.create(user=original_commenter,
                                                                              type="ios", registration_id=fcm_token)
                     original_commenter_fcm_device = FCMDevice.objects.filter(id=original_commenter_fcm_device.id)
 
-            message = "{} replied to your comment, {}.".format(auth_user.username, original_commenter.first().username)
+            message = "{} replied to your comment, {}.".format(auth_user.username, original_commenter.username)
 
-            if auth_user.username != original_commenter.first().username:
+            if auth_user.username != original_commenter.username:
                 communication_tasks.send_push_notification(message, original_commenter_fcm_device)
 
                 # Create the record of the notification being sent
                 PushNotificationRecord.objects.create(message=message,
                                                       fcm_receiver=original_commenter_fcm_device.first(),
-                                                      action="C", content_object=photo.first(), sender=auth_user)
+                                                      action="C", content_object=photo, sender=auth_user)
 
                 # Delete the APNs device for easier deprecation later
                 original_commenter_apns.delete()
@@ -1154,20 +1156,20 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
                 new_comment.save()
 
                 for mentioned_user in mentioned:
-                    mentioned_user = account_models.User.objects.filter(username=mentioned_user)
+                    mentioned_user = account_models.User.objects.filter(username=mentioned_user).first()
                     mentioned_device = APNSDevice.objects.filter(user=mentioned_user)
                     mentioned_fcm_device = FCMDevice.objects.filter(user=mentioned_user)
 
                     if not mentioned_fcm_device.exists() and mentioned_device.exists():
                         fcm_token = communication_tasks.update_device(mentioned_device)
                         if fcm_token:
-                            mentioned_fcm_device = FCMDevice.objects.create(user=mentioned_user.first(), type="ios",
+                            mentioned_fcm_device = FCMDevice.objects.create(user=mentioned_user, type="ios",
                                                                             registration_id=fcm_token)
                             mentioned_fcm_device = FCMDevice.objects.filter(id=mentioned_fcm_device.id)
 
-                    if mentioned_fcm_device.exists() and (mentioned_user.first().username != auth_user.username):
+                    if mentioned_fcm_device.exists() and (mentioned_user.username != auth_user.username):
                         message = "{} mentioned you in a comment, {}.".format(auth_user.username,
-                                                                              mentioned_user.first().username)
+                                                                              mentioned_user.username)
 
                         try:
                             communication_tasks.send_push_notification(message,
@@ -1175,7 +1177,7 @@ class PhotoSingleCommentReplyViewSet(generics.CreateAPIView):
                             # Create the record of the notification being sent
                             PushNotificationRecord.objects.create(message=message,
                                                                   fcm_receiver=mentioned_fcm_device.first(),
-                                                                  action="T", content_object=photo.first(),
+                                                                  action="T", content_object=photo,
                                                                   sender=auth_user)
 
                             # Delete the APNs device for easier deprecation later
@@ -1310,7 +1312,7 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
 
                 # Send a push notification for a Star (saved photo) to the photo owning user
                 if user_interest == "star":
-                    owning_user = account_models.User.objects.filter(id=photo.user.id)
+                    owning_user = account_models.User.objects.filter(id=photo.user.id).first()
                     owning_apns = APNSDevice.objects.filter(user=owning_user)
 
                     # Check for an existing FCM registry
@@ -1318,11 +1320,11 @@ class PhotoSingleInterestsViewSet(generics.DestroyAPIView, generics.CreateAPIVie
                     if not fcm_device.exists() and owning_apns.exists():
                         fcm_token = communication_tasks.update_device(owning_apns)
                         if fcm_token:
-                            fcm_device = FCMDevice.objects.create(user=owning_user.first(), type="ios",
+                            fcm_device = FCMDevice.objects.create(user=owning_user, type="ios",
                                                                   registration_id=fcm_token)
                             fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
-                    message = "Your artwork has been saved by another user, {}.".format(owning_user.first().username)
+                    message = "Your artwork has been saved by another user, {}.".format(owning_user.username)
 
                     # This check is here to make sure the record is only created for devices that we have. No APNS means no
                     # permission for notifications on the device.
@@ -1407,7 +1409,7 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                 # Send a push notification ONLY for upvote, and keep a record of it
                 if send_notification:
                     auth_user = TokenAuthentication().authenticate(request)[0]
-                    owning_user = account_models.User.objects.filter(id=photo.user.id)
+                    owning_user = account_models.User.objects.filter(id=photo.user.id).first()
                     owning_apns = APNSDevice.objects.filter(user=owning_user)
 
                     # Check for an existing FCM registry
@@ -1415,12 +1417,12 @@ class PhotoSingleVotesViewSet(generics.UpdateAPIView):
                     if not fcm_device.exists() and owning_apns.exists():
                         fcm_token = communication_tasks.update_device(owning_apns)
                         if fcm_token:
-                            fcm_device = FCMDevice.objects.create(user=owning_user.first(), type="ios",
+                            fcm_device = FCMDevice.objects.create(user=owning_user, type="ios",
                                                                   registration_id=fcm_token)
                             fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
                     message = "{} has upvoted your artwork, {}.".format(
-                        auth_user.username, owning_user.first().username)
+                        auth_user.username, owning_user.username)
 
                     # This check is here to make sure the record is only created for devices that we have. No APNS means no
                     # permission for notifications on the device.

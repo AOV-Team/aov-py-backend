@@ -22,7 +22,7 @@ class TestMeViewSetGET(TestCase):
 
         user = account_models.User.objects.create_user(email='test@test.com', social_name='aeon', username='aov_hov',
                                                        gender='Male')
-        user.gear = [gear_1, gear_2]
+        user.gear.set([gear_1, gear_2])
 
         # Simulate auth
         token = test_helpers.get_token_for_user(user)
@@ -95,9 +95,9 @@ class TestMeViewSetPATCH(TestCase):
         :return: None
         """
         # Create data
-        user = account_models.User.objects\
-            .create_user(avatar=Photo(open('apps/common/test/data/photos/cover.jpg', 'rb')), age=23,
-                         email='test@test.com', social_name='aeon', username='aov_hov')
+        user = account_models.User.objects.create_user(
+            avatar=Photo(open('apps/common/test/data/photos/cover.jpg', 'rb')), age=23,
+            email='test@test.com', social_name='aeon', username='aov_hov')
 
         self.assertIsNotNone(user.avatar)
         avatar = user.avatar
@@ -135,8 +135,8 @@ class TestMeViewSetPATCH(TestCase):
         :return: None
         """
         # Create data
-        user = account_models.User.objects\
-            .create_user(age=23, email='test@test.com', social_name='aeon', username='aov_hov')
+        user = account_models.User.objects.create_user(
+            age=23, email='test@test.com', social_name='aeon', username='aov_hov')
 
         self.assertIsNotNone(user.avatar)
         avatar = user.avatar
@@ -177,8 +177,9 @@ class TestMeViewSetPATCH(TestCase):
         user = account_models.User.objects.create_user(age=23, email='test@test.com', social_name='aeon',
                                                        username='aov_hov')
         user.save()
-        user.gear = [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II Test'),
-                     account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II Test')]
+        user.gear.set(
+            [account_models.Gear.objects.create_or_update(item_make='Canon', item_model='EOS 5D Mark II Test'),
+             account_models.Gear.objects.create_or_update(item_make='Sony', item_model='a99 II Test')])
         user.save()
 
         # Gear

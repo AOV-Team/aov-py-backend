@@ -9,8 +9,8 @@ from django.utils import timezone
 
 
 class Blocked(common_models.EditMixin):
-    user = models.ForeignKey("User", related_name="blocked")
-    blocked_by = models.ForeignKey("User", related_name="blocked_by")
+    user = models.ForeignKey("User", related_name="blocked", on_delete=models.CASCADE)
+    blocked_by = models.ForeignKey("User", related_name="blocked_by", on_delete=models.CASCADE)
 
 
 class GearManager(models.Manager):
@@ -163,7 +163,7 @@ class UserSessionManager(models.Manager):
 
 
 class UserSession(common_models.EditMixin):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     session_key = models.CharField(max_length=128)
 
     objects = UserSessionManager()
@@ -189,7 +189,7 @@ class ProfileManager(models.Manager):
 
 
 class Profile(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
     cover_image = models.ImageField(upload_to=common_models.get_uploaded_file_path, blank=True, null=True)
 
@@ -217,10 +217,10 @@ class UserInterest(models.Model):
         ('star', 'Star'),
     )
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     interest_type = models.CharField(max_length=10, choices=INTEREST_TYPE_CHOICES)
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -235,7 +235,7 @@ class UserLocation(common_models.GeoEditMixin):
     """
         Model used to store the history of a users location data
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     coordinates = geo_models.PointField(srid=4326, null=True, blank=True)  # Lat/long
     location = models.CharField(max_length=255, blank=True, null=True)

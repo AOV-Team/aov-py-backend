@@ -3,10 +3,10 @@ from apps.photo import forms as photo_forms
 from apps.photo import models as photo_models
 from apps.photo.photo import Photo
 from apps.utils.models import UserAction
+from django import urls
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
-from django.core import urlresolvers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from guardian.admin import GuardedModelAdmin
@@ -63,7 +63,7 @@ class FlaggedPhotoAdmin(admin.ModelAdmin):
 
     def user_info(self, obj):
         if obj.user:
-            link = urlresolvers.reverse("admin:account_user_change", args=[obj.user.id])
+            link = urls.reverse("admin:account_user_change", args=[obj.user.id])
             return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
         else:
             return '--empty--'
@@ -284,7 +284,7 @@ class PhotoAdmin(GuardedModelAdmin):
 
     def user_info(self, obj):
         if obj.user:
-            link = urlresolvers.reverse("admin:account_user_change", args=[obj.user.id])
+            link = urls.reverse("admin:account_user_change", args=[obj.user.id])
             return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
         else:
             return '--empty--'
@@ -373,7 +373,7 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
             photo_feeds += str(photo_feed.id) + ','
 
         # Since we had to disable link on image, this is the work-around
-        link = urlresolvers.reverse("admin:photo_photo_change", args=[obj.id])
+        link = urls.reverse("admin:photo_photo_change", args=[obj.id])
         edit_link = u'<a class="action" href="{}"><span class="fa fa-pencil-square"></span></a>'.format(link)
 
         return u'<span data-content-type="photos" data-id="{}" data-feeds="{}" data-current-feed="{}"' \
@@ -399,7 +399,7 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
 
     def user_info(self, obj):
         if obj.user:
-            link = urlresolvers.reverse("admin:account_user_change", args=[obj.user.id])
+            link = urls.reverse("admin:account_user_change", args=[obj.user.id])
             return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
         else:
             return '--empty--'
@@ -469,7 +469,7 @@ class StarredPhotoAdmin(admin.ModelAdmin):
 
     def user_info(self, obj):
         if obj.user:
-            link = urlresolvers.reverse("admin:account_user_change", args=[obj.user.id])
+            link = urls.reverse("admin:account_user_change", args=[obj.user.id])
             return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
         else:
             return '--empty--'

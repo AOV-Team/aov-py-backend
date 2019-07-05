@@ -2,8 +2,9 @@ from apps.account import models as account_models
 from apps.account import password
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
+from unittest import mock
 import redis
 
 
@@ -155,6 +156,9 @@ class TestAuthenticateResetViewSetPATCH(TestCase):
         self.assertEquals(request.status_code, 404)
 
 
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True,
+                   CELERY_DEFAULT_QUEUE='memory',
+                   EMAIL_BACKEND='django.core.mail.backends.dummy.EmailBackend')
 class TestAuthenticateResetViewSetPOST(TestCase):
     """
     Test that we can request to reset password
@@ -182,12 +186,13 @@ class TestAuthenticateResetViewSetPOST(TestCase):
             'email': user.email
         }
 
-        request = client.post('/api/auth/reset', data=payload, format='json')
+        with mock.patch('django.core.mail.backends.dummy.EmailBackend.send_messages') as p:
 
-        self.assertEquals(request.status_code, 201)
+            request = client.post('/api/auth/reset', data=payload, format='json')
 
-        # Check that an email was sent
-        self.assertEquals(len(mail.outbox), 1)
+            self.assertEquals(request.status_code, 201)
+
+            self.assertTrue(p.called)
 
     def test_authenticate_reset_view_set_post_already_requested(self):
         """
@@ -197,7 +202,7 @@ class TestAuthenticateResetViewSetPOST(TestCase):
         """
         # Create test data
         user = account_models.User.objects.create_user(email='test@test.com', username='aov1')
-        code = password.create_password_reset_code(user)
+        password.create_password_reset_code(user)
 
         client = APIClient()
 
@@ -205,12 +210,13 @@ class TestAuthenticateResetViewSetPOST(TestCase):
             'email': user.email
         }
 
-        request = client.post('/api/auth/reset', data=payload, format='json')
+        with mock.patch('django.core.mail.backends.dummy.EmailBackend.send_messages') as p:
 
-        self.assertEquals(request.status_code, 201)
+            request = client.post('/api/auth/reset', data=payload, format='json')
 
-        # Check that an email was sent
-        self.assertEquals(len(mail.outbox), 1)
+            self.assertEquals(request.status_code, 201)
+
+            self.assertTrue(p.called)
 
     def test_authenticate_reset_view_set_post_different_case(self):
         """
@@ -228,12 +234,13 @@ class TestAuthenticateResetViewSetPOST(TestCase):
             'email': user.email.lower()
         }
 
-        request = client.post('/api/auth/reset', data=payload, format='json')
+        with mock.patch('django.core.mail.backends.dummy.EmailBackend.send_messages') as p:
 
-        self.assertEquals(request.status_code, 201)
+            request = client.post('/api/auth/reset', data=payload, format='json')
 
-        # Check that an email was sent
-        self.assertEquals(len(mail.outbox), 1)
+            self.assertEquals(request.status_code, 201)
+
+            self.assertTrue(p.called)
 
     def test_authenticate_reset_view_set_post_no_email(self):
         """

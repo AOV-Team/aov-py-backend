@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'apps.analytic',
     'apps.communication',
     'apps.discover',
-    'apps.marketplace',
+    'apps.marketplace', # Development halted
     'apps.podcast',
     'apps.photo.apps.PhotoConfig',
     'apps.quote',
@@ -72,22 +72,22 @@ INSTALLED_APPS = [
     'push_notifications',
     'rest_framework',
     'rest_framework.authtoken',
-    'social.apps.django_app.default',
+    'social_django',
     'rest_framework_tracking',
     'fcm_django',
     'rangefilter',
     'aov_mkdocs',
 ]
 
-if DEBUG:
-    INSTALLED_APPS += ['debug_toolbar']
+# if DEBUG:
+#     INSTALLED_APPS += ['debug_toolbar']
 
 SITE_ID = 1
 
 MIDDLEWARE = list()
 
-if DEBUG:
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+# if DEBUG:
+#     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 MIDDLEWARE += [
     'django.middleware.security.SecurityMiddleware',
@@ -106,24 +106,116 @@ ROOT_URLCONF = 'backend.urls'
 
 # Admin
 
+JET_DEFAULT_THEME = 'default'
+
+JET_THEMES = [
+    {
+        'theme': 'default', # theme folder name
+        'color': '#47bac1', # color of the theme's button in user menu
+        'title': 'Default' # theme title
+    },
+    {
+        'theme': 'green',
+        'color': '#44b78b',
+        'title': 'Green'
+    },
+    {
+        'theme': 'light-green',
+        'color': '#2faa60',
+        'title': 'Light Green'
+    },
+    {
+        'theme': 'light-violet',
+        'color': '#a464c4',
+        'title': 'Light Violet'
+    },
+    {
+        'theme': 'light-blue',
+        'color': '#5EADDE',
+        'title': 'Light Blue'
+    },
+    {
+        'theme': 'light-gray',
+        'color': '#222',
+        'title': 'Light Gray'
+    }
+]
+
 JET_INDEX_DASHBOARD = 'apps.common.dashboard.AOVDashboard'
 
 JET_SIDE_MENU_COMPACT = True
 
-JET_SIDE_MENU_CUSTOM_APPS = [
-    ('account', ['__all__']),
-    ('photo', ['__all__']),
-    ('utils', ['__all__']),
-    ('authtoken', ['__all__']),
-    ('auth', ['__all__']),
-    ('communication', ['__all__']),
-    ('discover', ['__all__']),
-    ('podcast', ['__all__']),
-    ('quote', ['__all__']),
-    ('dbmail', ['MailTemplate']),
-    ('push_notifications', ['APNSDevice']),
-    ('fcm_django', ['FCMDevice']),
-    ('rest_framework_tracking', ['APIRequestLog']),
+JET_SIDE_MENU_ITEMS = [
+    {'label': 'Account',
+    'app_label': 'account', 'items': [
+        {'name': 'gear'},
+        {'name': 'profile'},
+        {'name': 'starreduser'},
+        {'name': 'userinterest'},
+        {'name': 'userlocation'},
+        {'name': 'usersession'},
+        {'name': 'user'},
+    ]},
+    {'app_label': 'authtoken', 'items': [
+        {'name': 'token'},
+    ]},
+    {'app_label': 'auth', 'items': [
+        {'name': 'group'},
+    ]},
+    {'app_label': 'communication', 'items': [
+        {'name': 'conversation'},
+        {'name': 'pushnotificationrecord'},
+        {'name': 'pushmessage'},
+    ]},
+    {'app_label': 'discover', 'items': [
+        {'name': 'downloader'},
+        {'name': 'photographer'},
+        {'name': 'sponsor'},
+        {'name': 'statephotographer'},
+        {'name': 'statephoto'},
+        {'name': 'statesponsor'},
+        {'name': 'state'},
+    ]},
+    {'app_label': 'fcm_django', 'items': [
+        {'name': 'fcmdevice'},
+    ]},
+    {'app_label': 'guardian', 'items': [
+        {'name': 'userobjectpermission'},
+    ]},
+    {'app_label': 'photo', 'items': [
+        {'name': 'photofeedphoto'},
+        {'name': 'photofeed'},
+        {'name': 'flaggedphoto'},
+        {'name': 'gallery'},
+        {'name': 'photocomment'},
+        {'name': 'photoclassification'},
+        {'name': 'photo'},
+        {'name': 'starredphoto'},
+    ]},
+    {'app_label': 'podcast', 'items': [
+        {'name': 'camera'},
+        {'name': 'episode'},
+        {'name': 'getfeaturedrequest'},
+        {'name': 'podcastimage'},
+        {'name': 'requester'},
+    ]},
+    {'app_label': 'push_notifications', 'items': [
+        {'name': 'apnsdevice'},
+    ]},
+    {'app_label': 'quote', 'items': [
+        {'name': 'quotesubscriber'},
+        {'name': 'quote'},
+    ]},
+    {'app_label': 'rest_framework_tracking', 'items': [
+        {'name': 'apirequestlog'},
+    ]},
+    {'app_label': 'utils', 'items': [
+        {'name': 'feedback'},
+        {'name': 'useraction'},
+    ]},
+    {'app_label': 'dbmail', 'items': [
+        {'name': 'MailTemplate'},
+    ]}
 ]
 
 
@@ -164,7 +256,7 @@ else:
     ]
 
 AUTHENTICATION_BACKENDS = (
-    'social.backends.facebook.Facebook2OAuth2',
+    'social.backends.facebook.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
@@ -198,6 +290,11 @@ CELERYBEAT_SCHEDULE = {
 
 # Communication
 
+DB_MAILER_SHOW_CONTEXT = True
+DB_MAILER_ALLOWED_MODELS_ON_ADMIN = [
+    'MailTemplate'
+]
+
 EMAIL_BACKEND = EMAIL['EMAIL_BACKEND']
 EMAIL_USE_TLS = EMAIL['EMAIL_USE_TLS']
 EMAIL_HOST = EMAIL['EMAIL_HOST']
@@ -206,6 +303,8 @@ EMAIL_HOST_PASSWORD = EMAIL['EMAIL_HOST_PASSWORD']
 EMAIL_HOST_USER = EMAIL['EMAIL_HOST_USER']
 DEFAULT_FROM_EMAIL = EMAIL['DEFAULT_FROM_EMAIL']
 SERVER_EMAIL = EMAIL['SERVER_EMAIL']
+
+CACHES = CACHES
 
 FCM_DJANGO_SETTINGS = FCM_DJANGO_SETTINGS
 

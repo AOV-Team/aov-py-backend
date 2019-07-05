@@ -24,7 +24,7 @@ class TestUserFollowersViewSetGET(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        target_user.follower = [user_1, user_2]
+        target_user.follower.set([user_1, user_2])
         target_user.save()
 
         # Simulate auth
@@ -79,7 +79,7 @@ class TestUserFollowersViewSetGET(TestCase):
         user_2 = account_models.User.objects.create_user(email='prince@aov.com', social_name='@wbp', username='wbp')
 
         # Follow target user
-        target_user.follower = [user_1, user_2]
+        target_user.follower.set([user_1, user_2])
         target_user.save()
 
         # Simulate auth
@@ -114,7 +114,7 @@ class TestUserFollowersViewSetGET(TestCase):
         user_2 = account_models.User.objects.create_user(email='prince@aov.com', social_name='@wbp', username='wbp')
 
         # Follow target user
-        target_user.follower = [user_1, user_2]
+        target_user.follower.set([user_1, user_2])
         target_user.save()
 
         # Get data from endpoint
@@ -154,7 +154,7 @@ class TestUserFollowersViewSetPOST(TestCase):
             type="ios")
 
         # Follow target user
-        target_user.follower = [user_1]
+        target_user.follower.set([user_1])
         target_user.save()
 
         # Simulate auth
@@ -201,7 +201,7 @@ class TestUserFollowersViewSetPOST(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        target_user.follower = [user_1]
+        target_user.follower.set([user_1])
         target_user.save()
 
         # Simulate auth
@@ -240,7 +240,7 @@ class TestUserFollowersViewSetPOST(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        target_user.follower = [access_user]
+        target_user.follower.set([access_user])
         target_user.save()
 
         # Simulate auth
@@ -318,7 +318,7 @@ class TestUserFollowersViewSetPOST(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        target_user.follower = [access_user]
+        target_user.follower.set([access_user])
         target_user.save()
 
         # Simulate auth

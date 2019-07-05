@@ -18,6 +18,6 @@ def send_transactional_email(user, slug, **data):
     :return:
     """
     try:
-        send_db_mail(slug, user.email, data)
+        send_db_mail(slug, user.email, data, use_celery=False)
     except ImportError:
         raise CommunicationException('Django mail settings may be incorrectly configured.')

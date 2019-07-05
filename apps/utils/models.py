@@ -12,10 +12,10 @@ class UserAction(models.Model):
         ('photo_imp', 'Photo Impression'),
     )
 
-    user = models.ForeignKey(account_models.User)
+    user = models.ForeignKey(account_models.User, on_delete=models.CASCADE)
     action = models.CharField(max_length=32, choices=ACTION_CHOICES)
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -32,7 +32,7 @@ class Feedback(EditMixin):
     message = models.TextField()
     reply = models.TextField(blank=True, null=True)
     reply_timestamp = models.DateTimeField(blank=True, null=True)
-    user = models.ForeignKey(account_models.User)
+    user = models.ForeignKey(account_models.User, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "User Feedback"

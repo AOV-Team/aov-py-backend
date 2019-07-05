@@ -25,7 +25,7 @@ class TestMeActionsViewSetPOST(TestCase):
 
         photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
+        photo.category.set([category])
         photo.save()
 
         # Simulate auth
@@ -59,7 +59,7 @@ class TestMeActionsViewSetPOST(TestCase):
 
         photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
+        photo.category.set([category])
         photo.save()
 
         # Simulate auth
@@ -102,7 +102,7 @@ class TestMeActionsViewSetPOST(TestCase):
 
         photo = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo.save()
-        photo.category = [category]
+        photo.category.set([category])
         photo.save()
 
         # Simulate auth

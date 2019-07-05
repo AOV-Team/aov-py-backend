@@ -29,13 +29,13 @@ class TestAOVWebTopUserViewGET(TestCase):
 
         photo1 = Photo(image=Image(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
         PhotoComment.objects.create_or_update(photo=photo1, comment="Nice one!", user=other_user)
 
         photo2 = Photo(image=Image(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=other_user)
         photo2.save()
-        photo2.category = [category]
+        photo2.category.set([category])
         photo2.save()
 
         request = APIClient().get('/api/aov-web/users/top', format='json')

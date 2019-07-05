@@ -47,7 +47,7 @@ class GetFeaturedRequest(common_models.EditMixin):
 
     """
     # Foreign Keys
-    requester_fk = models.ForeignKey(Requester)
+    requester_fk = models.ForeignKey(Requester, on_delete=models.CASCADE)
 
     # Media fields
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path, null=True, blank=True)
@@ -85,7 +85,7 @@ class Camera(common_models.EditMixin):
 
     """
     # Foreign Keys
-    get_featured_request_fk = models.ForeignKey(GetFeaturedRequest)
+    get_featured_request_fk = models.ForeignKey(GetFeaturedRequest, on_delete=models.CASCADE)
 
     model = models.CharField(max_length=156)
 
@@ -165,7 +165,7 @@ class PodcastImage(common_models.EditMixin):
 
     image = models.ImageField(upload_to=common_models.get_uploaded_file_path,
                               help_text="Image to be displayed below to the player on the webpage.")
-    episode = models.ForeignKey("Episode")
+    episode = models.ForeignKey("Episode", on_delete=models.CASCADE)
     display_type = models.CharField(max_length=2, choices=IMAGE_CHOICES)
 
     def __str__(self):
