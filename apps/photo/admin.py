@@ -9,6 +9,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
+from django.utils.html import format_html
 from guardian.admin import GuardedModelAdmin
 import os
 
@@ -56,7 +57,7 @@ class FlaggedPhotoAdmin(admin.ModelAdmin):
         """
         view_count = obj.user_action.filter(action='photo_click')
 
-        return u'{}'.format(len(view_count))
+        return '{}'.format(len(view_count))
 
     photo_clicks.allow_tags = True
     photo_clicks.short_description = 'Clicks'
@@ -64,7 +65,7 @@ class FlaggedPhotoAdmin(admin.ModelAdmin):
     def user_info(self, obj):
         if obj.user:
             link = urls.reverse("admin:account_user_change", args=[obj.user.id])
-            return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
+            return format_html('<a href="{}">{} / {}</a>', link, obj.user.username, obj.user.social_name)
         else:
             return '--empty--'
 
@@ -111,8 +112,8 @@ class PhotoClassificationAdmin(GuardedModelAdmin):
         if obj.classification_type == 'tag':
             parameter = 'q={}'.format(obj.name)
 
-        return u'<a class="action" href="/admin/photos/?{}"><span class="fa fa-picture-o"></span></a>' \
-            .format(parameter)
+        return format_html('<a class="action" href="/admin/photos/?{}"><span class="fa fa-picture-o"></span></a>',
+                           parameter)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -182,8 +183,8 @@ class PhotoFeedAdmin(GuardedModelAdmin):
         :param obj: instance of PhotoFeed
         :return: String w/ HTML
         """
-        return u'<a class="action" href="/admin/photos/?feed={}"><span class="fa fa-picture-o"></span></a>' \
-            .format(obj.name)
+        return format_html('<a class="action" href="/admin/photos/?feed={}"><span class="fa fa-picture-o"></span></a>',
+                           obj.name)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -251,19 +252,15 @@ class PhotoAdmin(GuardedModelAdmin):
         :return: String w/ HTML
         """
         starred = ' '
+        photo_type = ContentType.objects.get_for_model(obj)
+        interest = account_models.UserInterest.objects.filter(
+            user=self.current_user, interest_type='star', content_type__pk=photo_type.id, object_id=obj.id)
 
-        try:
-            photo_type = ContentType.objects.get_for_model(obj)
-            interest = account_models.UserInterest.objects \
-                .get(user=self.current_user, interest_type='star', content_type__pk=photo_type.id, object_id=obj.id)
+        if interest.exists():
+            starred = ' starred '
 
-            if interest:
-                starred = ' starred '
-        except ObjectDoesNotExist:
-            pass
-
-        return u'<span data-content-type="photos" data-id="{}" class="star-button{}fa fa-star"></span>' \
-            .format(obj.id, starred)
+        return format_html('<span data-content-type="photos" data-id="{}" class="star-button{}fa fa-star"></span>',
+                           obj.id, starred)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -277,7 +274,7 @@ class PhotoAdmin(GuardedModelAdmin):
         """
         view_count = obj.user_action.filter(action='photo_click')
 
-        return u'{}'.format(len(view_count))
+        return '{}'.format(len(view_count))
 
     photo_clicks.allow_tags = True
     photo_clicks.short_description = 'Clicks'
@@ -285,7 +282,7 @@ class PhotoAdmin(GuardedModelAdmin):
     def user_info(self, obj):
         if obj.user:
             link = urls.reverse("admin:account_user_change", args=[obj.user.id])
-            return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
+            return format_html('<a href="{}">{} / {}</a>', link, obj.user.username, obj.user.social_name)
         else:
             return '--empty--'
 
@@ -374,11 +371,12 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
 
         # Since we had to disable link on image, this is the work-around
         link = urls.reverse("admin:photo_photo_change", args=[obj.id])
-        edit_link = u'<a class="action" href="{}"><span class="fa fa-pencil-square"></span></a>'.format(link)
+        edit_link = format_html('<a class="action" href="{}"><span class="fa fa-pencil-square"></span></a>', link)
 
-        return u'<span data-content-type="photos" data-id="{}" data-feeds="{}" data-current-feed="{}"' \
-               u'class="eye-button fa fa-eye action" title="Toggle photo in this feed"></span>{}' \
-            .format(obj.id, str(photo_feeds), self.current_feed, edit_link)
+        return format_html(
+            '<span data-content-type="photos" data-id="{}" data-feeds="{}" data-current-feed="{}" class="eye-button '
+            'fa fa-eye action" title="Toggle photo in this feed"></span>{}',
+            obj.id, str(photo_feeds), self.current_feed, edit_link)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -392,7 +390,7 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
         """
         view_count = obj.user_action.filter(action='photo_click')
 
-        return u'{}'.format(len(view_count))
+        return '{}'.format(len(view_count))
 
     photo_clicks.allow_tags = True
     photo_clicks.short_description = 'Clicks'
@@ -400,7 +398,7 @@ class PhotoFeedPhotoAdmin(admin.ModelAdmin):
     def user_info(self, obj):
         if obj.user:
             link = urls.reverse("admin:account_user_change", args=[obj.user.id])
-            return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
+            return format_html('<a href="{}">{} / {}</a>', link, obj.user.username, obj.user.social_name)
         else:
             return '--empty--'
 
@@ -447,8 +445,8 @@ class StarredPhotoAdmin(admin.ModelAdmin):
         :param obj: instance of Photo
         :return: String w/ HTML
         """
-        return u'<span data-content-type="photos" data-id="{}" class="star-button starred fa fa-star"></span>'\
-            .format(obj.id)
+        return format_html('<span data-content-type="photos" data-id="{}" class="star-button starred fa fa-star"></span>',
+                           obj.id)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -462,7 +460,7 @@ class StarredPhotoAdmin(admin.ModelAdmin):
         """
         view_count = obj.user_action.filter(action='photo_click')
 
-        return u'{}'.format(len(view_count))
+        return '{}'.format(len(view_count))
 
     photo_clicks.allow_tags = True
     photo_clicks.short_description = 'Clicks'
@@ -470,7 +468,7 @@ class StarredPhotoAdmin(admin.ModelAdmin):
     def user_info(self, obj):
         if obj.user:
             link = urls.reverse("admin:account_user_change", args=[obj.user.id])
-            return u'<a href="{}">{} / {}</a>'.format(link, obj.user.username, obj.user.social_name)
+            return format_html('<a href="{}">{} / {}</a>', link, obj.user.username, obj.user.social_name)
         else:
             return '--empty--'
 
