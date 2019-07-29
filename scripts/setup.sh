@@ -107,6 +107,11 @@ EMAIL['EMAIL_HOST_USER'] = os.environ['EMAIL_HOST_USER']
 EMAIL['DEFAULT_FROM_EMAIL'] = os.environ['DEFAULT_FROM_EMAIL']
 EMAIL['SERVER_EMAIL'] = os.environ['EMAIL_HOST_USER']
 
+CACHES = dict()
+
+CACHES['default']['BACKEND'] = 'django_redis.cache.RedisCache'
+CACHES['default']['LOCATION'] = '127.0.0.1:6379:3'
+
 FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": os.environ.get('FCM_SERVER_KEY'),
     "ONE_DEVICE_PER_USER": True
@@ -118,6 +123,8 @@ PROFILE_PASSWORD = ""
 REDIS_DB = dict()
 
 REDIS_DB['PASSWORD_CODES'] = 1
+REDIS_DB['AUTHENTICATION_CODES'] = 2
+REDIS_DB['CACHE'] = 3
 REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
 REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', None)
 REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
