@@ -20,10 +20,10 @@ class DirectMessage(EditMixin):
         Model for a user-to-user direct message object
 
     """
-    sender = models.ForeignKey(User, related_name="sender")
-    recipient = models.ForeignKey(User, related_name="recipient")
+    sender = models.ForeignKey(User, related_name="sender", on_delete=models.CASCADE)
+    recipient = models.ForeignKey(User, related_name="recipient", on_delete=models.CASCADE)
     message = models.TextField()
-    conversation = models.ForeignKey(Conversation, related_name="conversation")
+    conversation = models.ForeignKey(Conversation, related_name="conversation", on_delete=models.CASCADE)
     read = models.BooleanField(default=False)
     index = models.PositiveIntegerField()
 
@@ -59,13 +59,13 @@ class PushNotificationRecord(EditMixin):
 
     action = models.CharField(max_length=1, choices=ACTION_CHOICES)
     message = models.TextField()
-    receiver = models.ForeignKey(APNSDevice, blank=True, null=True)
-    fcm_receiver = models.ForeignKey(FCMDevice, blank=True, null=True)
-    sender = models.ForeignKey(User, blank=True, null=True)
+    receiver = models.ForeignKey(APNSDevice, blank=True, null=True, on_delete=models.SET_NULL)
+    fcm_receiver = models.ForeignKey(FCMDevice, blank=True, null=True, on_delete=models.SET_NULL)
+    sender = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     viewed = models.BooleanField(default=False)
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 

@@ -19,7 +19,7 @@ class TestUserFollowersViewSetDELETE(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        target_user.follower = [access_user, user_1]
+        target_user.follower.set([access_user, user_1])
         target_user.save()
 
         # Simulate auth
@@ -56,7 +56,7 @@ class TestUserFollowersViewSetDELETE(TestCase):
         access_user = account_models.User.objects.create_user(email='mr@aov.com', social_name='@mr', username='mr')
 
         # Follow target user
-        target_user.follower = [user_1]
+        target_user.follower.set([user_1])
         target_user.save()
 
         # Simulate auth
@@ -111,7 +111,7 @@ class TestUserFollowersViewSetDELETE(TestCase):
         user_1 = account_models.User.objects.create_user(email='travis@aov.com', social_name='@travis', username='aov')
 
         # Follow target user
-        target_user.follower = [user_1]
+        target_user.follower.set([user_1])
         target_user.save()
 
         # Get data from endpoint

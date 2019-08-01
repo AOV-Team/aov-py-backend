@@ -28,7 +28,7 @@ class TestPhotoSingleVotesViewSetPATCH(TestCase):
         photo1 = photo_models.Photo(image=Photo(open("apps/common/test/data/photos/photo1-min.jpg", "rb")),
                                     user=photo_owner)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
         FCMDevice.objects.create(registration_id='1D2440F1F1BB3C1D3953B40A85D02403726A48828ACF92EDD5F17AAFFBFA8B50',

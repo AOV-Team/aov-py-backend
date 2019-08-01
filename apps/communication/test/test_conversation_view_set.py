@@ -28,7 +28,7 @@ class TestConversationViewSetGET(TestCase):
 
         # Create a few messages, and the Conversation
         conversation = Conversation.objects.create(message_count=3)
-        conversation.participants = [sender.id, recipient.id]
+        conversation.participants.set([sender.id, recipient.id])
         conversation.save()
 
         DirectMessage.objects.create(sender=sender, recipient=recipient, conversation=conversation, index=1,
@@ -151,7 +151,7 @@ class TestConversationViewSetDELETE(TestCase):
 
         # Create a few messages, and the Conversation
         conversation = Conversation.objects.create(message_count=3)
-        conversation.participants = [sender.id, recipient.id]
+        conversation.participants.set([sender.id, recipient.id])
         conversation.save()
 
         DirectMessage.objects.create(sender=sender, recipient=recipient, conversation=conversation, index=1,

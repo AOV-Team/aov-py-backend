@@ -23,16 +23,14 @@ class TestUsersPhotosViewSetPOST(TestCase):
         category = photo_models.PhotoClassification.objects\
             .create_or_update(name='Test', classification_type='category')
 
-        photo1 = photo_models\
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo1 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
-        photo2 = photo_models\
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
-        photo2.category = [category]
+        photo2.category.set([category])
         photo2.save()
 
         # Simulate auth
@@ -108,16 +106,14 @@ class TestUsersPhotosViewSetPOST(TestCase):
         category = photo_models.PhotoClassification.objects\
             .create_or_update(name='Test', classification_type='category')
 
-        photo1 = photo_models\
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
+        photo1 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
+        photo1.category.set([category])
         photo1.save()
 
-        photo2 = photo_models\
-            .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
+        photo2 = photo_models.Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
-        photo2.category = [category]
+        photo2.category.set([category])
         photo2.save()
 
         # Simulate auth

@@ -7,6 +7,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
+from django.utils.html import format_html
 from guardian import models as guardian
 from guardian.admin import GuardedModelAdmin
 from push_notifications.admin import DeviceAdmin
@@ -82,11 +83,12 @@ class StarredUserAdmin(admin.ModelAdmin):
         :param obj: instance of User
         :return: String w/ HTML
         """
-        photo_link = u'<a class="action" href="/admin/photos/?u={}"><span class="fa fa-picture-o"></span></a>' \
-            .format(obj.username)
+        photo_link = format_html(
+            '<a class="action" href="/admin/photos/?u={}"><span class="fa fa-picture-o"></span></a>', obj.username)
 
-        return u'<span data-content-type="users" data-id="{}" class="action star-button starred fa fa-star"></span>{}' \
-            .format(obj.id, photo_link)
+        return format_html(
+            '<span data-content-type="users" data-id="{}" class="action star-button starred fa fa-star"></span>{}',
+            obj.id, photo_link)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -228,13 +230,15 @@ class UserAdmin(BaseUserAdmin):
         except ObjectDoesNotExist:
             pass
 
-        photo_link = u'<a class="action" href="/admin/photos/?u={}"><span class="fa fa-picture-o"></span></a>'\
-            .format(obj.username)
+        photo_link = format_html(
+            '<a class="action" href="/admin/photos/?u={}"><span class="fa fa-picture-o"></span></a>', obj.username)
 
-        location_history_link = u'<a class="action" href="/admin/account/userlocation/?user_id={}"><span class="fa fa-map-marker"></span></a>'.format(obj.id)
+        location_history_link = format_html(
+            '<a class="action" href="/admin/account/userlocation/?user_id={}"><span class="fa fa-map-marker"></span></a>',
+            obj.id)
 
-        return u'<span data-content-type="users" data-id="{}" class="action star-button{}fa fa-star"></span>{}{}'\
-            .format(obj.id, starred, photo_link, location_history_link)
+        return format_html('<span data-content-type="users" data-id="{}" class="action star-button{}fa fa-star"></span>{}{}',
+                           obj.id, starred, photo_link, location_history_link)
 
     action_buttons.allow_tags = True
     action_buttons.short_description = 'Actions'
@@ -286,14 +290,6 @@ class ProfileAdmin(GuardedModelAdmin):
             return True
 
         return False
-
-    # Not needed if user is readonly
-    # def render_change_form(self, request, context, *args, **kwargs):
-    #     """
-    #     Fixes issue where form won't render due to annotation
-    #     """
-    #     context['adminform'].form.fields['user'].queryset = models.User.objects.all()
-    #     return super(ProfileAdmin, self).render_change_form(request, context, args, kwargs)
 
 
 class UserInterestAdmin(GuardedModelAdmin):

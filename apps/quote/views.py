@@ -18,7 +18,7 @@ class QuoteView(ListAPIView):
 
     def get_queryset(self):
         today = timezone.now().date()
-        return Quote.objects.filter(display_date=today)
+        return Quote.objects.filter(display_date=today).order_by("id")
 
 
 class QuoteSubscriberView(CreateAPIView):

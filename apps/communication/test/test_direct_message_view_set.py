@@ -120,7 +120,7 @@ class TestDirectMessageViewSetPOST(TestCase):
 
         # Create a simple two user conversation
         conversation = Conversation.objects.create(message_count=2)
-        conversation.participants = [sender.id, recipient.id]
+        conversation.participants.set([sender.id, recipient.id])
         conversation.save()
 
         DirectMessage.objects.create(sender=sender, recipient=recipient, conversation=conversation, index=1,
@@ -180,7 +180,7 @@ class TestDirectMessageViewSetPOST(TestCase):
 
         # Create a simple two user conversation
         conversation = Conversation.objects.create(message_count=2)
-        conversation.participants = [sender.id, recipient.id]
+        conversation.participants.set([sender.id, recipient.id])
         conversation.save()
 
         DirectMessage.objects.create(sender=sender, recipient=recipient, conversation=conversation, index=1,
@@ -275,7 +275,7 @@ class TestDirectMessageViewSetGET(TestCase):
 
         # Create a few messages, and the Conversation
         conversation = Conversation.objects.create(message_count=3)
-        conversation.participants = [sender.id, recipient.id]
+        conversation.participants.set([sender.id, recipient.id])
         conversation.save()
 
         DirectMessage.objects.create(sender=sender, recipient=recipient, conversation=conversation, index=1,

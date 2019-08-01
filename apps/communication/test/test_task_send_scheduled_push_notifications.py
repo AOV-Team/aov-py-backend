@@ -22,7 +22,7 @@ class TestTaskSendScheduledPushNotifications(TestCase):
 
         message = PushMessage(message='Testing123', send_at=send_at)
         message.save()
-        message.device = [device.id]
+        message.device.set([device.id])
         message.save()
 
         # Create more messages that shouldn't send

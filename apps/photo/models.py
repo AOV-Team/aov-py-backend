@@ -58,7 +58,7 @@ class Gallery(common_models.EditMixin):
     name = models.CharField(max_length=32)
     photos = models.ManyToManyField("Photo", related_name="gallery_photo")
     public = models.BooleanField(default=True)
-    user = models.ForeignKey(account_models.User)
+    user = models.ForeignKey(account_models.User, on_delete=models.CASCADE)
 
     objects = GalleryManager()
 
@@ -172,7 +172,7 @@ class Photo(geo_models.Model):
     gear = models.ManyToManyField(account_models.Gear, blank=True)
     photo_feed = models.ManyToManyField(PhotoFeed, blank=True)
     tag = models.ManyToManyField(PhotoClassification, blank=True, related_name='tag')
-    user = models.ForeignKey(account_models.User, blank=True, null=True, related_name="photo_user")
+    user = models.ForeignKey(account_models.User, blank=True, null=True, related_name="photo_user", on_delete=models.SET_NULL)
     user_action = GenericRelation(utils_models.UserAction)
     user_interest = GenericRelation(account_models.UserInterest)
 
@@ -211,21 +211,21 @@ class Photo(geo_models.Model):
     def save(self, *args, **kwargs):
         new_notification_sent = False
         if hasattr(self.user, "id"):
-            owning_user = account_models.User.objects.filter(id=self.user.id)
+            owning_user = account_models.User.objects.filter(id=self.user.id).first()
             owning_apns = APNSDevice.objects.filter(user=owning_user)
 
             # Check for an existing FCM registry
             fcm_device = FCMDevice.objects.filter(user=owning_user)
-            if not fcm_device.exists() and owning_apns.exists():
+            if not fcm_device.exists() and owning_apns.first():
                 fcm_token = update_device(owning_apns)
                 if fcm_token:
-                    fcm_device = FCMDevice.objects.create(user=owning_user.first(),
+                    fcm_device = FCMDevice.objects.create(user=owning_user,
                                                           type="ios", registration_id=fcm_token)
                     fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
 
-            if owning_user.exists():
-                message = "Your artwork has been featured in the AOV Picks gallery, {}!".format(owning_user.first().username)
+            if owning_user:
+                message = "Your artwork has been featured in the AOV Picks gallery, {}!".format(owning_user.username)
 
         else:
             fcm_device = FCMDevice.objects.none()
@@ -362,10 +362,10 @@ class PhotoComment(common_models.GeoEditMixin):
     :author: gallen
     """
 
-    photo = models.ForeignKey(Photo, related_name="photo_comment")
+    photo = models.ForeignKey(Photo, related_name="photo_comment", on_delete=models.CASCADE)
     comment = models.TextField()
-    parent = models.ForeignKey("self", null=True, related_name="replies")
-    user = models.ForeignKey(account_models.User, related_name="photo_comment_user")
+    parent = models.ForeignKey("self", null=True, related_name="replies", on_delete=models.SET_NULL)
+    user = models.ForeignKey(account_models.User, related_name="photo_comment_user", on_delete=models.CASCADE)
     votes = models.IntegerField(default=0)
     mentions = ArrayField(base_field=models.CharField(max_length=255, blank=True), blank=True, null=True)
 
@@ -403,9 +403,9 @@ class PhotoVote(common_models.EditMixin):
     :author: gallen
     """
 
-    photo = models.ForeignKey(Photo, related_name="photo_vote")
+    photo = models.ForeignKey(Photo, related_name="photo_vote", on_delete=models.CASCADE)
     upvote = models.BooleanField(default=False)
-    user = models.ForeignKey(account_models.User)
+    user = models.ForeignKey(account_models.User, on_delete=models.CASCADE)
 
     objects = PhotoVoteManager()
 

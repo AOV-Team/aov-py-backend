@@ -28,16 +28,16 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
         photo1.votes = 23
-        photo1.category = [category]
-        photo1.photo_feed = [feed]
+        photo1.category.set([category])
+        photo1.photo_feed.set([feed])
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
         photo2.votes = 2
-        photo2.category = [category]
-        photo2.photo_feed = [feed]
+        photo2.category.set([category])
+        photo2.photo_feed.set([feed])
         photo2.save()
 
         access_user = account_models.User.objects \
@@ -74,36 +74,36 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
-        photo1.photo_feed = [feed]
+        photo1.category.set([category])
+        photo1.photo_feed.set([feed])
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo2.save()
-        photo2.category = [category]
-        photo2.photo_feed = [feed]
+        photo2.category.set([category])
+        photo2.photo_feed.set([feed])
         photo2.save()
 
         photo3 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo3.save()
-        photo3.category = [category]
-        photo3.photo_feed = [feed]
+        photo3.category.set([category])
+        photo3.photo_feed.set([feed])
         photo3.save()
 
         photo4 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo4.save()
-        photo4.category = [category]
-        photo4.photo_feed = [feed]
+        photo4.category.set([category])
+        photo4.photo_feed.set([feed])
         photo4.save()
 
         photo5 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo5.save()
-        photo5.category = [category]
-        photo5.photo_feed = [feed]
+        photo5.category.set([category])
+        photo5.photo_feed.set([feed])
         photo5.save()
 
         access_user = account_models.User.objects \
@@ -139,50 +139,50 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
-        photo1.photo_feed = [feed]
+        photo1.category.set([category])
+        photo1.photo_feed.set([feed])
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo2.save()
-        photo2.category = [category]
-        photo2.photo_feed = [feed]
+        photo2.category.set([category])
+        photo2.photo_feed.set([feed])
         photo2.save()
 
         photo3 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo3.save()
-        photo3.category = [category]
-        photo3.photo_feed = [feed]
+        photo3.category.set([category])
+        photo3.photo_feed.set([feed])
         photo3.save()
 
         photo4 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo4.save()
-        photo4.category = [category]
-        photo4.photo_feed = [feed]
+        photo4.category.set([category])
+        photo4.photo_feed.set([feed])
         photo4.save()
 
         photo5 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo5.save()
-        photo5.category = [category]
-        photo5.photo_feed = [feed]
+        photo5.category.set([category])
+        photo5.photo_feed.set([feed])
         photo5.save()
 
         photo6 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo6.save()
-        photo6.category = [category]
-        photo6.photo_feed = [feed]
+        photo6.category.set([category])
+        photo6.photo_feed.set([feed])
         photo6.save()
 
         photo7 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/small.jpg', 'rb')), user=user)
         photo7.save()
-        photo7.category = [category]
-        photo7.photo_feed = [feed]
+        photo7.category.set([category])
+        photo7.photo_feed.set([feed])
         photo7.save()
 
         access_user = account_models.User.objects \
@@ -230,15 +230,15 @@ class TestPhotoFeedPhotosViewSetGET(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [category]
-        photo1.photo_feed = [feed]
+        photo1.category.set([category])
+        photo1.photo_feed.set([feed])
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user, public=False)
         photo2.save()
-        photo2.category = [category]
-        photo2.photo_feed = [feed]
+        photo2.category.set([category])
+        photo2.photo_feed.set([feed])
         photo2.save()
 
         access_user = account_models.User.objects \

@@ -199,13 +199,13 @@ class TestPhotoClassificationPhotosViewSetGET(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), public=False, user=user)
         photo1.save()
-        photo1.category = [classification]
+        photo1.category.set([classification])
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
-        photo2.category = [classification]
+        photo2.category.set([classification])
         photo2.save()
 
         access_user = account_models.User.objects \
@@ -259,13 +259,13 @@ class TestPhotoClassificationPhotosViewSetGET(TestCase):
         photo1 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo1-min.jpg', 'rb')), user=user)
         photo1.save()
-        photo1.category = [classification]
+        photo1.category.set([classification])
         photo1.save()
 
         photo2 = photo_models \
             .Photo(image=Photo(open('apps/common/test/data/photos/photo2-min.jpg', 'rb')), user=user)
         photo2.save()
-        photo2.category = [classification]
+        photo2.category.set([classification])
         photo2.save()
 
         # Simulate auth

@@ -2,7 +2,6 @@ from apps.account.models import User
 from apps.common.test import helpers as test_helpers
 from django.test import TestCase
 from fcm_django.models import FCMDevice
-from push_notifications.models import APNSDevice
 from rest_framework.test import APIClient
 
 

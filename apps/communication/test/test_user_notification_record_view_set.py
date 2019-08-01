@@ -60,7 +60,7 @@ class TestUserNotificationRecordViewSetGET(TestCase):
 
         # Set up a conversation with DMs
         conversation = Conversation.objects.create(message_count=1)
-        conversation.participants = [auth_user, target_user]
+        conversation.participants.set([auth_user, target_user])
         conversation.save()
 
         dm = DirectMessage.objects.create(sender=auth_user, recipient=target_user, message="Hey",

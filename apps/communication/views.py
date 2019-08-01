@@ -48,7 +48,7 @@ class DevicesViewSet(LoggingMixin, FCMDeviceViewSet):
                 Q(user__last_name__icontains=query) | Q(user__social_name__icontains=query) |
                 Q(user__username__icontains=query))
 
-        return queryset
+        return queryset.order_by("id")
 
     def post(self, request):
         """
@@ -105,18 +105,18 @@ class ConversationViewSet(generics.ListAPIView):
 
         if not user_pk and not conversation_id and participants is not None:
             participants = User.objects.filter(id__in=participants)
-            # print(participants)
+
             conversations = Conversation.objects.filter(
                     participants__in=participants).distinct().annotate(
                     num_participants=Count('participants')).filter(num_participants__gte=participants.count())
 
         if user.exists():
-            conversations = Conversation.objects.filter(participants=user)
+            conversations = Conversation.objects.filter(participants=user.first())
 
             if conversation_id:
                 conversations = conversations.filter(id=conversation_id)
 
-        return conversations
+        return conversations.order_by("id")
 
     def delete(self, request, **kwargs):
         """
@@ -173,7 +173,6 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
         :return: HTTP Response object denoting success/failure status of the request.
         """
 
-        # sending_user = TokenAuthentication().authenticate(request)[0]
         sending_user = User.objects.filter(id=TokenAuthentication().authenticate(request)[0].id).first()
         recipient = User.objects.filter(id=kwargs.get('pk'))
         response = get_default_response('200')
@@ -205,7 +204,7 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
                     conversation = existing_convo.first()
                 else:
                     conversation = Conversation.objects.create(message_count=0)
-                    conversation.participants = [sending_user, recipient]
+                    conversation.participants.set([sending_user, recipient])
                     conversation.save()
 
             message = request.data.get("message")
@@ -279,9 +278,9 @@ class DirectMessageViewSet(generics.ListCreateAPIView):
         queryset = DirectMessage.objects.none()
 
         if conversation.exists() and conversation.first().participants.filter(id=user_pk).exists():
-            queryset = DirectMessage.objects.filter(conversation=conversation).order_by("-index")
+            queryset = DirectMessage.objects.filter(conversation=conversation.first()).order_by("-index")
 
-        return queryset
+        return queryset.order_by("-index")
 
 
 class DirectMessageMarkReadViewSet(generics.CreateAPIView):

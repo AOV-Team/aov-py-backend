@@ -18,7 +18,7 @@ class Listing(common_models.EditMixin):
         ('Other Accessory', 'Other Accessory')
     )
 
-    owner = models.ForeignKey(account_models.User)
+    owner = models.ForeignKey(account_models.User, on_delete=models.CASCADE)
     category = models.CharField(max_length=32, choices=CATEGORY_CHOICES)
     brand = models.CharField(max_length=512)
     title = models.CharField(max_length=512)
@@ -56,9 +56,9 @@ class Offer(common_models.EditMixin):
         ('D', 'Denied')
     )
 
-    listing = models.ForeignKey(Listing) # FK to Gear model
-    owner = models.ForeignKey(account_models.User, related_name="owner")
-    buyer = models.ForeignKey(account_models.User, related_name="buyer")
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE) # FK to Gear model
+    owner = models.ForeignKey(account_models.User, related_name="owner", on_delete=models.CASCADE)
+    buyer = models.ForeignKey(account_models.User, related_name="buyer", on_delete=models.CASCADE)
     offer_value = models.DecimalField(max_digits=8, decimal_places=2)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='O')
 
