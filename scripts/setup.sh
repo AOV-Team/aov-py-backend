@@ -36,6 +36,13 @@ EMAIL['EMAIL_HOST_USER'] = ''
 EMAIL['DEFAULT_FROM_EMAIL'] = 'info@artofvisuals.com'
 EMAIL['SERVER_EMAIL'] = 'ronquillo.m@gmail.com'
 
+CACHES = {
+    "default": {
+        "BACKEND": 'django_redis.cache.RedisCache',
+        "LOCATION": '127.0.0.1:6379:3'
+    }
+}
+
 FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": os.environ.get('FCM_SERVER_KEY'),
     "ONE_DEVICE_PER_USER": True
@@ -107,10 +114,12 @@ EMAIL['EMAIL_HOST_USER'] = os.environ['EMAIL_HOST_USER']
 EMAIL['DEFAULT_FROM_EMAIL'] = os.environ['DEFAULT_FROM_EMAIL']
 EMAIL['SERVER_EMAIL'] = os.environ['EMAIL_HOST_USER']
 
-CACHES = dict()
-
-CACHES['default']['BACKEND'] = 'django_redis.cache.RedisCache'
-CACHES['default']['LOCATION'] = '127.0.0.1:6379:3'
+CACHES = {
+    "default": {
+        "BACKEND": 'django_redis.cache.RedisCache',
+        "LOCATION": '127.0.0.1:6379:3'
+    }
+}
 
 FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": os.environ.get('FCM_SERVER_KEY'),
