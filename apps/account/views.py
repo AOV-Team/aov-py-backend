@@ -934,7 +934,7 @@ class UserFollowersViewSet(generics.ListCreateAPIView):
                     if not fcm_device.exists() and followed_device.exists():
                         fcm_token = update_device(followed_device)
                         if fcm_token:
-                            fcm_device = FCMDevice.objects.create(user=user.first(),
+                            fcm_device = FCMDevice.objects.create(user=user,
                                                                   type="ios", registration_id=fcm_token)
                             fcm_device = FCMDevice.objects.filter(id=fcm_device.id)
 
