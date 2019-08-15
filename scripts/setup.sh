@@ -117,7 +117,7 @@ EMAIL['SERVER_EMAIL'] = os.environ['EMAIL_HOST_USER']
 CACHES = {
     "default": {
         "BACKEND": 'django_redis.cache.RedisCache',
-        "LOCATION": 'redis://aovstagingb.oi33ht.ng.0001.usw2.cache.amazonaws.com:6379:3'
+        "LOCATION": 'redis://aovstagingb.oi33ht.ng.0001.usw2.cache.amazonaws.com:6379/3'
     }
 }
 
