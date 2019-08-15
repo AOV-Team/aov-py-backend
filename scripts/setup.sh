@@ -86,8 +86,8 @@ import os
 APNS_CERTIFICATE = os.environ.get('APNS_CERT')
 
 # TODO change these when ready to enable celery
-BROKER_URL = 'redis://:{}@{}:{}/2'.format(os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
-CELERY_RESULT_BACKEND = 'redis://:{}@{}:{}/3'.format(os.environ.get('REDIS_PASSWORD'), os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
+BROKER_URL = 'redis://:{}:{}/2'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
+CELERY_RESULT_BACKEND = 'redis://:{}:{}/3'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
 
 DATABASES = {
     'default': {
@@ -117,7 +117,7 @@ EMAIL['SERVER_EMAIL'] = os.environ['EMAIL_HOST_USER']
 CACHES = {
     "default": {
         "BACKEND": 'django_redis.cache.RedisCache',
-        "LOCATION": '127.0.0.1:6379:3'
+        "LOCATION": 'redis://aovstagingb.oi33ht.ng.0001.usw2.cache.amazonaws.com:6379:3:3'
     }
 }
 
